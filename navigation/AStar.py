@@ -1,3 +1,4 @@
+from _heapq import *
 from math import hypot
 
 
@@ -23,9 +24,9 @@ class AStar:
     def find_path(self, start, end):
         self.frontier = list()
         node = self.create_node(start, end, 0)
-        self.frontier.append(node)
+        heappush(self.frontier, [node, node.cost])
         while not self.frontier:
-            best_node = self.get_best_node()
+            best_node = heappop(self.frontier)
             if best_node.index == end:
                 return self.create_path(start, best_node)
             self.investigate_point(best_node, end)
@@ -41,52 +42,36 @@ class AStar:
         bottom_node = self.create_node(node.index + self.map.width, end, node.movement_cost + 1)
         new_nodes = [left_node, right_node, top_node, bottom_node]
         for new_node in new_nodes:
-            if self.is_node_in_frontier(new_node):
-                self.update_node_in_frontier(new_node)
-            elif self.is_node_investigated(new_node):
-                self.update_node_in_investigated(new_node)
+            if self.is_node_in_frontier(new_node) and not self.is_node_investigated(new_node):
+                self.update_node(new_node)
             else:
-                self.frontier.append(new_node)
+                heappush(self.frontier, [new_node, new_node.cost])
 
-    def get_best_node(self):
-        best_node = self.frontier[0]
-        for node in self.frontier:
-            if node.cost < best_node:
-                best_node = node
-        return best_node
-
+    # checks if the node is already in frontier
     def is_node_in_frontier(self, node):
         for frontier_node in self.frontier:
             if frontier_node.index == node.index:
                 return True
         return False
 
+    # checks if the node has already been investigated
     def is_node_investigated(self, node):
         for investigated_node in self.investigated:
             if investigated_node.index == node.index:
                 return True
         return False
 
-    def update_node_in_investigated(self, new_node):
-        for node in self.investigated:
-            self.update_node_cost_in_investigated(new_node, node)
-
-    # helper for self.update_node_in_frontier
-    def update_node_cost_in_investigated(self, new_node, old_node):
-        if old_node.index == new_node.index and new_node.cost < old_node.cost:
-            self.investigated.remove(old_node)
-            self.investigated.append(new_node)
-
-    # helper for self.investigate_point
-    def update_node_in_frontier(self, new_node):
+    # Updates the node if it already exists in the frontier and has a shorter path
+    def update_node(self, new_node):
         for node in self.frontier:
-            self.update_node_cost_in_frontier(new_node, node)
+            self.update_node_cost(new_node, node)
 
     # helper for self.update_node_in_frontier
-    def update_node_cost_in_frontier(self, new_node, old_node):
+    def update_node_cost(self, new_node, old_node):
         if old_node.index == new_node.index and new_node.cost < old_node.cost:
-            self.frontier.remove(old_node)
-            self.frontier.append(new_node)
+            self.frontier.remove([old_node, old_node.cost])
+            heapify(self.frontier)
+            heappush(self.frontier, [new_node, new_node.cost])
 
     # this creates path from the given start and end node
     def create_path(self, start_index, end):
@@ -98,6 +83,7 @@ class AStar:
             current_node = current_node.previous_point
         return path
 
+    # creates a new node object from the given index, end index, and current movement cost
     def create_node(self, position, end, movement_cost):
         node = Node
         node.heuristic = self.get_heuristic(position, end)
@@ -106,11 +92,13 @@ class AStar:
         node.cost = node.heuristic + node.movement_cost
         return node
 
+    # returns the estimated cost between the two given points
     def get_heuristic(self, start, end):
         start_point = self.convert_index_to_point(start)
         end_point = self.convert_index_to_point(end)
         return hypot(start_point.x - end_point.x, start_point.y - end_point.y)
 
+    # converts the given index to an xy point. Used to find heuristic
     def convert_index_to_point(self, index):
         x = index % self.map.width
         y = index / self.map.width
@@ -120,6 +108,7 @@ class AStar:
         return point
 
 
+# data class used for AStar. Shouldn't be used anywhere else
 class Node:
     cost = 0
     heuristic = 0
@@ -129,6 +118,7 @@ class Node:
 
 
 # delete later once ROS is included in workspace
+# will be replaced by ROS.Point data
 class Point:
     x = 0
     y = 0
