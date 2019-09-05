@@ -36,52 +36,30 @@ class AStar:
             best_node = heappop(self.__frontier)[0]
             if best_node.index == end:
                 return self.__create_path(start, best_node)
-            self.__handle_new_nodes(self.__investigate_neighbors(best_node, end))
+            self.__investigate_point(best_node, end)
             self.__investigated.append(best_node)
         return start
 
     # checks local points above, below, and to either side of given node
-    # and returns a list of possible nodes
-    def __investigate_neighbors(self, node, end):
+    # and adds them to the frontier
+    def __investigate_point(self, node, end):
         new_nodes = list()
-        if node.index - 1 >= 0 \
-                and node.index % self.__map.width != 0 \
-                and self.__map.map[node.index - 1] != -1:
-            left_node = self.__create_node(node.index - 1,
-                                           end,
-                                           node.movement_cost + Constants.standard_move_cost,
-                                           node)
+        if node.index - 1 >= 0 and node.index % self.__map.width != 0:
+            left_node = self.__create_node(node.index - 1, end, node.movement_cost + Constants.standard_move_cost, node)
             new_nodes.append(left_node)
 
-        if node.index + 1 < self.__map.width * self.__map.width \
-                and node.index % self.__map.width != 3 \
-                and self.__map.map[node.index + 1] != -1:
-            right_node = self.__create_node(node.index + 1,
-                                            end,
-                                            node.movement_cost + Constants.standard_move_cost,
-                                            node)
+        if node.index + 1 < self.__map.width * self.__map.width and node.index % self.__map.width != 3:
+            right_node = self.__create_node(node.index + 1, end, node.movement_cost + Constants.standard_move_cost, node)
             new_nodes.append(right_node)
 
-        if node.index - self.__map.width > 0 \
-                and self.__map.map[node.index - self.__map.width] != -1:
-            top_node = self.__create_node(node.index - self.__map.width,
-                                          end,
-                                          node.movement_cost + Constants.standard_move_cost,
-                                          node)
+        if node.index - self.__map.width > 0:
+            top_node = self.__create_node(node.index - self.__map.width, end, node.movement_cost + Constants.standard_move_cost, node)
             new_nodes.append(top_node)
 
-        if node.index + self.__map.width < self.__map.width * self.__map.width \
-                and self.__map.map[node.index + self.__map.width] != -1:
-            bottom_node = self.__create_node(node.index + self.__map.width,
-                                             end,
-                                             node.movement_cost + Constants.standard_move_cost,
-                                             node)
+        if node.index + self.__map.width < self.__map.width * self.__map.width:
+            bottom_node = self.__create_node(node.index + self.__map.width, end, node.movement_cost + Constants.standard_move_cost, node)
             new_nodes.append(bottom_node)
 
-        return new_nodes
-
-    # determines whether to update an existing node or to add the new node to the frontier
-    def __handle_new_nodes(self, new_nodes):
         for new_node in new_nodes:
             if self.__is_node_in_frontier(new_node) and not self.__is_node_investigated(new_node):
                 self.__update_node(new_node)
@@ -109,7 +87,7 @@ class AStar:
 
     def __get_direction(self, node):
         # 1 is horizontal direction, 0 is vertical
-        if abs(node.index - node.previous_point.index) > 1:
+        if node.index - node.previous_point.index > abs(1):
             return 1
         else:
             return 0
@@ -132,8 +110,6 @@ class AStar:
         while current_node.index != start_index:
             path.append(current_node.index)
             current_node = current_node.previous_point
-        path.append(start_index)
-        path.reverse()
         return path
 
     # creates a new node object from the given index, end index, and current movement cost
@@ -162,7 +138,7 @@ class AStar:
         return point
 
 
-# data classes used for AStar. Shouldn't be used anywhere else
+# data class used for AStar. Shouldn't be used anywhere else
 class Node:
     cost = 0
     heuristic = 0
@@ -178,8 +154,6 @@ class Node:
 
 
 class Map:
-    # occupancy grid where values != -1 are able to be traversed with 0 being easy to cross
-    # -1 is unable to traverse
     map = list()
     width = 0
 
@@ -187,11 +161,11 @@ class Map:
 # for testing
 if __name__ == '__main__':
     map = Map()
-    map.map = [0, 0, 0, 0,
-               -1, 0, 0, 0,
-               0, 0, -1, 0,
-               0, 0, 0, 0]  # length = 16
+    map.map = [1, 1, 1, 1,
+               1, 1, 1, 10,
+               1, 1, 1, 1,
+               1, 1, 10, 1]  # length = 16
     map.width = int(math.sqrt(map.map.__len__()))
     a_star = AStar(map)
-    path = a_star.find_path(0, 14)
+    path = a_star.find_path(0, 15)
     print(path)
