@@ -28,7 +28,10 @@ class CleaningManager:
     # assigns the next task to the given robot
     def assign_robot_task(self, robot):
         for task in self.cleaningTasks:
-            if task.workerID == -1 and task.isActive == False and task.isComplete == False:
+            if task.workerID == -1 and task.isActive is False and task.isComplete is False:
                 task.workerID = robot.workerID
                 task.isActive = True
-                self.robotManager
+                for managedRobot in self.robotManager.managedRobots:
+                    if managedRobot.workerID == robot.workerID:
+                        managedRobot.isBusy = True
+                        managedRobot.task = task
