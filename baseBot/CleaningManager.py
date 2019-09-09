@@ -35,3 +35,4 @@ class CleaningManager:
                     if managedRobot.workerID == robot.workerID:
                         managedRobot.isBusy = True
                         managedRobot.task = task
+                return
