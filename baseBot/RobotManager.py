@@ -30,9 +30,9 @@ class RobotManager:
                     self.director.avoid_to_right(robot2.workerID)
 
     # checks if the given robot positions are too close
-    def are_robots_too_close(self, robotPosition1, robotPosition2):
-        distance = math.hypot(robotPosition1.position[0] - robotPosition2.position[0],
-                              robotPosition1.position[1] - robotPosition2.position[1])
+    def __are_robots_too_close(self, robot_position1, robot_position2):
+        distance = math.hypot(robot_position1.position[0] - robot_position2.position[0],
+                              robot_position1.position[1] - robot_position2.position[1])
         return distance < Constants.safe_distance_between_bots
 
     # updates the positions of the robots
