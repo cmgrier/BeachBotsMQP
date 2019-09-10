@@ -22,7 +22,7 @@ class RobotManager:
     # checks if the given robot positions are too close
     def are_robots_too_close(self, robotPosition1, robotPosition2):
         distance = math.hypot(robotPosition1.position[0] - robotPosition2.position[0], robotPosition1.position[1] - robotPosition2.position[1])
-        return distance < Constants.safeDistanceBetweenBots
+        return distance < Constants.safe_distance_between_bots
 
     # updates the positions of the robots
     def update_robot_positions(self):

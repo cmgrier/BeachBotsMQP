@@ -11,7 +11,7 @@ class MapMaker:
 
         # create map using photo todo
 
-        if self.maps.__len__() < Constants.storedMapSize:
+        if self.maps.__len__() < Constants.stored_map_size:
             self.maps.append(map)
         else:
             self.maps.pop(0)
