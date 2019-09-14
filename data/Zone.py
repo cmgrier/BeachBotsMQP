@@ -1,7 +1,6 @@
 class Zone:
-    def __init__(self, zone_corners, map, id):
+    def __init__(self, zone_corners, id):
         self.corners = zone_corners  # list of [top left, top right, bottom right, bottom left]
-        self.parent_map = map
         self.id = id
 
     #   x ->

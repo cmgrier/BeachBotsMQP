@@ -6,8 +6,11 @@ class Director:
     def go_back_to_zone(self, workerID):
         pass
 
-    def avoid_to_left(self, workerID):
+    # sends a Task to robot with given ID to divert off current path in order to avoid another robot
+    def avoid_to_direction(self, direction, workerID):
         pass
 
-    def avoid_to_right(self, workerID):
+    # sends a Task to a robot to not move in order for another robot to avoid it
+    # only called when all directions are unsafe to avoid to
+    def play_possum(self, workerID):
         pass
