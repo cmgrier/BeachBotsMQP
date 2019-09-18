@@ -4,4 +4,4 @@ class RobotFinder:
         pass
 
     def find_robots(self):
-        return list()
+        return list() # list of [workerID, position]

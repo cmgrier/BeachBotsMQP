@@ -10,25 +10,30 @@ class CleaningManager:
     def __init__(self, robots):
         self.mapManager = MapManager()
         self.cleaningTasks = list()
-        self.robotManager = RobotManager(robots)
+        self.robotManager = RobotManager(robots, self.mapManager)
 
-        self.create_cleaning_tasks()
+        self.__create_cleaning_tasks()
 
     # run on startup
-    def create_cleaning_tasks(self):
+    def __create_cleaning_tasks(self):
         for zone in self.mapManager.zones:
             self.cleaningTasks.append(Task(zone))
 
     # checks if each robot is busy, if not, assigns a task
+    # should be run in main loop or every so often
     def assign_available_robots(self):
         for robot in self.robotManager.managedRobots:
             if not robot.isBusy:
-                self.assign_robot_task(robot)
+                self.__assign_robot_task(robot)
 
     # assigns the next task to the given robot
-    def assign_robot_task(self, robot):
+    def __assign_robot_task(self, robot):
         for task in self.cleaningTasks:
-            if task.workerID == -1 and task.isActive == False and task.isComplete == False:
+            if task.workerID == -1 and task.isActive is False and task.isComplete is False:
                 task.workerID = robot.workerID
                 task.isActive = True
-                self.robotManager
+                for managedRobot in self.robotManager.managedRobots:
+                    if managedRobot.workerID == robot.workerID:
+                        managedRobot.isBusy = True
+                        managedRobot.task = task
+                return

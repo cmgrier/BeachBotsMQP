@@ -5,3 +5,4 @@ class Task:
         self.isComplete = False
         self.workerID = -1
         self.zone = zone
+        self.robot_to_avoid = None
