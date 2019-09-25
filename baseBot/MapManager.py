@@ -10,9 +10,9 @@ class MapManager:
 
     def __init__(self):
         self.zones = list()
-        self.map = []   # should be a Mesh type
+        self.map = []  # should be a Mesh type
         self.mapMaker = MapMaker()
-        self.landing_strip = []     # [top_left, top_right, bottom_right, bottom_left]
+        self.landing_strip = []  # [top_left, top_right, bottom_right, bottom_left]
         self.update_map()
 
     # run on startup
