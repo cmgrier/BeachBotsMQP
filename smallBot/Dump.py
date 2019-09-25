@@ -10,7 +10,7 @@ class Dump:
         """
 
     #Makes small robot return to base bot and dump trash
-    def handle_dump(self,task):
+    def handle_dump(self, task):
         """self.NavToGoal.navigate(task.Dump.coord) #Go to base bot dump coordinates
         self.removeTrash()
         """
