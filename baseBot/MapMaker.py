@@ -6,12 +6,9 @@ class MapMaker:
     def __init__(self):
         self.maps = list()
 
-    def create_map(self, photo):
-        map = []
-
-        # create map using photo todo
-
-        if self.maps.__len__() < Constants.storedMapSize:
+    def add_map(self, mesh):
+        map = mesh.vertices
+        if self.maps.__len__() < Constants.stored_map_size:
             self.maps.append(map)
         else:
             self.maps.pop(0)

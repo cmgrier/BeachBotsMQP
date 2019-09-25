@@ -7,6 +7,7 @@ class Task:
         self.type = type or "clean"
         self.zone = zone
         self.priority = 1
+        self.robot_to_avoid = None
         self.set_priority()
 
 #set the priority level of the task based on the type
