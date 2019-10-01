@@ -19,3 +19,7 @@ turning_factor = 1
 terrain_too_difficult = 30
 zone_too_difficult_percent = .1
 
+#Motors
+left_wheel_pin = 17
+right_wheel_pin = 18
+
