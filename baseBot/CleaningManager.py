@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from baseBot.MapManager import MapManager
 from baseBot.RobotManager import RobotManager
 
@@ -12,12 +13,12 @@ class CleaningManager:
         self.cleaningTasks = list()
         self.robotManager = RobotManager(robots, self.mapManager)
 
-        self.__create_cleaning_tasks()
+        self.create_cleaning_tasks()
 
     # run on startup
-    def __create_cleaning_tasks(self):
+    def create_cleaning_tasks(self):
         for zone in self.mapManager.zones:
-            self.cleaningTasks.append(Task(zone))
+            self.cleaningTasks.append(Task(zone=zone))
 
     # checks if each robot is busy, if not, assigns a task
     # should be run in main loop or every so often
