@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from baseBot.MapMaker import MapMaker
 import math
 
@@ -10,18 +11,21 @@ class MapManager:
 
     def __init__(self):
         self.zones = list()
-        self.map = []  # should be a Mesh type
         self.mapMaker = MapMaker()
         self.landing_strip = []  # [top_left, top_right, bottom_right, bottom_left]
-        self.update_map()
+        self.map = self.mapMaker.get_map()  # is a map of difficulty of terrain
 
-    # run on startup
-    # sets the current map to be the avg map
+    # sets the current map from mapMaker and creates zones
     def update_map(self):
-        self.map = self.mapMaker.create_avg_map()
+        self.map = self.mapMaker.get_map()
+        self.divide_map()
+
+    def divide_map(self):
+        self.__create_zones()
+        self.__create_landing_strip()
 
     # divides the map into different zones
-    def create_zones(self):
+    def __create_zones(self):
         self.zones = list()
         map_width = int(math.sqrt(len(self.map)))
         number_of_zones = int(map_width / Constants.zone_width)

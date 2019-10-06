@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # this class is a data class for the robot manager
 class Robot:
     def __init__(self, id):

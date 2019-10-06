@@ -25,6 +25,8 @@ class AStar:
 
     # method to be called outside of AStar class to retrieve path
     def find_path(self, start, end):
+        if start == end:
+            return [start]
         self.__frontier = list()
         node = Node()
         node.index = start

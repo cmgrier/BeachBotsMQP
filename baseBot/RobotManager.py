@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import itertools
 import math
 
@@ -11,7 +12,7 @@ class RobotManager:
     def __init__(self, robots, map_manager):
         self.managedRobots = robots
         self.robotFinder = RobotFinder()
-        self.director = Director()
+        self.director = Director(self)
         self.map_manager = map_manager
 
     # for each robot this checks if they are too close to one another.
@@ -57,27 +58,27 @@ class RobotManager:
     def update_robot_positions(self):
         new_robot_positions = self.robotFinder.find_robots()
         for new_robot_position in new_robot_positions:
-            robot = self.__get_robot(new_robot_position[0])
+            robot = self.get_robot(new_robot_position[0])
             robot.position = new_robot_position[1]
 
     # marks the given robot as busy
     def assign_robot(self, workerID):
-        self.__get_robot(workerID).isBusy = True
+        self.get_robot(workerID).isBusy = True
 
     # checks if robot with given worker ID is outside of its zone
     def __is_out_of_zone(self, workerID):
-        robot = self.__get_robot(workerID)
+        robot = self.get_robot(workerID)
         return robot.task.zone.__is_out_of_zone(robot.position)
 
     # returns the robot that has the given worker ID
-    def __get_robot(self, workerID):
+    def get_robot(self, workerID):
         for robot in self.managedRobots:
             if robot.workerID == workerID:
                 return robot
 
     # finds which directions are safe to avoid to
     def __get_safe_escape_directions(self, workerID):
-        given_bot = self.__get_robot(workerID)
+        given_bot = self.get_robot(workerID)
         safe_directions = Constants.avoid_direction_priority_list
         for robot in self.managedRobots:
             if robot.workerID != workerID:
@@ -111,8 +112,8 @@ class RobotManager:
     # todo should be updated when ROS data types are added
     # returns the angle between two robots based on the firsts heading
     def __get_angle_between_bots(self, start_bot_ID, target_bot_ID):
-        start_bot = self.__get_robot(start_bot_ID)
-        target_bot = self.__get_robot(target_bot_ID)
+        start_bot = self.get_robot(start_bot_ID)
+        target_bot = self.get_robot(target_bot_ID)
         robot_heading = start_bot.pose[1][2]
         x = target_bot.pose[0][0] - start_bot.pose[0][0]
         y = target_bot.pose[0][0] - start_bot.pose[0][0]

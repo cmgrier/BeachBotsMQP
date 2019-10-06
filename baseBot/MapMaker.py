@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from support import Constants
 
 
@@ -5,9 +6,17 @@ from support import Constants
 class MapMaker:
     def __init__(self):
         self.maps = list()
+        self.map = []
 
-    def add_map(self, mesh):
-        map = mesh.vertices
+    def get_map(self):
+        return self.map
+
+    # Following code shouldn't be necessary because ZED should avg maps for us
+
+    def add_map_from_mesh(self, mesh):
+        self.add_map(mesh.vertices)
+
+    def add_map(self, map):
         if self.maps.__len__() < Constants.stored_map_size:
             self.maps.append(map)
         else:
@@ -16,4 +25,7 @@ class MapMaker:
         return map
 
     def create_avg_map(self):
-        return [sum(i) for i in zip(self.maps)]
+        avg_map = [sum(i) for i in zip(self.maps)]
+        self.map = avg_map
+        return avg_map
+

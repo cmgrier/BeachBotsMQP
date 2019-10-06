@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 stored_map_size = 10
 safe_distance_between_bots = 100
 avoid_distance = 30
