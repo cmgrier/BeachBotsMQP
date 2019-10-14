@@ -3,6 +3,7 @@ import rospy
 from std_msgs.msg import String
 #from smallBot.TaskIdentifier import TaskIdentifier TODO optimize of ROS
 from data.Task import Task
+from data.srv import *
 from support.EqualPriorityQueue import EqualPriorityQueue
 
 
@@ -19,22 +20,34 @@ class TaskSeeker:
         self.Tasks = EqualPriorityQueue()
         self.ID = -1
         self.request()
-        #self.send_to_id() TODO delete commemt
+       # self.send_to_id() TODO REMOVE after TaskID Update
 
 
+    def parseTask(self, taskResponse):
+        task = Task(taskResponse.zone, taskResponse.priority)
+        task.isActive = taskResponse.isActive
+        task.isComplete = taskResponse.isComplete
+        task.workerID = taskResponse.workerID
+        return task
 
 
     #Requests a new task from the base bot and updates the currentTask variable
     def request(self):
         rospy.wait_for_service('give_zones')
+        print("tryimg to request")
         try:
-            zone_request = rospy.ServiceProxy('give_zones',GiveZones)
+            zone_request = rospy.ServiceProxy('give_zones', GetCleanTask)
             clean_task = zone_request(self.ID)
+            clean_task = self.parseTask(clean_task)
             if self.ID is -1:
-                self.ID = clean_task.ID
+                self.ID = clean_task.workerID
+                rospy.loginfo("Tryimg to update worker ID")
+                rospy.loginfo(clean_task.workerID)
+            else:
+                rospy.loginfo("mo meed to update")
             self.Tasks.put(clean_task.priority,clean_task.type)
         except rospy.ServiceException, e:
-            print("Service call failed: %s" % e)
+            rospy.loginfo("Service call failed: %s" % e)
 
 
 
@@ -60,4 +73,3 @@ class TaskSeeker:
 
 if __name__ == "__main__":
     ts = TaskSeeker()
-    ts.request()
