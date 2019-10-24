@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+
+trash_bin_threshold = 12    # TODO: Get the actual value for this constant
+
 stored_map_size = 10
 safe_distance_between_bots = 100
 avoid_distance = 30
@@ -16,3 +19,8 @@ turning_factor = 1
 
 terrain_too_difficult = 30
 zone_too_difficult_percent = .1
+
+#Motors
+left_wheel_pin = 17
+right_wheel_pin = 18
+
