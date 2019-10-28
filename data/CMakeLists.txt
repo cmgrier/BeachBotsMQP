@@ -54,12 +54,10 @@ catkin_python_setup()
 #   Message2.msg
 # )
 
-# Generate services in the 'srv' folder
- add_service_files(
-   FILES
-   GiveAvoidTask.srv
-   GetCleanTask.srv
-)
+## Generate services in the 'srv' folder
+# add_service_files(
+#   FILES
+#)
 
 ## Generate actions in the 'action' folder
 # add_action_files(

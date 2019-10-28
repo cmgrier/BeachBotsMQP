@@ -6,7 +6,7 @@ class Task:
         self.workerID = -1
         self.type = type or "clean"
         self.zone = zone
-        self.priority = 1
+        self.priority = 3
         self.robot_to_avoid = None
         self.set_priority()
 
@@ -18,3 +18,11 @@ class Task:
             self.priority = 1
         elif self.type is "dump":
             self.priority = 2
+
+    def __repr__(self):
+        return str((self.type, self.workerID, self.zone, self.isActive, self.isComplete))
+
+
+    def __str__(self):
+        return str((self.type, self.workerID, self.zone, self.isActive, self.isComplete))
+
