@@ -1,0 +1,6 @@
+bool isActive
+bool isComplete
+int32 workerID
+int32 zone
+string type
+---

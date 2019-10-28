@@ -3,7 +3,7 @@ import rospy
 from std_msgs.msg import String
 #from smallBot.TaskIdentifier import TaskIdentifier TODO optimize of ROS
 from data.Task import Task
-from data.srv import *
+from small_bot.srv import RequestCleanTask, PassAvoidTask, Identify
 from support.EqualPriorityQueue import EqualPriorityQueue
 
 
@@ -19,8 +19,8 @@ class TaskSeeker:
         self.currentTask = None
         self.Tasks = EqualPriorityQueue()
         self.ID = -1
-        self.avoid_service = " "
-        self.request()
+        self.request_ID()
+        #self.request_clean_task()
         rospy.spin()
        # self.send_to_id() TODO REMOVE after TaskID Update
 
@@ -31,35 +31,46 @@ class TaskSeeker:
         :param taskResponse: response received from a service
         :return: a Task
         """
-        task = Task(taskResponse.zone, taskResponse.priority)
+        task = Task(taskResponse.zone, taskResponse.type)
         task.isActive = taskResponse.isActive
         task.isComplete = taskResponse.isComplete
         task.workerID = taskResponse.workerID
         return task
 
 
-    #Requests a new task from the base bot and updates the currentTask variable
-    def request(self):
+    def request_ID(self):
         """
-        Client that asks for a clean task to add to its task list and will update its ID if it is given a new one
+        Client that asks for a robot ID from basebot
+        :return:
+        """
+        rospy.wait_for_service('identify_worker')
+        print("trying to request")
+        try:
+            rospy.loginfo("Current ID: " + str(self.ID))
+            request = rospy.ServiceProxy('identify_worker', Identify)
+            service_result = request(self.ID)
+            self.ID = service_result.newID
+            rospy.loginfo("new ID: " + str(self.ID))
+            topic_name = "robot_avoid_"+str(self.ID)
+            s = rospy.Service(topic_name, PassAvoidTask, self.update_avoid_status_handler)
+
+        except rospy.ServiceException, e:
+            rospy.loginfo("Service call (request_ID) failed: %s" % e)
+
+
+    def request_clean_task(self):
+        """
+        Client that asks for a clean task to add to its task list
         :return:
         """
         rospy.wait_for_service('give_zones')
-        print("tryimg to request")
+        print("trying to request")
         try:
-            zone_request = rospy.ServiceProxy('give_zones', GetCleanTask)
+            zone_request = rospy.ServiceProxy('give_zones', RequestCleanTask)
             clean_task = zone_request(self.ID)
             clean_task = self.parse_task(clean_task)
-            if self.ID is -1:
-                self.ID = clean_task.workerID
-                self.avoid_service = 'robo_avoid_' + str(self.ID)
-                s = rospy.Service(self.avoid_service, GiveAvoidTask, self.update_avoid_status_handler())
-
-                rospy.loginfo("Tryimg to update worker ID")
-                rospy.loginfo(clean_task.workerID)
-            else:
-                rospy.loginfo("mo meed to update")
-            self.Tasks.put(clean_task.priority,clean_task.type)
+            self.Tasks.put(clean_task.priority, clean_task)
+            rospy.loginfo(self.Tasks)
         except rospy.ServiceException, e:
             rospy.loginfo("Service call failed: %s" % e)
 
@@ -73,8 +84,10 @@ class TaskSeeker:
         :param req: parameters for an avoid Task
         :return:
         """
+        rospy.loginfo("Hamdlimg avoid status request")
         rospy.loginfo(self.Tasks)
-        self.Tasks.put(self.parseTask(req))
+        avoid_task = self.parse_task(req)
+        self.Tasks.put(avoid_task.priority, avoid_task)
         rospy.loginfo(self.Tasks)
     #TODO make the service to update the avoid status and avoid coordinate from Task
 

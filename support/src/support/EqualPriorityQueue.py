@@ -57,6 +57,27 @@ class EqualPriorityQueue:
         else:
             return False
 
+    def __getitem__(self, item):
+        """
+        Magic function to allow printing parts of this list from the class
+        :param item: index to print from the queue
+        :return: a string of the values to print
+        """
+        return str(self.queue[item])
+
+
+    def __str__(self):
+        """
+        Magic method to allow printing of whole list from the class
+        :return: a string of values to print
+        """
+        return str(self.queue)
+
+    def __repr__(self):
+        return str(self.queue)
+
+    def __len__(self):
+        return len(self.queue)
 
 if __name__ == "__main__":
     queue = EqualPriorityQueue()
@@ -64,7 +85,4 @@ if __name__ == "__main__":
     queue.put(3, "Truth Hurts")
     queue.put(2, "I Love You")
 
-    print(queue.empty())
-
-    for stuff in range(queue.size()):
-        print(queue.get())
+    print(queue[2])
