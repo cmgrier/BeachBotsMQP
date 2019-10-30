@@ -7,16 +7,15 @@ class Task:
         self.type = type or "clean"
         self.zone = zone
         self.priority = 3
-        self.robot_to_avoid = None
         self.set_priority()
 
 #set the priority level of the task based on the type
     def set_priority(self):
-        if self.type is "clean":
+        if self.type == "clean":
             self.priority = 3
-        elif self.type is "avoid":
+        elif self.type == "avoid":
             self.priority = 1
-        elif self.type is "dump":
+        elif self.type == "dump":
             self.priority = 2
 
     def __repr__(self):

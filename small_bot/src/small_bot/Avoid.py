@@ -1,5 +1,6 @@
 """from smallBot.NavToGoal import NavToGoal
 """
+import rospy
 
 #This class combines all necessary classes for performing the Avoid task
 
@@ -12,4 +13,4 @@ class Avoid:
         """self.NavToGoal.navigate(task.Avoid.coord)
         """
         # TODO delete bottom code and uncomment when done
-        print("In Avoid")
+        rospy.loginfo("In Avoid")

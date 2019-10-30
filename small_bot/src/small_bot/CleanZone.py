@@ -4,6 +4,7 @@ from smallBot.Collect import Collect
 from smallBot.NavToGoal import NavToGoal
 from smallBot.TaskStatus import TaskStatus
 """
+import rospy
 #This class combines and uses all necessary classes that will execute the clean zone task
 #This includes moving in a pattern within a zone, locating trash, and collecting trash
 
@@ -25,4 +26,4 @@ class CleanZone:
             task.Dump.status = True"""
 
         #TODO delete bottom code and uncomment when done
-        print("In Clean Zone")
+        rospy.loginfo("In Clean Zone")

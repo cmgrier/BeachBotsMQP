@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 import rospy
 from std_msgs.msg import String
-#from smallBot.TaskIdentifier import TaskIdentifier TODO optimize of ROS
+from small_bot.TaskIdentifier import TaskIdentifier
 from data.Task import Task
-from small_bot.srv import RequestCleanTask, PassAvoidTask, Identify
+from small_bot.srv import RequestCleanTask, PassAvoidTask, PassDumpTask, Identify
 from support.EqualPriorityQueue import EqualPriorityQueue
 
 
@@ -15,14 +15,14 @@ class TaskSeeker:
 
     def __init__(self):
         rospy.init_node('task_seeker', anonymous=True)
-        #self.TaskIdentifier = TaskIdentifier() TODO REMOVE QOUTES
+        self.TaskIdentifier = TaskIdentifier() 
         self.currentTask = None
         self.Tasks = EqualPriorityQueue()
         self.ID = -1
         self.request_ID()
-        #self.request_clean_task()
-        rospy.spin()
-       # self.send_to_id() TODO REMOVE after TaskID Update
+        self.request_clean_task()
+        rospy.sleep(8)
+        #self.send_to_id()
 
 
     def parse_task(self, taskResponse):
@@ -53,7 +53,8 @@ class TaskSeeker:
             rospy.loginfo("new ID: " + str(self.ID))
             topic_name = "robot_avoid_"+str(self.ID)
             s = rospy.Service(topic_name, PassAvoidTask, self.update_avoid_status_handler)
-
+            topic_name = "robot_dump_" + str(self.ID)
+            s2 = rospy.Service(topic_name, PassDumpTask, self.update_dump_status_handler)
         except rospy.ServiceException, e:
             rospy.loginfo("Service call (request_ID) failed: %s" % e)
 
@@ -82,20 +83,29 @@ class TaskSeeker:
         """
         Service that adds an avoid Task to the task list
         :param req: parameters for an avoid Task
-        :return:
+        :return: a string to notify service completion
         """
-        rospy.loginfo("Hamdlimg avoid status request")
-        rospy.loginfo(self.Tasks)
+        rospy.loginfo("Handling avoid status request")
         avoid_task = self.parse_task(req)
         self.Tasks.put(avoid_task.priority, avoid_task)
         rospy.loginfo(self.Tasks)
-    #TODO make the service to update the avoid status and avoid coordinate from Task
+        return "Avoid Task Added To Robot ID: " + str(self.ID)
+
 
 
 
     #When service is requested, updates amd adds a dump task to the priority queue
-    def update_dump_status(self):
-        return
+    def update_dump_status_handler(self, req):
+        """
+        Service that adds a dump Task to the task list
+        :param req: parameters for an avoid Task
+        :return: a string to notify service completion
+        """
+        rospy.loginfo("Handling DUMP status request")
+        dump_task = self.parse_task(req)
+        self.Tasks.put(dump_task.priority, dump_task)
+        rospy.loginfo(self.Tasks)
+        return "Dump Task Added To Robot ID: " + str(self.ID)
 
 
 

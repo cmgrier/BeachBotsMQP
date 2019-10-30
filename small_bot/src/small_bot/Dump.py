@@ -1,6 +1,8 @@
 """from smallBot.NavToGoal import NavToGoal
 from smallBot.TrashBin import TrashBin
 """
+import rospy
+
 #This class combines all necessary classes for performing the Dump task
 
 class Dump:
@@ -15,7 +17,7 @@ class Dump:
         self.removeTrash()
         """
         # TODO delete bottom code and uncomment when done
-        print("In Dump")
+        rospy.loginfo("In Dump")
 
     #Lines up with base bot dumping mechanism and removes trash into it
     def removeTrash(self):

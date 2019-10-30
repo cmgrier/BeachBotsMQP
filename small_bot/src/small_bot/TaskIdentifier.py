@@ -1,6 +1,6 @@
-from smallBot.CleanZone import CleanZone
-from smallBot.Avoid import Avoid
-from smallBot.Dump import Dump
+from small_bot.CleanZone import CleanZone
+from small_bot.Avoid import Avoid
+from small_bot.Dump import Dump
 from data.Task import Task
 
 

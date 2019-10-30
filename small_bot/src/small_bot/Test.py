@@ -2,7 +2,7 @@
 import sys
 import rospy
 from data.Task import Task
-from small_bot.srv import RequestCleanTask, Identify, PassAvoidTask
+from small_bot.srv import RequestCleanTask, Identify, PassAvoidTask, PassDumpTask
 
 class Test:
     def __init__(self):
@@ -12,7 +12,8 @@ class Test:
         self.ros_node()
         rospy.sleep(8)
         self.order_avoid(2, 360)
-
+        self.order_dump(1,123)
+        self.order_dump(2,456)
 
 
     def give_ID_handler(self, robo_id):
@@ -55,14 +56,28 @@ class Test:
         :return:
         """
         rospy.wait_for_service("robot_avoid_"+str(ID))
-        print("tryimg to request AVOID")
         try:
             give_request = rospy.ServiceProxy('robot_avoid_' + str(ID), PassAvoidTask)
             send_avoid = give_request(True, False, ID, zone, "avoid")
 
         except rospy.ServiceException, e:
             rospy.loginfo("Service call failed: %s" % e)
-    
+
+
+    def order_dump(self, ID, zone):
+        """
+        Client for semdimg avoid Tasks to two smallvots
+        :param ID: ID of rovot
+        :param zone:
+        :return:
+        """
+        rospy.wait_for_service("robot_dump_"+str(ID))
+        try:
+            give_request = rospy.ServiceProxy('robot_dump_' + str(ID), PassDumpTask)
+            send_dump = give_request(True, False, ID, zone, "dump")
+
+        except rospy.ServiceException, e:
+            rospy.loginfo("Service call failed: %s" % e)
 
     def ros_node(self):
         """
