@@ -4,15 +4,17 @@ import math
 
 from baseBot.Director import Director
 from baseBot.RobotFinder import RobotFinder
+from data.Robot import Robot
 from support import Constants
 
 
 # manages the robots connected to the base bot
 class RobotManager:
-    def __init__(self, robots, map_manager):
+    def __init__(self, robots, map_manager, cleaning_manager):
         self.managedRobots = robots
         self.robotFinder = RobotFinder()
-        self.director = Director(self)
+        self.cleaning_manager = cleaning_manager
+        self.director = Director(self, cleaning_manager)
         self.map_manager = map_manager
 
     # for each robot this checks if they are too close to one another.
@@ -60,6 +62,11 @@ class RobotManager:
         for new_robot_position in new_robot_positions:
             robot = self.get_robot(new_robot_position[0])
             robot.position = new_robot_position[1]
+
+    # add new robot
+    def add_new_robot(self, workerID):
+        new_robot = Robot(workerID)
+        self.managedRobots.append(new_robot)
 
     # marks the given robot as busy
     def assign_robot(self, workerID):

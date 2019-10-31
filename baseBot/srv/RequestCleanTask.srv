@@ -5,4 +5,5 @@ bool isComplete
 int32 workerID
 int32 zone
 string type
+Point start_point
 

@@ -7,6 +7,7 @@ class Task:
         self.type = type or "clean"
         self.zone = zone
         self.priority = 3
+        self.start_point = None
         self.set_priority()
 
 #set the priority level of the task based on the type
@@ -25,3 +26,5 @@ class Task:
     def __str__(self):
         return str((self.type, self.workerID, self.zone, self.isActive, self.isComplete))
 
+    def to_service_format(self):
+        return [self.isActive, self.isComplete, self.workerID, self.type, self.zone, self.start_point]

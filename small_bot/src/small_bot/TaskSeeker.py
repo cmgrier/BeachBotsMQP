@@ -15,7 +15,7 @@ class TaskSeeker:
 
     def __init__(self):
         rospy.init_node('task_seeker', anonymous=True)
-        self.TaskIdentifier = TaskIdentifier() 
+        self.TaskIdentifier = TaskIdentifier()
         self.currentTask = None
         self.Tasks = EqualPriorityQueue()
         self.ID = -1
