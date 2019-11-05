@@ -5,7 +5,7 @@ import math
 from baseBot.Director import Director
 from baseBot.RobotFinder import RobotFinder
 from data.Robot import Robot
-from support import Constants
+from support.Constants import Constants
 
 
 # manages the robots connected to the base bot

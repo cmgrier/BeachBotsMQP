@@ -4,6 +4,7 @@
 # this class will hold all of the other managers and relay information between them.
 # It will also hold on to the queued cleaning tasks
 from baseBot.MapManager import MapManager
+from baseBot.RobotManager import RobotManager
 
 
 class CleaningManager:

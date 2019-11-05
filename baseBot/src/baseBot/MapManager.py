@@ -4,7 +4,7 @@ import math
 
 # This class holds the current map and passes it between the other managers
 from data.Zone import Zone
-from support import Constants
+from support.Constants import Constants
 
 
 class MapManager:
