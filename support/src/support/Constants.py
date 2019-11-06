@@ -1,26 +1,26 @@
 #!/usr/bin/env python
 
-trash_bin_threshold = 12    # TODO: Get the actual value for this constant
+TRASH_BIN_THRESHOLD = 12    # TODO: Get the actual value for this constant
 
-stored_map_size = 10
-safe_distance_between_bots = 100
-avoid_distance = 30
+STORED_MAP_SIZE = 10
+SAFE_DISTANCE_BETWEEN_BOTS = 100
+AVOID_DISTANCE = 30
 
-zone_width = 20
-landing_strip_width = 20
+ZONE_WIDTH = 20
+LANDING_STRIP_WIDTH = 20
 
 # ask Chris. Essentially we prioritize to avoiding robots by backing up first rather than trying to move forward
-avoid_direction_priority_list = [3, 4, 2, 5, 1, 6, 0, 7]
+AVOID_DIRECTION_PRIORITY_LIST = [3, 4, 2, 5, 1, 6, 0, 7]
 
 #AStar
-standard_move_cost = 1
-difficult_terrain_factor = 1
-turning_factor = 1
+STANDARD_MOVE_COST = 1
+DIFFICULT_TERRAIN_FACTOR = 1
+TURNING_FACTOR = 1
 
-terrain_too_difficult = 30
-zone_too_difficult_percent = .1
+TERRAIN_TOO_DIFFICULT = 30
+ZONE_TOO_DIFFICULT_PERCENT = .1
 
 #Motors
-left_wheel_pin = 17
-right_wheel_pin = 18
+LEFT_WHEEL_PIN= 17
+RIGHT_WHEEL_PIN = 18
 

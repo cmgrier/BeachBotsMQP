@@ -1,6 +1,6 @@
 # for testing
 import math
-
+import rospy
 from navigation.AStar import AStar, Map
 
 if __name__ == '__main__':
@@ -14,5 +14,5 @@ if __name__ == '__main__':
     assert a_star.find_path(0,0) == [0]
 
     path = a_star.find_path(0, 1)
-    print(path)
-    print("all tests passed")
+    rospy.loginfo(path)
+    rospy.loginfo("all tests passed")

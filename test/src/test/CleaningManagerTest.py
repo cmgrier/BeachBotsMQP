@@ -3,7 +3,7 @@ import math
 
 from baseBot.CleaningManager import CleaningManager
 from data.Robot import Robot
-from support import Constants
+from support.Constants import *
 
 # for testing
 if __name__ == '__main__':
@@ -15,9 +15,11 @@ if __name__ == '__main__':
     cleaningManager.mapManager.update_map()
     cleaningManager.create_cleaning_tasks()
 
-    assert len(cleaningManager.cleaningTasks) == map_width/Constants.zone_width
+    assert len(cleaningManager.cleaningTasks) == map_width/ZONE_WIDTH
 
-    cleaningManager.assign_available_robots()
+
+    #TODO Chris you need to add this function to the CleaningManager Class
+    #cleaningManager.assign_available_robots()
 
     for i in range(0, len(cleaningManager.cleaningTasks)):
         if i < len(robots) - 1:

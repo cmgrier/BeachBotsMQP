@@ -5,6 +5,7 @@
 # It will also hold on to the queued cleaning tasks
 from baseBot.MapManager import MapManager
 from baseBot.RobotManager import RobotManager
+from data.Task import Task
 
 
 class CleaningManager:

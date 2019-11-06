@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import math
-
+import rospy
 from baseBot.MapManager import MapManager
-from support import Constants
+from support.Constants import *
 
 # for testing
 if __name__ == '__main__':
@@ -12,7 +12,7 @@ if __name__ == '__main__':
     mapManager.mapMaker.map = map
     mapManager.update_map()
 
-    number_of_zones = int(map_width / Constants.zone_width)
+    number_of_zones = int(map_width / ZONE_WIDTH)
     print(len(map))
     print(number_of_zones)
 
@@ -24,4 +24,4 @@ if __name__ == '__main__':
         map[i] = -1
 
     assert mapManager.percent_of_indexes_safe(index_list) == 1.0
-    print("all tests passed")
+    rospy.loginfo("all tests passed")

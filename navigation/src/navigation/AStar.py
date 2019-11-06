@@ -2,7 +2,7 @@
 import math
 from _heapq import *
 
-from support import Constants
+from support.Constants import *
 
 
 class AStar:
@@ -51,7 +51,7 @@ class AStar:
                 and self.__map.map[node.index - 1] != -1:
             left_node = self.__create_node(node.index - 1,
                                            end,
-                                           node.movement_cost + Constants.standard_move_cost,
+                                           node.movement_cost + STANDARD_MOVE_COST,
                                            node)
             new_nodes.append(left_node)
 
@@ -60,7 +60,7 @@ class AStar:
                 and self.__map.map[node.index + 1] != -1:
             right_node = self.__create_node(node.index + 1,
                                             end,
-                                            node.movement_cost + Constants.standard_move_cost,
+                                            node.movement_cost + STANDARD_MOVE_COST,
                                             node)
             new_nodes.append(right_node)
 
@@ -68,7 +68,7 @@ class AStar:
                 and self.__map.map[node.index - self.__map.width] != -1:
             top_node = self.__create_node(node.index - self.__map.width,
                                           end,
-                                          node.movement_cost + Constants.standard_move_cost,
+                                          node.movement_cost + STANDARD_MOVE_COST,
                                           node)
             new_nodes.append(top_node)
 
@@ -76,7 +76,7 @@ class AStar:
                 and self.__map.map[node.index + self.__map.width] != -1:
             bottom_node = self.__create_node(node.index + self.__map.width,
                                              end,
-                                             node.movement_cost + Constants.standard_move_cost,
+                                             node.movement_cost + STANDARD_MOVE_COST,
                                              node)
             new_nodes.append(bottom_node)
 
@@ -142,12 +142,12 @@ class AStar:
     def __create_node(self, position, end, movement_cost, origin):
         node = Node()
         node.heuristic = self.__get_heuristic(position, end)
-        node.movement_cost = movement_cost + self.__map.map[position] * Constants.difficult_terrain_factor
+        node.movement_cost = movement_cost + self.__map.map[position] * DIFFICULT_TERRAIN_FACTOR
         node.index = position
         node.cost = node.heuristic + node.movement_cost
         node.previous_point = origin
         if not node.previous_point.is_start and self.__is_turning(node):
-            node.movement_cost += Constants.turning_factor
+            node.movement_cost += TURNING_FACTOR
         return node
 
     # returns the estimated cost between the two given points
