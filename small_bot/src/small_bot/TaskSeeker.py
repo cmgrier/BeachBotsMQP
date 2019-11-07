@@ -15,14 +15,11 @@ class TaskSeeker:
 
     def __init__(self):
         rospy.init_node('task_seeker', anonymous=True)
-        rospy.init_node('task_seeker', anonymous=True)
         self.TaskIdentifier = TaskIdentifier()
         self.currentTask = None
         self.Tasks = EqualPriorityQueue()
         self.ID = -1
         self.request_ID()
-        self.request_clean_task()
-        rospy.sleep(8)
         #self.send_to_id()
 
 

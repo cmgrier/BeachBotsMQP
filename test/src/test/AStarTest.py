@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # for testing
 import math
 import rospy
@@ -11,8 +12,8 @@ if __name__ == '__main__':
                0, 0, 0, 0]  # length = 16
     map.width = int(math.sqrt(map.map.__len__()))
     a_star = AStar(map)
-    assert a_star.find_path(0,0) == [0]
+    assert a_star.find_path(0, 0) == [0]
 
-    path = a_star.find_path(0, 1)
-    rospy.loginfo(path)
-    rospy.loginfo("all tests passed")
+    path = a_star.find_path(0, 14)
+    assert path == [0, 1, 5, 9, 13, 14]
+

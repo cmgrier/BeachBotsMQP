@@ -18,12 +18,5 @@ if __name__ == '__main__':
     assert len(cleaningManager.cleaningTasks) == map_width/ZONE_WIDTH
 
 
-    #TODO Chris you need to add this function to the CleaningManager Class
-    #cleaningManager.assign_available_robots()
-
-    for i in range(0, len(cleaningManager.cleaningTasks)):
-        if i < len(robots) - 1:
-            assert cleaningManager.robotManager.managedRobots[i].isBusy is True
-
     print("all tests passed")
 
