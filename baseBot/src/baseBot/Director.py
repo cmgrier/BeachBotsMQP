@@ -13,6 +13,8 @@ class Director:
         rospy.init_node('test_for_seeker', anonymous=True)
         s = rospy.Service('give_zones', RequestCleanTask, self.give_cleaning_task)
         s = rospy.Service('identify_worker', Identify, self.give_ID)
+        s = rospy.Service('dump_request', Dump, self.)
+
         print("ros node started")
 
     # The following methods will create Tasks to send to the small bots that will move them
@@ -52,3 +54,10 @@ class Director:
             return robot.task.to_service_format()
         else:
             return Task(None).to_service_format()
+
+    def handle_dump_request(self, dump_request):
+        self.cleaningManager.dumpRequests.append(dump_request)
+        if len(self.cleaningManager.dumpRequests) != 1:
+            return "wait"
+        else:
+            return "go ahead"

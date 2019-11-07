@@ -13,6 +13,7 @@ class CleaningManager:
         self.mapManager = MapManager()
         self.cleaningTasks = []
         self.robotManager = RobotManager(robots, self.mapManager, self)
+        self.dumpRequests = []
 
         self.create_cleaning_tasks()
 
