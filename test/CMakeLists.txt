@@ -57,10 +57,10 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate services in the 'srv' folder
 add_service_files(
   FILES
-  #PassAvoidTask.srv
-  #PassDumpTask.srv
-  #RequestCleanTask.srv
-  #Identify.srv
+  PassAvoidTask.srv
+  PassDumpTask.srv
+  RequestCleanTask.srv
+  Identify.srv	
 )
 
 ## Generate actions in the 'action' folder

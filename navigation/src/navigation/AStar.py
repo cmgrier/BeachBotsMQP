@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import math
+import rospy
 from _heapq import *
 
 from support.Constants import *
@@ -26,6 +27,7 @@ class AStar:
     # method to be called outside of AStar class to retrieve path
     def find_path(self, start, end):
         if start == end:
+            rospy.loginfo("START IS LAST")
             return [start]
         self.__frontier = list()
         node = Node()
