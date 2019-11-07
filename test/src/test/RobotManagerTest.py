@@ -11,3 +11,7 @@ if __name__ == '__main__':
     cleaningManager = CleaningManager(robots)
     cleaningManager.robotManager.assign_robot(0)
     assert cleaningManager.robotManager.get_robot(0).isBusy is True
+
+    cleaningManager.robotManager.get_robot(1).isBusy = True
+
+    assert cleaningManager.robotManager.get_robot(1).isBusy is False
