@@ -54,7 +54,7 @@ class RobotManager:
     def __are_robots_too_close(self, robot_position1, robot_position2):
         distance = math.hypot(robot_position1.position[0] - robot_position2.position[0],
                               robot_position1.position[1] - robot_position2.position[1])
-        return distance < Constants.safe_distance_between_bots
+        return distance < SAFE_DISTANCE_BETWEEN_BOTS
 
     # updates the positions of the robots
     def update_robot_positions(self):
@@ -69,7 +69,7 @@ class RobotManager:
         self.managedRobots.append(new_robot)
 
     # marks the given robot as busy
-    def assign_robot(self, workerID):
+    def mark_as_busy(self, workerID):
         self.get_robot(workerID).isBusy = True
 
     # checks if robot with given worker ID is outside of its zone
@@ -86,7 +86,7 @@ class RobotManager:
     # finds which directions are safe to avoid to
     def __get_safe_escape_directions(self, workerID):
         given_bot = self.get_robot(workerID)
-        safe_directions = Constants.avoid_direction_priority_list
+        safe_directions = AVOID_DIRECTION_PRIORITY_LIST
         for robot in self.managedRobots:
             if robot.workerID != workerID:
                 if self.__are_robots_too_close(given_bot.pose, robot.pose):
@@ -104,10 +104,10 @@ class RobotManager:
     def __get_local_indices(self, position):
         local_indices = []
         origin_index = self.__point_to_index(position)
-        top_left_index = origin_index - Constants.avoid_distance * (int(math.sqrt(len(self.map_manager.map))) + 1)
-        for i in range(0, Constants.avoid_distance * 2):
-            for j in range(0, Constants.avoid_distance * 2):
-                local_indices.append(int(top_left_index + i * Constants.avoid_distance + j))
+        top_left_index = origin_index - AVOID_DISTANCE * (int(math.sqrt(len(self.map_manager.map))) + 1)
+        for i in range(0, AVOID_DISTANCE * 2):
+            for j in range(0, AVOID_DISTANCE * 2):
+                local_indices.append(int(top_left_index + i * AVOID_DISTANCE + j))
         return local_indices
 
     # converts given point to nearest index
