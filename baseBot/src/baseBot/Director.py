@@ -57,6 +57,6 @@ class Director:
     def handle_dump_request(self, dump_request):
         self.cleaningManager.dumpRequests.append(dump_request)
         if len(self.cleaningManager.dumpRequests) != 1:
-            return "wait"
+            return True     # wait
         else:
-            return "go ahead"
+            return False    # go ahead
