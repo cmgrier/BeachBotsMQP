@@ -106,3 +106,10 @@ if __name__ == "__main__":
     assert task.workerID is 1
     assert task.zone == 120
     assert task.type == "avoid"
+
+#Test send to ID
+    print("**************************")
+    print(len(TS.Tasks))
+    TS.send_to_id()
+    assert len(TS.Tasks) is 1
+    print(len(TS.Tasks))

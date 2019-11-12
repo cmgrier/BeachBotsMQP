@@ -13,9 +13,10 @@ This class also updates the status for the avoid and return tasks
 """
 class TaskSeeker:
 
+
     def __init__(self):
         rospy.init_node('task_seeker', anonymous=True)
-        self.TaskIdentifier = TaskIdentifier()
+        self.TaskIdentifier = TaskIdentifier(self)
         self.currentTask = None
         self.Tasks = EqualPriorityQueue()
         self.ID = -1
@@ -25,7 +26,7 @@ class TaskSeeker:
 
     def parse_task(self, taskResponse):
         """
-        Takes a service response amd comvines all the fields into a Task
+        Takes a service response and combines all the fields into a Task
         :param taskResponse: response received from a service
         :return: a Task
         """
@@ -110,7 +111,7 @@ class TaskSeeker:
     #Send task to be identified for appropriate execution
     def send_to_id(self):
         """
-        Sends the first element in the priority queue to ve identified
+        Sends the first element in the priority queue to be identified
         :return:
         """
         self.currentTask = self.Tasks.get()

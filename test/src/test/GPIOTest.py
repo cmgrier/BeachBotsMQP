@@ -7,11 +7,14 @@ import sys
 #Pins
 led = 18
 switch = 17
+interrupt = 27
 
+def interrupt_test(channel):
+	print("Interrupt detected!")
 
 if __name__ == "__main__":
 	if (len(sys.argv)) is 1:
-		print("arguements are needed for execution (led, switch, ect.)")
+		print("arguements are needed for execution (led, switch, interrupt, ect.)")
 
 	#Light up an LED
 	elif str(sys.argv[1]) == "led":
@@ -42,5 +45,27 @@ if __name__ == "__main__":
 		
 
 	#Test PWM generation	
-	
+
+
+
+
+
+	#Interrupts
+
+	elif str(sys.argv[1]) == "interrupt":
+		GPIO.setmode(GPIO.BCM)
+		GPIO.setup(interrupt, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+		GPIO.add_event_detect(interrupt, GPIO.FALLING, callback=interrupt_test, bouncetime=300)
+		num = 0
+		try:
+			while(True):
+				#Do busy things in here
+				for x in range(1, 500):
+					num += x
+					num %= 2
+
+
+		except KeyboardInterrupt:
+			GPIO.cleanup()
+
 

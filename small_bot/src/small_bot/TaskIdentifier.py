@@ -8,14 +8,21 @@ from data.Task import Task
 
 class TaskIdentifier:
 
-    def __init__(self):
+
+        #TS is TaskSeeker
+    def __init__(self, TS):
         self.CleanZone = CleanZone()
         self.Avoid = Avoid()
         self.Dump = Dump()
-
+        self.TS = TS
 
     #Sends the task to the proper class to be executed
     def task_ID(self, task):
+        """
+        Takes a task and sends it off to the proper method handler
+        :param task: the task to be identified and executed
+        :return:
+        """
 
         if task.type == "avoid":
             self.Avoid.handle_avoid(task)
@@ -24,7 +31,6 @@ class TaskIdentifier:
         else:
             self.CleanZone.handle_clean(task)
 
-
-if __name__=='__main__':
-    ti = TaskIdentifier()
-    ti.task_ID(Task(3))
+        #If task was not completed
+        if task.isComplete is False:
+            self.TS.Tasks.put(task.priority, task)
