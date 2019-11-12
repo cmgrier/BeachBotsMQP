@@ -4,5 +4,6 @@ int32 workerID
 int32 zone
 string type
 ---
+bool wait
 string resp
 
