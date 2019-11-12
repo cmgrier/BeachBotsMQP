@@ -21,7 +21,7 @@ if __name__  == "__main__":
     if str(sys.argv[1]) == "direction":
         try:
             drive.set_direction(str(sys.argv[2]), str(sys.argv[3]))
-            drive.run_wheels(800, 800)
+            drive.run_wheels(50, 50)
             rospy.sleep(10)
             drive.cleanup()
 

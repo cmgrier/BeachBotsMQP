@@ -4,7 +4,7 @@
 
 import rospy
 import roslib
-import RPiGPIO as GPIO 
+import RPi.GPIO as GPIO 
 
 class Drive:
 	def __init__(self, l_pin, r_pin, l_direct_1, l_direct_2, r_direct_1, r_direct_2):
@@ -15,7 +15,7 @@ class Drive:
 		self.r_direct_1 = r_direct_1
 		self.r_direct_2 = r_direct_2
 		
-		GPIO.setMode(GPIO.BCM)
+		GPIO.setmode(GPIO.BCM)
 		GPIO.setup(self.l_direct_1, GPIO.OUT)
 		GPIO.setup(self.l_direct_2, GPIO.OUT)
 		GPIO.setup(self.r_direct_1, GPIO.OUT)
@@ -24,8 +24,8 @@ class Drive:
 		GPIO.setup(self.r_wheel_pin, GPIO.OUT)
 		self.set_direction("F", "F")
 		
-		self.l_pwm = GPIO.PWM(self.l_wheel_pin, 0)
-		self.r_pwm = GPIO.PWM(self.r_wheel_pin, 0)
+		self.l_pwm = GPIO.PWM(self.l_wheel_pin, 1000)
+		self.r_pwm = GPIO.PWM(self.r_wheel_pin, 1000)
 		
 		
 	def run_wheels(self,l_freq,r_freq):
@@ -36,10 +36,8 @@ class Drive:
 		:return: void
 		"""
 		
-		self.l_pwm = GPIO.PWM(self.l_wheel_pin, l_freq)
-		self.r_pwm = GPIO.PWM(self.r_wheel_pin, r_freq)
-		self.l_pwm.start(50)
-		self.r_pwm.start(50)
+		self.l_pwm.start(float(l_freq))
+		self.r_pwm.start(float(r_freq))
 	
 	def stop_wheels(self):
 		"""
