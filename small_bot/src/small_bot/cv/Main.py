@@ -1,4 +1,4 @@
-# This will be the main for the Computer Vision
+# This will be a test for the Computer Vision
 
 import numpy as np
 import cv2
@@ -24,6 +24,11 @@ class Main:
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 
+    def brightness_and_contrast_auto(self):
+
+        # Delete in due time
+        self.test_cam()
+        print("lol")
 
 if __name__ == "__main__":
     m = Main()
