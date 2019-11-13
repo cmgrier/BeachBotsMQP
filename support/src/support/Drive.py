@@ -47,7 +47,8 @@ class Drive:
 				self.set_direction("F", "B")
 			elif val < 0:
 				self.set_direction("B", "F")
-			turn(val)
+			self.run_wheels(val, val)
+
 		#Detected linear velocity
 		elif msg.angular.z is 0 and msg.linear.x is not 0:
 			val = msg.linear.x
@@ -121,6 +122,7 @@ class Drive:
 		elif rwheel == "B":
 			GPIO.output(self.r_direct_1, GPIO.HIGH)
 			GPIO.output(self.r_direct_2, GPIO.LOW)
+
 
 	def cleanup(self):
 		self.stop_wheels()
