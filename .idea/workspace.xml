@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="be179176-b088-4180-a92d-f3692eb0d709" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/small_bot/src/small_bot/cv/Main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/small_bot/src/small_bot/cv/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/small_bot/src/small_bot/cv/Main.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -16,8 +15,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/small_bot/src/small_bot/cv/Main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="420">
-              <caret line="28" lean-forward="true" selection-start-line="28" selection-end-line="28" />
+            <state relative-caret-position="240">
+              <caret line="16" column="40" lean-forward="true" selection-start-line="16" selection-start-column="40" selection-end-line="16" selection-end-column="40" />
               <folding>
                 <element signature="e#49#67#0" expanded="true" />
               </folding>
@@ -172,8 +171,8 @@
     <entry file="file://$PROJECT_DIR$/small_bot/src/small_bot/cv/AutoBC.py" />
     <entry file="file://$PROJECT_DIR$/small_bot/src/small_bot/cv/Main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="420">
-          <caret line="28" lean-forward="true" selection-start-line="28" selection-end-line="28" />
+        <state relative-caret-position="240">
+          <caret line="16" column="40" lean-forward="true" selection-start-line="16" selection-start-column="40" selection-end-line="16" selection-end-column="40" />
           <folding>
             <element signature="e#49#67#0" expanded="true" />
           </folding>

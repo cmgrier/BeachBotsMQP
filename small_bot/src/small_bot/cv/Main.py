@@ -4,11 +4,12 @@ import numpy as np
 import cv2
 
 
-class Main():
+class Main:
 
     def __init__(self):
 
         self.cap = cv2.VideoCapture(0)
+        self.test_cam()
 
     def test_cam(self):
         while True:
