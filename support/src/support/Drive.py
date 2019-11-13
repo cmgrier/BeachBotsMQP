@@ -1,4 +1,4 @@
-#!/usr/bin/env python0
+#!/usr/bin/env python
 
 
 
@@ -6,6 +6,7 @@ import rospy
 import roslib
 import RPi.GPIO as GPIO 
 from support.Constants import *
+import geometry_msgs.msg
 
 class Drive:
 	def __init__(self):
@@ -25,33 +26,38 @@ class Drive:
 		GPIO.setup(self.r_wheel_pin, GPIO.OUT)
 		self.set_direction("F", "F")
 		
-		self.l_pwm = GPIO.PWM(self.l_wheel_pin, 1000)
-		self.r_pwm = GPIO.PWM(self.r_wheel_pin, 1000)
+		self.l_pwm = GPIO.PWM(self.l_wheel_pin, 200)
+		self.r_pwm = GPIO.PWM(self.r_wheel_pin, 200)
 		
 	def listener(self):
 		rospy.init_node('drive_listener', anonymous=True)
-		rospy.Subscriber("cmd_vel", geometry_msg/Twist, self.interpreter)
+                rospy.Subscriber("/cmd_vel", geometry_msgs.msg.Twist, self.interpreter)
 		# spin() simply keeps python from exiting until this node is stopped
 		rospy.spin()
 
 	def interpreter(self, msg):
+		print("In CALLBACK")
+	
 		#Detected angular velocity
-		if msg.angular.z is not 0 and msg.linear.x is 0:
-			val = msg.angular.z
+		if msg.angular.z != 0.0 and msg.linear.x == 0.0:
+			print("IN ANGULAR ")
+			val = (msg.angular.z * 100)
 			if val > 100:
 				val = 100
 			elif val < -100:
 				val = -100
 
 			if val >= 0:
-				self.set_direction("F", "B")
-			elif val < 0:
 				self.set_direction("B", "F")
+			elif val < 0:
+				self.set_direction("F", "B")
+				val *= -1
 			self.run_wheels(val, val)
 
 		#Detected linear velocity
-		elif msg.angular.z is 0 and msg.linear.x is not 0:
-			val = msg.linear.x
+		elif msg.angular.z == 0.0 and msg.linear.x != 0.0:
+			print("In LINEAR")
+			val = (msg.linear.x * 100)
 			if val > 100:
 				val = 100
 			elif val < -100:
@@ -60,7 +66,8 @@ class Drive:
 				self.set_direction("F", "F")
 			elif val < 0:
 				self.set_direction("B", "B")
-			run_wheels(val, val)
+				val *= -1
+			self.run_wheels(val, val)
 
 		"""else:
 			turn_val = msg.angular.z
