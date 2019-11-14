@@ -59,6 +59,7 @@ add_service_files(
    FILES
    PassAvoidTask.srv
    RequestCleanTask.srv
+   PassDumpTask.srv
    Identify.srv
  )
 

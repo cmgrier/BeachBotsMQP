@@ -34,6 +34,7 @@ class TaskSeeker:
         task.isActive = taskResponse.isActive
         task.isComplete = taskResponse.isComplete
         task.workerID = taskResponse.workerID
+        task.start_point = taskResponse.start_point
         return task
 
 
