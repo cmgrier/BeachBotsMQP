@@ -14,9 +14,9 @@ from support.Constants import *
 
 class CleanZone:
     def __init__(self):
-        GPIO.setmode(BCM)
-        GPIO.setup(INTERRUPT_INPUT, GPIO.INPUT)
-        GPIO.add_event_detect(INTERRUPT_INPUT, GPIO.FALLING, callback=this.task_added_interrupt, bouncetime=300)
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(INTERRUPT_INPUT, GPIO.IN)
+        GPIO.add_event_detect(INTERRUPT_INPUT, GPIO.FALLING, callback=self.task_added_interrupt, bouncetime=300)
         """self.DrivePattern = DrivePattern()
         self.FindTrash = FindTrash()
         self.Collect = Collect()
