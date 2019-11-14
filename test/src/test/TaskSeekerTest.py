@@ -97,6 +97,11 @@ if __name__ == "__main__":
         x = True
     assert len(TS.Tasks) is 1
 
+#Test interrupt
+    TS.send_to_id()
+    order_avoid(1, 120)
+    print("exited TS")
+"""    
 #Test give avoid service request
     order_avoid(1, 120)
     assert len(TS.Tasks) is 2
@@ -113,3 +118,4 @@ if __name__ == "__main__":
     TS.send_to_id()
     assert len(TS.Tasks) is 1
     print(len(TS.Tasks))
+"""
