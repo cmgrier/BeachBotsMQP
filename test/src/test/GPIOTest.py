@@ -7,7 +7,7 @@ import sys
 #Pins
 led = 18
 switch = 17
-interrupt = 27
+interrupt = 23
 power = 22
 
 def interrupt_test(channel):
@@ -71,5 +71,4 @@ if __name__ == "__main__":
 
 		except KeyboardInterrupt:
 			GPIO.cleanup()
-
 
