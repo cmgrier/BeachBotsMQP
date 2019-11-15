@@ -7,13 +7,13 @@
 #include "small_bot/ImageTransfer.h"
 
 
-bool fixImage(small_bot::ImageTransfer::input &input, small_bot::ImageTransfer::output &output)
+bool fixImage(small_bot::ImageTransfer::input &in, small_bot::ImageTransfer::output &out)
 {
 
     cv::Mat changed;
-    brightnessAndContrastAuto(input, changed)
+    brightnessAndContrastAuto(in, changed)
 
-    output = changed->toImageMsg()
+    out = changed->toImageMsg()
 
     //res.sum = req.a + req.b;
     //ROS_INFO("request: x=%ld, y=%ld", (long int)req.a, (long int)req.b);
