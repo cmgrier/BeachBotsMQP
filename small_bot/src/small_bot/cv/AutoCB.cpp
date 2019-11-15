@@ -1,41 +1,36 @@
-/**
- *  Node for Brightness and Contrasting
- *
-*/
-
 #include "ros/ros.h"
-#include <image_transport/image_transport.h>
-#include <cv_bridge/cv_bridge.h>
-#include <sensor_msgs/image_encodings.h>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include "small_bot/ImageTransfer.h" //If this causes issues it could be due to the fact that the file is not .h
+#include "image_transport/image_transport.h"
+#include "cv_bridge/cv_bridge.h"
+#include "sensor_msgs/image_encodings.h"
+#include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "small_bot/ImageTransfer.h"
 
 
-bool fixImage(small_bot::ImageTransfer::Request  &req,
-         small_bot::ImageTransfer::Response &res)
+bool fixImage(small_bot::ImageTransfer::input &input, small_bot::ImageTransfer::output &output)
 {
-  cv::Mat changed;
-  brightnessAndContrastAuto(req, changed)
 
-  res = changed->toImageMsg()
+    cv::Mat changed;
+    brightnessAndContrastAuto(input, changed)
 
-  //res.sum = req.a + req.b;
-  //ROS_INFO("request: x=%ld, y=%ld", (long int)req.a, (long int)req.b);
-  //ROS_INFO("sending back response: [%ld]", (long int)res.sum);
-  return true;
+    output = changed->toImageMsg()
+
+    //res.sum = req.a + req.b;
+    //ROS_INFO("request: x=%ld, y=%ld", (long int)req.a, (long int)req.b);
+    //ROS_INFO("sending back response: [%ld]", (long int)res.sum);
+    return true;
 }
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "brightness_and_contrast");
-  ros::NodeHandle n;
+    ros::init(argc, argv, "brightness_and_contrast");
+    ros::NodeHandle n;
 
-  ros::ServiceServer service = n.advertiseService("brightness_and_contrast", fixImage);
-  ROS_INFO("Ready to change image");
-  ros::spin();
+    ros::ServiceServer service = n.advertiseService("brightness_and_contrast", fixImage);
+    ROS_INFO("Ready to change image");
+    ros::spin();
 
-  return 0;
+    return 0;
 }
 
 
