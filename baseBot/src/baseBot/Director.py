@@ -1,19 +1,23 @@
 #!/usr/bin/env python
 from data.Task import Task
+from data.Robot import Robot
+from baseBot.srv import RequestCleanTask, PassAvoidTask, PassDumpTask, Identify
 import rospy
 
 class Director:
     def __init__(self, robot_manager, cleaning_manager):
         self.robotManager = robot_manager
         self.cleaningManager = cleaning_manager
+
+        self.ros_node()
         pass
 
     # Set up ROS initiators
     def ros_node(self):
-        rospy.init_node('test_for_seeker', anonymous=True)
+        rospy.init_node('task_seeker', anonymous=True)
         s = rospy.Service('give_zones', RequestCleanTask, self.give_cleaning_task)
         s = rospy.Service('identify_worker', Identify, self.give_ID)
-        s = rospy.Service('dump_request', Dump, self.handle_dump_request)
+        s = rospy.Service('dump_request', PassDumpTask, self.handle_dump_request)
 
         print("ros node started")
 
@@ -49,8 +53,9 @@ class Director:
 
     def give_cleaning_task(self, robot_id):
         task = self.cleaningManager.cleaningTasks.pop()
-        if robot.task:
-            return robot.task.to_service_format()
+        if task:
+            task.workerID = robot_id
+            return task.to_service_format()
         else:
             return Task(None).to_service_format()
 

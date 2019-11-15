@@ -5,6 +5,8 @@ from small_bot.TaskIdentifier import TaskIdentifier
 from data.Task import Task
 from small_bot.srv import RequestCleanTask, PassAvoidTask, PassDumpTask, Identify
 from support.EqualPriorityQueue import EqualPriorityQueue
+import RPi.GPIO as GPIO
+from support.Constants import *
 
 
 """
@@ -21,6 +23,9 @@ class TaskSeeker:
         self.Tasks = EqualPriorityQueue()
         self.ID = -1
         self.request_ID()
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(INTERRUPT_OUTPUT, GPIO.OUT)
+        GPIO.output(INTERRUPT_OUTPUT, GPIO.LOW)
         #self.send_to_id()
 
 
@@ -34,6 +39,7 @@ class TaskSeeker:
         task.isActive = taskResponse.isActive
         task.isComplete = taskResponse.isComplete
         task.workerID = taskResponse.workerID
+        task.start_point = taskResponse.start_point
         return task
 
 
@@ -88,6 +94,8 @@ class TaskSeeker:
         avoid_task = self.parse_task(req)
         self.Tasks.put(avoid_task.priority, avoid_task)
         rospy.loginfo(self.Tasks)
+        GPIO.output(INTERRUPT_OUTPUT, GPIO.HIGH)
+        GPIO.output(INTERRUPT_OUTPUT, GPIO.LOW)
         return "Avoid Task Added To Robot ID: " + str(self.ID)
 
 
@@ -120,4 +128,8 @@ class TaskSeeker:
 
 
 if __name__ == "__main__":
-    ts = TaskSeeker()
+    try:
+        ts = TaskSeeker()
+
+    except KeyboardInterrupt:
+        GPIO.cleanup()

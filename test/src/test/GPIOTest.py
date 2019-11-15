@@ -7,7 +7,8 @@ import sys
 #Pins
 led = 18
 switch = 17
-interrupt = 27
+interrupt = 23
+power = 22
 
 def interrupt_test(channel):
 	print("Interrupt detected!")
@@ -54,7 +55,9 @@ if __name__ == "__main__":
 
 	elif str(sys.argv[1]) == "interrupt":
 		GPIO.setmode(GPIO.BCM)
-		GPIO.setup(interrupt, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+		GPIO.setup(interrupt, GPIO.IN)
+		GPIO.setup(power, GPIO.OUT)
+		GPIO.output(power, GPIO. HIGH)
 		GPIO.add_event_detect(interrupt, GPIO.FALLING, callback=interrupt_test, bouncetime=300)
 		num = 0
 		try:
@@ -65,7 +68,7 @@ if __name__ == "__main__":
 					num %= 2
 
 
+
 		except KeyboardInterrupt:
 			GPIO.cleanup()
-
 

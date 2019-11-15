@@ -3,6 +3,6 @@ int32 workerID
 bool isActive
 bool isComplete
 int32 workerID
-int32 zone
 string type
-
+int32 zone
+Pose startingPoint
