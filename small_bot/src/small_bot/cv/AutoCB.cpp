@@ -1,11 +1,52 @@
 /**
+ *  Node for Brightness and Contrasting
+ *
+*/
+
+#include "ros/ros.h"
+#include <image_transport/image_transport.h>
+#include <cv_bridge/cv_bridge.h>
+#include <sensor_msgs/image_encodings.h>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include "small_bot/ImageTransfer.h" //If this causes issues it could be due to the fact that the file is not .h
+
+
+bool fixImage(small_bot::ImageTransfer::Request  &req,
+         small_bot::ImageTransfer::Response &res)
+{
+  cv::Mat changed;
+  brightnessAndContrastAuto(req, changed)
+
+  res = changed->toImageMsg()
+
+  //res.sum = req.a + req.b;
+  //ROS_INFO("request: x=%ld, y=%ld", (long int)req.a, (long int)req.b);
+  //ROS_INFO("sending back response: [%ld]", (long int)res.sum);
+  return true;
+}
+
+int main(int argc, char **argv)
+{
+  ros::init(argc, argv, "brightness_and_contrast");
+  ros::NodeHandle n;
+
+  ros::ServiceServer service = n.advertiseService("brightness_and_contrast", fixImage);
+  ROS_INFO("Ready to change image");
+  ros::spin();
+
+  return 0;
+}
+
+
+/**
  *  \brief Automatic brightness and contrast optimization with optional histogram clipping
  *  \param [in]src Input image GRAY or BGR or BGRA
  *  \param [out]dst Destination image
  *  \param clipHistPercent cut wings of histogram at given percent tipical=>1, 0=>Disabled
  *  \note In case of BGRA image, we won't touch the transparency
 */
-void BrightnessAndContrastAuto(const cv::Mat &src, cv::Mat &dst, float clipHistPercent=0)
+void brightnessAndContrastAuto(const cv::Mat &src, cv::Mat &dst, float clipHistPercent=0)
 {
 
     CV_Assert(clipHistPercent >= 0);

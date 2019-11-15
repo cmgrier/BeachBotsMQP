@@ -60,7 +60,8 @@ catkin_python_setup()
    PassAvoidTask.srv
    PassDumpTask.srv
    RequestCleanTask.srv
-   Identify.srv	
+   Identify.srv
+   ImageTransfer.srv
 )
 
 ## Generate actions in the 'action' folder
