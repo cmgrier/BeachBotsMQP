@@ -10,7 +10,7 @@ from cv_bridge import CvBridge, CvBridgeError
 from std_msgs.msg import Bool
 from geometry_msgs.msg import Point
 from sensor_msgs.msg import Image
-from small_bot.srv import ImageTransfer
+#from small_bot.srv import ImageTransfer
 
 
 class CVMain:
@@ -43,7 +43,7 @@ class CVMain:
             ret, frame = self.cap.read()
 
             # Initial Processing
-            frame = self.brightness_and_contrast_auto_service(frame)
+            frame = self.brightness_and_contrast_auto(frame)
 
             # Main Video Processing
             frame = self.video_process(frame)
@@ -58,22 +58,28 @@ class CVMain:
 
         return frame
 
-    def brightness_and_contrast_auto_service(self, frame):
+    def brightness_and_contrast_auto(self, frame):
 
-        rospy.wait_for_service('brightness_and_contrast')
-        try:
-            try:
-                cv_image = self.bridge.cv2_to_imgmsg(frame, "bgr8")
-                service_request = rospy.ServiceProxy('brightness_and_contrast', ImageTransfer)
-                new_frame = service_request(cv_image)
-                return new_frame
 
-            except CvBridgeError as e:
-                print(e)
 
-        except rospy.ServiceException as e:
+        return frame
 
-            print("Service call failed: %s" % e)
+    # def brightness_and_contrast_auto_service(self, frame):
+    #
+    #     rospy.wait_for_service('brightness_and_contrast')
+    #     try:
+    #         try:
+    #             cv_image = self.bridge.cv2_to_imgmsg(frame, "bgr8")
+    #             service_request = rospy.ServiceProxy('brightness_and_contrast', ImageTransfer)
+    #             new_frame = service_request(cv_image)
+    #             return new_frame
+    #
+    #         except CvBridgeError as e:
+    #             print(e)
+    #
+    #     except rospy.ServiceException as e:
+    #
+    #         print("Service call failed: %s" % e)
 
     def get_cords(self, frame):
 

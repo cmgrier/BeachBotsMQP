@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="be179176-b088-4180-a92d-f3692eb0d709" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/small_bot/src/small_bot/cv/AutoCB.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/small_bot/src/small_bot/cv/AutoCB.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/small_bot/src/small_bot/cv/CVMain.py" beforeDir="false" afterPath="$PROJECT_DIR$/small_bot/src/small_bot/cv/CVMain.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -21,49 +21,23 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/small_bot/src/small_bot/cv/CVMain.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="15">
-              <caret line="1" lean-forward="true" selection-start-line="1" selection-end-line="1" />
+            <state relative-caret-position="442">
+              <caret line="62" column="8" selection-start-line="62" selection-start-column="8" selection-end-line="62" selection-end-column="8" />
               <folding>
-                <element signature="e#0#18#0" expanded="true" />
+                <element signature="e#23#41#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/small_bot/src/small_bot/Avoid.py">
-          <provider selected="true" editor-type-id="text-editor" />
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/small_bot/srv/ImageTransfer.srv">
-          <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret column="23" lean-forward="true" selection-start-column="23" selection-end-column="23" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/small_bot/src/small_bot/Test.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret selection-end-column="21" />
-              <folding>
-                <element signature="e#22#32#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/small_bot/src/small_bot/cv/AutoCB.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="270">
-              <caret line="18" column="46" selection-start-line="18" selection-start-column="46" selection-end-line="18" selection-end-column="46" />
+            <state relative-caret-position="842">
+              <caret line="112" column="11" lean-forward="true" selection-start-line="46" selection-start-column="4" selection-end-line="112" selection-end-column="11" />
             </state>
           </provider>
         </entry>
@@ -92,8 +66,8 @@
         <option value="$PROJECT_DIR$/small_bot/src/small_bot/cv/Main.py" />
         <option value="$PROJECT_DIR$/small_bot/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/small_bot/srv/ImageTransfer.srv" />
-        <option value="$PROJECT_DIR$/small_bot/src/small_bot/cv/CVMain.py" />
         <option value="$PROJECT_DIR$/small_bot/src/small_bot/cv/AutoCB.cpp" />
+        <option value="$PROJECT_DIR$/small_bot/src/small_bot/cv/CVMain.py" />
       </list>
     </option>
   </component>
@@ -215,7 +189,7 @@
     <frame x="65" y="24" width="928" height="1056" extended-state="4" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.11491713" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.34917128" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -259,26 +233,6 @@
     <entry file="file://$PROJECT_DIR$/small_bot/src/small_bot/CleanZone.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/small_bot/srv/ImageTransfer.srv">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="23" lean-forward="true" selection-start-column="23" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/small_bot/src/small_bot/Avoid.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/small_bot/src/small_bot/cv/CVMain.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="1" lean-forward="true" selection-start-line="1" selection-end-line="1" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/small_bot/src/small_bot/Test.py">
       <provider selected="true" editor-type-id="text-editor">
         <state>
@@ -289,10 +243,30 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/small_bot/srv/ImageTransfer.srv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="23" lean-forward="true" selection-start-column="23" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/small_bot/src/small_bot/Avoid.py">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
     <entry file="file://$PROJECT_DIR$/small_bot/src/small_bot/cv/AutoCB.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="18" column="46" selection-start-line="18" selection-start-column="46" selection-end-line="18" selection-end-column="46" />
+        <state relative-caret-position="842">
+          <caret line="112" column="11" lean-forward="true" selection-start-line="46" selection-start-column="4" selection-end-line="112" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/small_bot/src/small_bot/cv/CVMain.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="442">
+          <caret line="62" column="8" selection-start-line="62" selection-start-column="8" selection-end-line="62" selection-end-column="8" />
+          <folding>
+            <element signature="e#23#41#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
