@@ -18,6 +18,8 @@ class Task:
             self.priority = 1
         elif self.type == "dump":
             self.priority = 2
+        else:
+            self.priority = 4
 
     def __repr__(self):
         return str((self.type, self.workerID, self.zone, self.isActive, self.isComplete))
@@ -28,3 +30,4 @@ class Task:
 
     def to_service_format(self):
         return [self.isActive, self.isComplete, self.workerID, self.type, self.zone, self.start_point]
+

@@ -1,10 +1,7 @@
 #!/usr/bin/env python
 import rospy
-from std_msgs.msg import String
-from small_bot.TaskIdentifier import TaskIdentifier
 from data.Task import Task
-from small_bot.srv import RequestCleanTask, PassAvoidTask, PassDumpTask, Identify
-from support.EqualPriorityQueue import EqualPriorityQueue
+from small_bot.srv import RequestCleanTask, PassAvoidTask, RequestDumpTask, Identify
 import RPi.GPIO as GPIO
 from support.Constants import *
 
@@ -16,17 +13,14 @@ This class also updates the status for the avoid and return tasks
 class TaskSeeker:
 
 
-    def __init__(self):
+    def __init__(self, smallbot):
         rospy.init_node('task_seeker', anonymous=True)
-        self.TaskIdentifier = TaskIdentifier(self)
-        self.currentTask = None
-        self.Tasks = EqualPriorityQueue()
-        self.ID = -1
-        self.request_ID()
+        self.smallbot = smallbot
+        """
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(INTERRUPT_OUTPUT, GPIO.OUT)
         GPIO.output(INTERRUPT_OUTPUT, GPIO.LOW)
-        #self.send_to_id()
+        """
 
 
     def parse_task(self, taskResponse):
@@ -58,8 +52,6 @@ class TaskSeeker:
             rospy.loginfo("new ID: " + str(self.ID))
             topic_name = "robot_avoid_"+str(self.ID)
             s = rospy.Service(topic_name, PassAvoidTask, self.update_avoid_status_handler)
-            topic_name = "robot_dump_" + str(self.ID)
-            s2 = rospy.Service(topic_name, PassDumpTask, self.update_dump_status_handler)
         except rospy.ServiceException, e:
             rospy.loginfo("Service call (request_ID) failed: %s" % e)
 
@@ -73,9 +65,9 @@ class TaskSeeker:
         print("trying to request")
         try:
             zone_request = rospy.ServiceProxy('give_zones', RequestCleanTask)
-            clean_task = zone_request(self.ID)
+            clean_task = zone_request(self.smallbot.ID)
             clean_task = self.parse_task(clean_task)
-            self.Tasks.put(clean_task.priority, clean_task)
+            self.smallbot.Tasks.put(clean_task.priority, clean_task)
             rospy.loginfo(self.Tasks)
         except rospy.ServiceException, e:
             rospy.loginfo("Service call failed: %s" % e)
@@ -92,44 +84,30 @@ class TaskSeeker:
         """
         rospy.loginfo("Handling avoid status request")
         avoid_task = self.parse_task(req)
-        self.Tasks.put(avoid_task.priority, avoid_task)
-        rospy.loginfo(self.Tasks)
+        self.smallbot.Tasks.put(avoid_task.priority, avoid_task)
+        """
         GPIO.output(INTERRUPT_OUTPUT, GPIO.HIGH)
         GPIO.output(INTERRUPT_OUTPUT, GPIO.LOW)
+        """
         return "Avoid Task Added To Robot ID: " + str(self.ID)
 
 
 
 
     #When service is requested, updates amd adds a dump task to the priority queue
-    def update_dump_status_handler(self, req):
+    def request_dump_task(self):
         """
-        Service that adds a dump Task to the task list
-        :param req: parameters for an avoid Task
-        :return: a string to notify service completion
-        """
-        rospy.loginfo("Handling DUMP status request")
-        dump_task = self.parse_task(req)
-        self.Tasks.put(dump_task.priority, dump_task)
-        rospy.loginfo(self.Tasks)
-        return "Dump Task Added To Robot ID: " + str(self.ID)
-
-
-
-    #Send task to be identified for appropriate execution
-    def send_to_id(self):
-        """
-        Sends the first element in the priority queue to be identified
+        Client that asks for a dump Task and adds it to the task list
         :return:
         """
-        self.currentTask = self.Tasks.get()
-        self.TaskIdentifier.task_ID(self.currentTask)
+        rospy.wait_for_service('give_dump')
+        print("trying to request")
+        try:
+            zone_request = rospy.ServiceProxy('give_dump', RequestDumpTask)
+            dump_task = zone_request(self.smallbot.ID)
+            dump_task = self.parse_task(dump_task)
+            self.smallbot.Tasks.put(dump_task.priority, dump_task)
+        except rospy.ServiceException, e:
+            rospy.loginfo("Service call failed: %s" % e)
 
 
-
-if __name__ == "__main__":
-    try:
-        ts = TaskSeeker()
-
-    except KeyboardInterrupt:
-        GPIO.cleanup()
