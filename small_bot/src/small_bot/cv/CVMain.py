@@ -1,16 +1,12 @@
 #!/usr/bin/env python
 
+# Imports
 import numpy as np
 import cv2
 import rospy
 import sys
-import roslib
-
-from cv_bridge import CvBridge, CvBridgeError
 from std_msgs.msg import Bool
 from geometry_msgs.msg import Point
-from sensor_msgs.msg import Image
-#from small_bot.srv import ImageTransfer
 
 
 class CVMain:
@@ -24,7 +20,6 @@ class CVMain:
         # Subscribers and Publishers
         rospy.Subscriber("/cv_trigger", Bool, self.is_running_callback)
         self.pub = rospy.Publisher("/blob_cords", Point)
-        self.bridge = CvBridge()
 
         # Get the Camera Video
         self.cap = cv2.VideoCapture(0)
@@ -39,56 +34,92 @@ class CVMain:
         """
         while self.isRunning:
 
-            # Capture frame-by-frame
+            # Image Acquisition
             ret, frame = self.cap.read()
 
-            # Initial Processing
-            frame = self.brightness_and_contrast_auto(frame)
+            # Image Enhancement
+            frame = self.enhancement(frame)
 
-            # Main Video Processing
-            frame = self.video_process(frame)
+            # Segmentation
+            frame = self.segmentation(frame)
 
-            self.get_cords(frame)
+            # Post Processing
+            frame = self.post_processing(frame)
 
+            # Information Extraction
+            x, y = self.info_extract(frame)
+
+            # Publish Information
+            self.pub_cords(x, y)
+
+            # Necessary to make loop run
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 
     @staticmethod
-    def video_process(frame):
+    def enhancement(frame):
+        """
+        Computer Vision Image Enhancement function
+        :param frame: a frame
+        :return: a modified frame
+        """
+
+        # Convert the image into YUV
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2YUV)
+
+        # Equalize the histogram of the Y channel
+        frame[:, :, 0] = cv2.equalizeHist(frame[:, :, 0])
+
+        # Convert the image back to RGB
+        return cv2.cvtColor(frame, cv2.COLOR_YUV2BGR)
+
+    @staticmethod
+    def segmentation(frame):
+        """
+        Computer Vision Image Segmentation where we will distinguish unusual sand things
+        :param frame: a frame
+        :return: a modified frame
+        """
 
         return frame
 
-    def brightness_and_contrast_auto(self, frame):
-
-
+    @staticmethod
+    def post_processing(frame):
+        """
+        Computer Vision Post Processing (Fixes Segmentation)
+        :param frame: a frame
+        :return: a modified frame
+        """
 
         return frame
 
-    # def brightness_and_contrast_auto_service(self, frame):
-    #
-    #     rospy.wait_for_service('brightness_and_contrast')
-    #     try:
-    #         try:
-    #             cv_image = self.bridge.cv2_to_imgmsg(frame, "bgr8")
-    #             service_request = rospy.ServiceProxy('brightness_and_contrast', ImageTransfer)
-    #             new_frame = service_request(cv_image)
-    #             return new_frame
-    #
-    #         except CvBridgeError as e:
-    #             print(e)
-    #
-    #     except rospy.ServiceException as e:
-    #
-    #         print("Service call failed: %s" % e)
+    @staticmethod
+    def info_extract(frame):
+        """
+        Extracts the information from a given frame
+        :param frame: a frame
+        :return: a tuple of x and y from bottom middle
+        """
 
-    def get_cords(self, frame):
+        x = 0
+        y = 0
+
+        return x, y
+
+    def pub_cords(self, x, y):
+        """
+        Publish a tuple as a point
+        :param x: the x distance from center, + is right, - is left
+        :param y: the y distance from bottom, only +
+        :return: void
+        """
 
         # Make new point
         new_point = Point()
 
         # Make Point message
-        new_point.x = 0
-        new_point.y = 0
+        new_point.x = x
+        new_point.y = y
         new_point.z = 0
 
         # Publish point
