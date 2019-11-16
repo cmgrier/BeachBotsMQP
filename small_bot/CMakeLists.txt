@@ -11,6 +11,8 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  geometry_msgs
+  sensor_msgs
   message_generation
 )
 
@@ -58,7 +60,7 @@ catkin_python_setup()
  add_service_files(
    FILES
    PassAvoidTask.srv
-   PassDumpTask.srv
+   RequestDumpTask.srv
    RequestCleanTask.srv
    Identify.srv
    ImageTransfer.srv
@@ -75,6 +77,8 @@ catkin_python_setup()
  generate_messages(
    DEPENDENCIES  
    std_msgs
+   geometry_msgs
+   sensor_msgs
 )
 
 ################################################

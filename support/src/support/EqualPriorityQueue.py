@@ -57,6 +57,19 @@ class EqualPriorityQueue:
         else:
             return False
 
+
+    def has(self, priority):
+        """
+        Checks to see if an item of the specified priority is in the queue
+        :param priority: The item's priority to search
+        :return: True if item was found
+        """
+        for item in self.queue:
+            if item[0] == priority:
+                return True
+        return False
+
+
     def __getitem__(self, item):
         """
         Magic function to allow printing parts of this list from the class

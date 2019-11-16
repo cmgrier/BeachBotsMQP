@@ -1,7 +1,8 @@
 bool isActive
 bool isComplete
 int32 workerID
-int32 zone
 string type
+int32 zone
+geometry_msgs/Pose startingPoint
 ---
 string resp

@@ -5,4 +5,4 @@ bool isComplete
 int32 workerID
 string type
 int32 zone
-Pose startingPoint
+geometry_msgs/Pose startingPoint
