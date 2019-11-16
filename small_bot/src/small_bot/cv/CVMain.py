@@ -59,6 +59,7 @@ class CVMain:
     @staticmethod
     def enhancement(frame):
         """
+        NOTE: COULD USE MORE ENHANCEMENT FOR NOW IT LOOKS FINE TO ME
         Computer Vision Image Enhancement function
         :param frame: a frame
         :return: a modified frame
