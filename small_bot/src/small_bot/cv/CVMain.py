@@ -49,8 +49,10 @@ class CVMain:
             # Information Extraction
             x, y = self.info_extract(frame)
 
-            # Publish Information
-            self.pub_cords(x, y)
+            # Current Handler for no cords
+            if x < 10000:
+                # Publish Information
+                self.pub_cords(x, y)
 
             # Necessary to make loop run
             if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -82,6 +84,10 @@ class CVMain:
         :return: a modified frame
         """
 
+        # Convert to Gray scale
+
+        # threshold them
+
         return frame
 
     @staticmethod
@@ -92,6 +98,10 @@ class CVMain:
         :return: a modified frame
         """
 
+        # Get rid of any static
+
+        # Improve Finally
+
         return frame
 
     @staticmethod
@@ -101,6 +111,10 @@ class CVMain:
         :param frame: a frame
         :return: a tuple of x and y from bottom middle
         """
+
+        # Extract the nearest largest object
+
+        # If not return x larger than a 10000 so that it knows its wrong
 
         x = 0
         y = 0
