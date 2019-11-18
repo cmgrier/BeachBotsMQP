@@ -111,5 +111,4 @@ if __name__ == "__main__":
     sbm.TaskSeeker.wait_for_service("robot_avoid_1")
     order_avoid(1, 123)
     print (sbm.tasks)
-
     assert len(sbm.tasks) is 2
