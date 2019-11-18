@@ -5,8 +5,10 @@ import numpy as np
 import cv2
 import rospy
 import sys
+from sensor_msgs.msg import Image
 from std_msgs.msg import Bool
 from geometry_msgs.msg import Point
+from cv_bridge import CvBridge, CvBridgeError
 
 
 class CVMain:
@@ -21,10 +23,14 @@ class CVMain:
         rospy.Subscriber("/cv_trigger", Bool, self.is_running_callback)
         self.pub = rospy.Publisher("/blob_cords", Point)
 
+        self.init_image_pub = rospy.Publisher("/init_image", Image)
+        self.curr_image_pub = rospy.Publisher("/curr_image", Image)
+
         # Get the Camera Video
         self.cap = cv2.VideoCapture(0)
 
         # Initialization of variables
+        self.bridge = CvBridge()
         self.isRunning = False
 
     def main_process(self):
@@ -37,8 +43,14 @@ class CVMain:
             # Image Acquisition
             ret, frame = self.cap.read()
 
+            # Publish the original image (MOVE THIS TO TEST FUNCTIONS)
+            self.publish_image(frame, True)
+
             # Image Enhancement
             frame = self.enhancement(frame)
+
+            # Publish the fixed Image (MOVE THIS STATEMENT TO TEST FUNCTIONS)
+            self.publish_image(frame, False)
 
             # Segmentation
             frame = self.segmentation(frame)
@@ -57,6 +69,25 @@ class CVMain:
             # Necessary to make loop run
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
+
+    def publish_image(self, cv_image, is_init):
+        """
+        Publishes the image to the selected topic
+        :param cv_image: an image
+        :param is_init: if it is the initial image or not
+        :return: void
+        """
+
+        if is_init:
+            try:
+                self.init_image_pub.publish(self.bridge.cv2_to_imgmsg(cv_image, "bgr8"))
+            except CvBridgeError as e:
+                print(e)
+        else:
+            try:
+                self.curr_image_pub.publish(self.bridge.cv2_to_imgmsg(cv_image, "bgr8"))
+            except CvBridgeError as e:
+                print(e)
 
     @staticmethod
     def enhancement(frame):
