@@ -10,6 +10,11 @@ import rospy
 if __name__ == "__main__":
     emptyRobotList = []
     CM = CleaningManager(emptyRobotList)
+    while 1:
+        CM.robotManager.director.send_safe(1)
+        print("sent safe message")
+
+    """
     cleaningTask1 = Task(Zone([1,1,1,1], 0))
     CM.cleaningTasks.append(cleaningTask1)
     cleaningTask2 = Task(Zone([1, 1, 1, 1], 1))
@@ -43,3 +48,4 @@ if __name__ == "__main__":
     TS.send_to_id()
     assert len(TS.Tasks) is 1
     print(len(TS.Tasks))
+    """
