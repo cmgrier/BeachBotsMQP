@@ -3,8 +3,8 @@ from small_bot.TaskSeeker import TaskSeeker
 from test.srv import RequestCleanTask, Identify, PassDumpTask, PassAvoidTask
 from data.Task import Task
 import rospy
-
-
+from small_bot.SmallBotManager import SmallBotManager
+from geometry_msgs.msg import Pose
 
 #Test variables
 Tasks = []
@@ -20,17 +20,20 @@ def ros_node():
     s = rospy.Service('identify_worker', Identify, give_ID_handler)
 
 
+
 def give_ID_handler( robo_id):
     """
     Service for giving a small_vot an ID and adding it to the workforce list
     :param robo_id: current ID of the small_vot
     :return: a next avaivle rovot ID numver
     """
-    if robo_id.ID is -1:
+    if robo_id.ID == -1:
+        print("LOOKS LIKE ID WAS ORIGINALLY -1")
         workerID = len(robotList) + 1
         robotList.append("Robot: " + str(workerID))
         return workerID
     else:
+        print("ID WAS NOT ORIGINALLY -1")
         return robo_id.ID
 
 
@@ -41,42 +44,45 @@ def give_zones_handler( robo_id):
         :return: fields for a clean Task
         """
         latestTask = Task(3)
-        if robo_id.workerID is -1:
-            Tasks.append("Robot")
-            latestTask.workerID = len(Tasks)
-        else:
-            latestTask.workerID = robo_id.workerID
-            # [isActive, isComplete, WorkerID, Zone, Task type]
-        return [True, False, latestTask.workerID, 123, "clean"]
+        latestTask.workerID = robo_id.workerID
+        start = Pose()
+        start.position.x = 30
+            # ['isActive', 'isComplete', 'workerID', 'type', 'zone', 'startingPoint']
+        return [True, False, latestTask.workerID, "clean", 123, start]
 
 def order_avoid( ID, zone):
         """
-        Client for semdimg avoid Tasks to two smallvots
-        :param ID: ID of rovot
+        Client for sendimg avoid Tasks to two smallbots
+        :param ID: ID of robot
         :param zone:
         :return:
         """
         rospy.wait_for_service("robot_avoid_"+str(ID))
         try:
             give_request = rospy.ServiceProxy('robot_avoid_' + str(ID), PassAvoidTask)
-            send_avoid = give_request(True, False, ID, zone, "avoid")
+            start = Pose()
+            start.position.y = 30
+            # ['isActive', 'isComplete', 'workerID', 'type', 'zone', 'startingPoint']
+            return [True, False, ID, "avoid", zone, start]
 
         except rospy.ServiceException, e:
             rospy.loginfo("Service call failed: %s" % e)
 
 
-def order_dump( ID, zone):
+def order_dump(ID, zone):
         """
-        Client for semdimg avoid Tasks to two smallvots
-        :param ID: ID of rovot
+        Client for sendimg avoid Tasks to two smallbots
+        :param ID: ID of robot
         :param zone:
         :return:
         """
         rospy.wait_for_service("robot_dump_"+str(ID))
         try:
             give_request = rospy.ServiceProxy('robot_dump_' + str(ID), PassDumpTask)
-            send_dump = give_request(True, False, ID, zone, "dump")
-
+            start = Pose()
+            start.position.z = 30
+            # ['isActive', 'isComplete', 'workerID', 'type', 'zone', 'startingPoint']
+            return [True, False, ID, "dump", zone, start]
         except rospy.ServiceException, e:
             rospy.loginfo("Service call failed: %s" % e)
 
@@ -84,38 +90,22 @@ def order_dump( ID, zone):
 
 if __name__ == "__main__":
     ros_node()
-    TS = TaskSeeker()
+    sbm = SmallBotManager()
+    sbm.TaskSeeker.request_ID()
 #Test ID service request
-    while(TS.ID == -1):
+    while(sbm.id == -1):
          x = True
-    assert TS.ID == 1
+    assert sbm.id == 1
 
 #Test get clean task service request
-    assert len(TS.Tasks) is 0
-    TS.request_clean_task()
-    while(len(TS.Tasks) is 0):
+    assert len(sbm.tasks) is 0
+    sbm.TaskSeeker.request_clean_task()
+    while(len(sbm.tasks) is 0):
         x = True
-    assert len(TS.Tasks) is 1
+    assert len(sbm.tasks) is 1
 
-#Test interrupt
-    TS.send_to_id()
-    order_avoid(1, 120)
-    print("exited TS")
-"""    
-#Test give avoid service request
-    order_avoid(1, 120)
-    assert len(TS.Tasks) is 2
-    task =  TS.Tasks.get()
-    assert task.isActive == True
-    assert task.isComplete == False
-    assert task.workerID is 1
-    assert task.zone == 120
-    assert task.type == "avoid"
 
-#Test send to ID
-    print("**************************")
-    print(len(TS.Tasks))
-    TS.send_to_id()
-    assert len(TS.Tasks) is 1
-    print(len(TS.Tasks))
-"""
+#Test add avoid service request
+
+    order_avoid(1, 123)
+    assert len(sbm.tasks) is 2

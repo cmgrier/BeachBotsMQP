@@ -2,7 +2,7 @@
 import rospy
 from data.Task import Task
 from small_bot.srv import RequestCleanTask, PassAvoidTask, RequestDumpTask, Identify
-import RPi.GPIO as GPIO
+#import RPi.GPIO as GPIO
 from support.Constants import *
 
 
@@ -33,7 +33,7 @@ class TaskSeeker:
         task.isActive = taskResponse.isActive
         task.isComplete = taskResponse.isComplete
         task.workerID = taskResponse.workerID
-        task.start_point = taskResponse.start_point
+        task.start_point = taskResponse.startingPoint
         return task
 
 
@@ -45,13 +45,15 @@ class TaskSeeker:
         rospy.wait_for_service('identify_worker')
         print("trying to request")
         try:
-            rospy.loginfo("Current ID: " + str(self.ID))
+            rospy.loginfo("Current ID: " + str(self.smallbot.id))
             request = rospy.ServiceProxy('identify_worker', Identify)
-            service_result = request(self.ID)
-            self.ID = service_result.newID
-            rospy.loginfo("new ID: " + str(self.ID))
-            topic_name = "robot_avoid_"+str(self.ID)
+            service_result = request(self.smallbot.id)
+            self.smallbot.id = service_result.newID
+            rospy.loginfo("new ID: " + str(self.smallbot.id))
+            topic_name = "robot_avoid_"+str(self.smallbot.id)
             s = rospy.Service(topic_name, PassAvoidTask, self.update_avoid_status_handler)
+
+
         except rospy.ServiceException, e:
             rospy.loginfo("Service call (request_ID) failed: %s" % e)
 
@@ -65,10 +67,10 @@ class TaskSeeker:
         print("trying to request")
         try:
             zone_request = rospy.ServiceProxy('give_zones', RequestCleanTask)
-            clean_task = zone_request(self.smallbot.ID)
+            clean_task = zone_request(self.smallbot.id)
             clean_task = self.parse_task(clean_task)
-            self.smallbot.Tasks.put(clean_task.priority, clean_task)
-            rospy.loginfo(self.Tasks)
+            self.smallbot.tasks.put(clean_task.priority, clean_task)
+            rospy.loginfo(self.smallbot.tasks)
         except rospy.ServiceException, e:
             rospy.loginfo("Service call failed: %s" % e)
 
@@ -84,12 +86,12 @@ class TaskSeeker:
         """
         rospy.loginfo("Handling avoid status request")
         avoid_task = self.parse_task(req)
-        self.smallbot.Tasks.put(avoid_task.priority, avoid_task)
+        self.smallbot.tasks.put(avoid_task.priority, avoid_task)
         """
         GPIO.output(INTERRUPT_OUTPUT, GPIO.HIGH)
         GPIO.output(INTERRUPT_OUTPUT, GPIO.LOW)
         """
-        return "Avoid Task Added To Robot ID: " + str(self.ID)
+        return "Avoid Task Added To Robot ID: " + str(self.smallbot.id)
 
 
 
@@ -104,9 +106,9 @@ class TaskSeeker:
         print("trying to request")
         try:
             zone_request = rospy.ServiceProxy('give_dump', RequestDumpTask)
-            dump_task = zone_request(self.smallbot.ID)
+            dump_task = zone_request(self.smallbot.id)
             dump_task = self.parse_task(dump_task)
-            self.smallbot.Tasks.put(dump_task.priority, dump_task)
+            self.smallbot.tasks.put(dump_task.priority, dump_task)
         except rospy.ServiceException, e:
             rospy.loginfo("Service call failed: %s" % e)
 

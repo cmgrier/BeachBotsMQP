@@ -1,7 +1,8 @@
 from support.EqualPriorityQueue import EqualPriorityQueue
 from small_bot.TaskManager import TaskManager
+from small_bot.TaskSeeker import TaskSeeker
 from data.Task import Task
-from geometry_msgs import Pose
+from geometry_msgs.msg import Pose
 
 class SmallBotManager:
 
@@ -12,11 +13,11 @@ class SmallBotManager:
         self.id = -1
         self.position = Pose()
         self.taskManager = TaskManager(self)
-        self.TaskSeeker(self)
-        self.request_id()
+        self.TaskSeeker = TaskSeeker(self)
+        """self.request_id()
         if self.id != -1:
             self.main()
-
+        """
     def main(self):
         """
         Main loop for small robot
