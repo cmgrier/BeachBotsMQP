@@ -36,6 +36,24 @@ class Director:
         task = Task()
         pass
 
+    def send_avoid(self, goal, workerID):
+        task = Task()
+        task.make_avoid_task(goal, workerID)
+        topic_name = 'avoid_alert_' + str(workerID)
+        msg = task.to_service_format
+        pub = rospy.Publisher(topic_name, msgtype, queue_size=1)
+        pub.publish(msg)
+        pass
+
+    def send_safe(self, workerID):
+        task = Task()
+        task.make_safe_task(workerID)
+        topic_name = 'avoid_alert_' + str(workerID)
+        msg = task.to_service_format
+        pub = rospy.Publisher(topic_name, msgtype, queue_size=1)
+        pub.publish(msg)
+        pass
+
     # sends a Task to a robot to not move in order for another robot to avoid it
     # only called when all directions are unsafe to avoid to
     def play_possum(self, workerID):

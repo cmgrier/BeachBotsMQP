@@ -108,4 +108,5 @@ if __name__ == "__main__":
 #Test add avoid service request
 
     order_avoid(1, 123)
+
     assert len(sbm.tasks) is 2
