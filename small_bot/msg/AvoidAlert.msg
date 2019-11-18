@@ -1,0 +1,6 @@
+bool isActive
+bool isComplete
+int32 workerID
+string type
+int32 zone
+geometry_msgs/Pose startingPoint

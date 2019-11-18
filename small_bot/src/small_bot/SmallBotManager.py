@@ -3,6 +3,7 @@ from small_bot.TaskManager import TaskManager
 from small_bot.TaskSeeker import TaskSeeker
 from data.Task import Task
 from geometry_msgs.msg import Pose
+from small_bot.msg import AvoidAlert
 
 class SmallBotManager:
 
@@ -64,8 +65,14 @@ class SmallBotManager:
         :return:
         """
         self.TaskSeeker.request_ID()
+        topic = "avoid_alert_" + str(self.id)
+        rospy.Subscriber(topic, AvoidAlert, self.avoidListener)
         pass
 
+    def avoidListener(self, data):
+        if data.type == "avoid":
+            task = self.TaskSeeker.parse_task(data)
+            self.tasks.put(task.priority, task)
 
 
 if __name__ == "__main__":
