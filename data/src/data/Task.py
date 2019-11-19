@@ -10,7 +10,7 @@ class Task:
         self.start_point = None
         self.set_priority()
 
-#set the priority level of the task based on the type
+    # set the priority level of the task based on the type
     def set_priority(self):
         if self.type == "clean":
             self.priority = 3
@@ -24,7 +24,6 @@ class Task:
     def __repr__(self):
         return str((self.type, self.workerID, self.zone, self.isActive, self.isComplete))
 
-
     def __str__(self):
         return str((self.type, self.workerID, self.zone, self.isActive, self.isComplete))
 
@@ -32,8 +31,8 @@ class Task:
         return [self.isActive, self.isComplete, self.workerID, self.type, self.zone, self.start_point]
 
     def make_safe_task(self, worker_id):
-        self.isActive = None
-        self.isComplete = None
+        self.isActive = False
+        self.isComplete = False
         self.type = "safe"
         self.zone = None
         self.priority = None

@@ -20,11 +20,11 @@ class CVMain:
         rospy.init_node('CV')
 
         # Subscribers and Publishers
-        rospy.Subscriber("/cv_trigger", Bool, self.is_running_callback)
-        self.pub = rospy.Publisher("/blob_cords", Point)
+        rospy.Subscriber("cv_trigger", Bool, self.is_running_callback)
+        self.pub = rospy.Publisher("blob_cords", Point)
 
-        self.init_image_pub = rospy.Publisher("/init_image", Image)
-        self.curr_image_pub = rospy.Publisher("/curr_image", Image)
+        self.init_image_pub = rospy.Publisher("init_image", Image)
+        self.curr_image_pub = rospy.Publisher("curr_image", Image)
 
         # Get the Camera Video
         self.cap = cv2.VideoCapture(0)
@@ -46,7 +46,7 @@ class CVMain:
             # Publish the original image (MOVE THIS TO TEST FUNCTIONS)
             self.publish_image(frame, True)
 
-            # Image Enhancement
+            # Image Enhancements
             frame = self.enhancement(frame)
 
             # Publish the fixed Image (MOVE THIS STATEMENT TO TEST FUNCTIONS)
