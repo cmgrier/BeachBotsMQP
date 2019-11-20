@@ -178,11 +178,9 @@ class CVMain:
         :return: void
         """
         self.isRunning = msg.data
-        print(msg.data)
+        print("" + msg.data)
         if self.isRunning:
             self.main_process()
-
-
 
 
 if __name__ == "__main__":
