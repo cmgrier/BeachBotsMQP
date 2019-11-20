@@ -17,6 +17,9 @@ class CVOutput:
         Initialization of the output from testing
         """
 
+        # Initialization of the node
+        rospy.init_node('CV_1')
+
         # Subscribers
         rospy.Subscriber('init_image', Image, self.init_image_callback)
         rospy.Subscriber('curr_image', Image, self.curr_image_callback)
