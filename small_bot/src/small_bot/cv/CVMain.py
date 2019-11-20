@@ -53,7 +53,7 @@ class CVMain:
             frame = self.enhancement(frame)
 
             # Publish the fixed Image (MOVE THIS STATEMENT TO TEST FUNCTIONS)
-            # self.publish_image(frame, False)
+            self.publish_image(frame, False)
 
             # Segmentation
             frame = self.segmentation(frame)
@@ -69,8 +69,7 @@ class CVMain:
                 # Publish Information
                 # self.pub_cords(x, y)
 
-            print("Done")
-            time.sleep(.5)
+            time.sleep(.2)
 
             # Necessary to make loop run
             if cv2.waitKey(1) & 0xFF == ord('q'):
