@@ -26,9 +26,6 @@ class CVMain:
         self.init_image_pub = rospy.Publisher("init_image", Image, queue_size=1)
         self.curr_image_pub = rospy.Publisher("curr_image", Image, queue_size=1)
 
-        # Get the Camera Video
-        self.cap = cv2.VideoCapture(0)
-
         # Initialization of variables
         self.bridge = CvBridge()
         self.isRunning = False
@@ -38,10 +35,13 @@ class CVMain:
         Runs the main process on the video
         :return: void
         """
+        
+        cap = cv2.VideoCapture(0)
+
         while self.isRunning:
 
             # Image Acquisition
-            ret, frame = self.cap.read()
+            ret, frame = cap.read()
 
             # Publish the original image (MOVE THIS TO TEST FUNCTIONS)
             self.publish_image(frame, True)
