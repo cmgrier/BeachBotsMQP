@@ -36,7 +36,7 @@ class CVOutput:
         :return: void
         """
         try:
-            cv_image = self.bridge.imgmsg_to_cv2(msg.data, "bgr8")
+            cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
             cv2.imshow('initial image', cv_image)
         except CvBridgeError as e:
             print(e)
@@ -48,7 +48,7 @@ class CVOutput:
         :return: void
         """
         try:
-            cv_image = self.bridge.imgmsg_to_cv2(msg.data, "bgr8")
+            cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
             cv2.imshow('current image', cv_image)
         except CvBridgeError as e:
             print(e)
