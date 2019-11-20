@@ -184,3 +184,4 @@ class CVMain:
 
 if __name__ == "__main__":
     cv_main = CVMain()
+    rospy.spin()
