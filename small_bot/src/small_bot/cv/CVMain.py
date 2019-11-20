@@ -6,7 +6,7 @@ import cv2
 import rospy
 import time
 import sys
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import Image, CompressedImage
 from std_msgs.msg import Bool
 from geometry_msgs.msg import Point
 from cv_bridge import CvBridge, CvBridgeError
@@ -24,8 +24,8 @@ class CVMain:
         rospy.Subscriber("cv_trigger", Bool, self.is_running_callback)
         self.pub = rospy.Publisher("blob_cords", Point, queue_size=1)
 
-        self.init_image_pub = rospy.Publisher("init_image", Image, queue_size=1)
-        self.curr_image_pub = rospy.Publisher("curr_image", Image, queue_size=1)
+        self.init_image_pub = rospy.Publisher("init_image", CompressedImage, queue_size=1)
+        self.curr_image_pub = rospy.Publisher("curr_image", CompressedImage, queue_size=1)
 
         # Initialization of variables
         self.bridge = CvBridge()
@@ -47,13 +47,17 @@ class CVMain:
             ret, frame = cap.read()
 
             # Publish the original image (MOVE THIS TO TEST FUNCTIONS)
-            self.publish_image(frame, True)
+            # self.publish_image(frame, True)
+
+            self.init_image_pub.publish(self.make_compressed_msg(frame))
 
             # Image Enhancements
             frame = self.enhancement(frame)
 
             # Publish the fixed Image (MOVE THIS STATEMENT TO TEST FUNCTIONS)
-            self.publish_image(frame, False)
+            # self.publish_image(frame, False)
+
+            self.curr_image_pub.publish(self.make_compressed_msg(frame))
 
             # Segmentation
             frame = self.segmentation(frame)
@@ -74,6 +78,21 @@ class CVMain:
             # Necessary to make loop run
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
+
+    @staticmethod
+    def make_compressed_msg(frame):
+        """
+
+        :param frame:
+        :return:
+        """
+
+        msg = CompressedImage()
+        msg.header.stamp = rospy.Time.now()
+        msg.format = "jpeg"
+        msg.data = np.array(cv2.imencode('.jpg', frame)[1]).tostring()
+
+        return msg
 
     def publish_image(self, cv_image, is_init):
         """
