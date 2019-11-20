@@ -4,6 +4,7 @@
 import numpy as np
 import cv2
 import rospy
+import time
 import sys
 from sensor_msgs.msg import Image
 from std_msgs.msg import Bool
@@ -30,12 +31,14 @@ class CVMain:
         self.bridge = CvBridge()
         self.isRunning = False
 
+        print("Finished Initialization of CV")
+
     def main_process(self):
         """
         Runs the main process on the video
         :return: void
         """
-        
+
         cap = cv2.VideoCapture(0)
 
         while self.isRunning:
@@ -50,7 +53,7 @@ class CVMain:
             frame = self.enhancement(frame)
 
             # Publish the fixed Image (MOVE THIS STATEMENT TO TEST FUNCTIONS)
-            self.publish_image(frame, False)
+            # self.publish_image(frame, False)
 
             # Segmentation
             frame = self.segmentation(frame)
@@ -62,9 +65,12 @@ class CVMain:
             x, y = self.info_extract(frame)
 
             # Current Handler for no cords
-            if x < 10000:
+            # if x < 10000:
                 # Publish Information
-                self.pub_cords(x, y)
+                # self.pub_cords(x, y)
+
+            print("Done")
+            time.sleep(.5)
 
             # Necessary to make loop run
             if cv2.waitKey(1) & 0xFF == ord('q'):
