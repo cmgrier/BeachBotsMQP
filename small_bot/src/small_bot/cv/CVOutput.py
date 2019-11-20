@@ -5,7 +5,7 @@ import numpy as np
 import cv2
 import rospy
 import sys
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import Image, CompressedImage
 from std_msgs.msg import Bool
 from geometry_msgs.msg import Point
 from cv_bridge import CvBridge, CvBridgeError
@@ -21,8 +21,12 @@ class CVOutput:
         rospy.init_node('CV_1')
 
         # Subscribers
-        rospy.Subscriber('init_image', Image, self.init_image_callback)
-        rospy.Subscriber('curr_image', Image, self.curr_image_callback)
+        rospy.Subscriber('init_image', CompressedImage, self.init_image_callback)
+        rospy.Subscriber('curr_image', CompressedImage, self.curr_image_callback)
+
+        # Publishers
+        self.init_pub = rospy.Publisher('init_image_final', Image, queue_size=10)
+        self.curr_pub = rospy.Publisher('curr_image_final', Image, queue_size=10)
 
         # Variable Declarations
         self.bridge = CvBridge()
@@ -35,9 +39,14 @@ class CVOutput:
         :param msg: the image message
         :return: void
         """
+
+        # Image to numpy array
+        nparr = np.fromstring(msg.data, np.uint8)
+        img_decode = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
         try:
-            cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
-            cv2.imshow('initial image', cv_image)
+            cv_image = self.bridge.cv2_to_imgmsg(img_decode, "bgr8")
+            self.init_pub.publish(cv_image)
         except CvBridgeError as e:
             print(e)
 
@@ -47,9 +56,13 @@ class CVOutput:
         :param msg: the image message
         :return: void
         """
+        # Image to numpy array
+        nparr = np.fromstring(msg.data, np.uint8)
+        img_decode = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
         try:
-            cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
-            cv2.imshow('current image', cv_image)
+            cv_image = self.bridge.cv2_to_imgmsg(img_decode, "bgr8")
+            self.curr_pub.publish(cv_image)
         except CvBridgeError as e:
             print(e)
 
