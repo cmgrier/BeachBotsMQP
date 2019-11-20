@@ -85,12 +85,12 @@ class CVMain:
 
         if is_init:
             try:
-                self.init_image_pub.publish(self.bridge.cv2_to_imgmsg(cv_image, "bgr8"))
+                self.init_image_pub.publish(self.bridge.cv2_to_imgmsg(cv_image, encoding="passthrough"))
             except CvBridgeError as e:
                 print(e)
         else:
             try:
-                self.curr_image_pub.publish(self.bridge.cv2_to_imgmsg(cv_image, "bgr8"))
+                self.curr_image_pub.publish(self.bridge.cv2_to_imgmsg(cv_image, encoding="passthrough"))
             except CvBridgeError as e:
                 print(e)
 

@@ -24,6 +24,11 @@ class CVOutput:
         rospy.Subscriber('init_image', Image, self.init_image_callback)
         rospy.Subscriber('curr_image', Image, self.curr_image_callback)
 
+        # Variable Declarations
+        self.bridge = CvBridge()
+
+        print("CV_1 Node Initialized")
+
     def init_image_callback(self, msg):
         """
         Image Callback (Displays an image)
