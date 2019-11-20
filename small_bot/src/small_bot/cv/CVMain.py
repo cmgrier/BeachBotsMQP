@@ -21,10 +21,10 @@ class CVMain:
 
         # Subscribers and Publishers
         rospy.Subscriber("cv_trigger", Bool, self.is_running_callback)
-        self.pub = rospy.Publisher("blob_cords", Point)
+        self.pub = rospy.Publisher("blob_cords", Point, queue_size=10)
 
-        self.init_image_pub = rospy.Publisher("init_image", Image)
-        self.curr_image_pub = rospy.Publisher("curr_image", Image)
+        self.init_image_pub = rospy.Publisher("init_image", Image, queue_size=10)
+        self.curr_image_pub = rospy.Publisher("curr_image", Image, queue_size=10)
 
         # Get the Camera Video
         self.cap = cv2.VideoCapture(0)
