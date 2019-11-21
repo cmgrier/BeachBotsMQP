@@ -14,7 +14,7 @@ class SmallBotManager:
         self.id = -1
         self.position = Pose()
         self.taskManager = TaskManager(self)
-        self.TaskSeeker = TaskSeeker(self)
+        self.taskSeeker = TaskSeeker(self)
         """self.request_id()
         if self.id != -1:
             self.main()
@@ -41,7 +41,7 @@ class SmallBotManager:
         # check the services and update SmallBotManager's info
         clean = 3
         if self.tasks.has(clean) == False:
-            self.TaskSeeker.request_clean_task()
+            self.taskSeeker.request_clean_task()
 
         #TODO update robots position as well as add more info
         #Maybe have a ros listener for current position
@@ -64,14 +64,14 @@ class SmallBotManager:
         Requests basebot to ID smallbot
         :return:
         """
-        self.TaskSeeker.request_ID()
+        self.taskSeeker.request_ID()
         topic = "avoid_alert_" + str(self.id)
         rospy.Subscriber(topic, AvoidAlert, self.avoidListener)
         pass
 
     def avoidListener(self, data):
         if data.type == "avoid":
-            task = self.TaskSeeker.parse_task(data)
+            task = self.taskSeeker.parse_task(data)
             self.tasks.put(task.priority, task)
 
 

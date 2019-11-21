@@ -91,7 +91,7 @@ def order_dump(ID, zone):
 if __name__ == "__main__":
     ros_node()
     sbm = SmallBotManager()
-    sbm.TaskSeeker.request_ID()
+    sbm.taskSeeker.request_ID()
 #Test ID service request
     while(sbm.id == -1):
          x = True
@@ -99,16 +99,9 @@ if __name__ == "__main__":
 
 #Test get clean task service request
     assert len(sbm.tasks) is 0
-    sbm.TaskSeeker.request_clean_task()
+    sbm.taskSeeker.request_clean_task()
     while(len(sbm.tasks) is 0):
         x = True
     assert len(sbm.tasks) is 1
 
 
-#Test add avoid service request
-
-    order_avoid(1, 123)
-    sbm.TaskSeeker.wait_for_service("robot_avoid_1")
-    order_avoid(1, 123)
-    print (sbm.tasks)
-    assert len(sbm.tasks) is 2
