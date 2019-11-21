@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 from small_bot.TaskSeeker import TaskSeeker
+from baseBot.CleaningManager import CleaningManager
 from test.srv import RequestCleanTask, Identify, PassDumpTask, PassAvoidTask
 from data.Task import Task
 import rospy
 from small_bot.SmallBotManager import SmallBotManager
 from geometry_msgs.msg import Pose
+from test.msg import AvoidAlert
 
 #Test variables
 Tasks = []
@@ -105,3 +107,6 @@ if __name__ == "__main__":
     assert len(sbm.tasks) is 1
 
 
+#Test add avoid service request
+    rospy.wait_for_message("avoid_alert_1", AvoidAlert)
+    assert len(sbm.tasks) is 2

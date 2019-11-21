@@ -2,23 +2,25 @@
 from data.Task import Task
 from data.Robot import Robot
 from baseBot.srv import RequestCleanTask, PassAvoidTask, PassDumpTask, Identify
+from baseBot.msg import AvoidAlert
 import rospy
+
 
 class Director:
     def __init__(self, robot_manager, cleaning_manager):
         self.robotManager = robot_manager
         self.cleaningManager = cleaning_manager
-
+        self.pub = None
         self.ros_node()
         pass
 
     # Set up ROS initiators
     def ros_node(self):
-        rospy.init_node('task_seeker', anonymous=True)
-        s = rospy.Service('give_zones', RequestCleanTask, self.give_cleaning_task)
-        s = rospy.Service('identify_worker', Identify, self.give_ID)
-        s = rospy.Service('dump_request', PassDumpTask, self.handle_dump_request)
-
+        rospy.init_node('base_bot_director', anonymous=True)
+        # s = rospy.Service('give_zones', RequestCleanTask, self.give_cleaning_task)
+        # s = rospy.Service('identify_worker', Identify, self.give_ID)
+        # s = rospy.Service('dump_request', PassDumpTask, self.handle_dump_request)
+        self.pub = rospy.Publisher('avoid_alert_1', AvoidAlert, queue_size=10)
         print("ros node started")
 
     # The following methods will create Tasks to send to the small bots that will move them
@@ -40,18 +42,32 @@ class Director:
         task = Task()
         task.make_avoid_task(goal, workerID)
         topic_name = 'avoid_alert_' + str(workerID)
-        msg = task.to_service_format
-        pub = rospy.Publisher(topic_name, msgtype, queue_size=1)
-        pub.publish(msg)
+        msg = AvoidAlert()
+        msg.isActive = task.isActive
+        msg.isComplete = task.isComplete
+        msg.workerID = task.workerID
+        msg.type = task.type
+        msg.zone = task.zone
+        msg.startingPoint = task.start_point
+        self.pub.publish(msg)
+        # print(topic_name)
+        # print("end of send_avoid method")
         pass
 
     def send_safe(self, workerID):
         task = Task()
         task.make_safe_task(workerID)
         topic_name = 'avoid_alert_' + str(workerID)
-        msg = task.to_service_format
-        pub = rospy.Publisher(topic_name, msgtype, queue_size=1)
-        pub.publish(msg)
+        msg = AvoidAlert()
+        msg.isActive = task.isActive
+        msg.isComplete = task.isComplete
+        msg.workerID = task.workerID
+        msg.type = task.type
+        msg.zone = task.zone
+        msg.startingPoint = task.start_point
+        self.pub.publish(msg)
+        # print(topic_name)
+        # print("end of send_avoid method")
         pass
 
     # sends a Task to a robot to not move in order for another robot to avoid it
@@ -80,6 +96,6 @@ class Director:
     def handle_dump_request(self, dump_request):
         self.cleaningManager.dumpRequests.append(dump_request)
         if len(self.cleaningManager.dumpRequests) != 1:
-            return True     # wait
+            return True  # wait
         else:
-            return False    # go ahead
+            return False  # go ahead
