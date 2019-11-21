@@ -28,7 +28,10 @@ class CVMain:
         GPIO.setup(self.cam_servo_pin, GPIO.OUT)
 
         self.servo = GPIO.PWM(self.cam_servo_pin, 50)
-        self.servo.start(5)
+
+        self.servo.start(5)  # Start
+        time.sleep(.5)  # Wait
+        self.servo.stop()  # Stop
 
         # Subscribers and Publishers
         rospy.Subscriber("cv_trigger", Bool, self.is_running_callback)
