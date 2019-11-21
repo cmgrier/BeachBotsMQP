@@ -6,6 +6,8 @@ import cv2
 import rospy
 import time
 import sys
+import RPi.GPIO as GPIO
+from support.Constants import *
 from sensor_msgs.msg import Image, CompressedImage
 from std_msgs.msg import Bool
 from geometry_msgs.msg import Point
@@ -19,6 +21,14 @@ class CVMain:
         """
         # Initialization of Node
         rospy.init_node('CV')
+
+        # Configure the Camera Servo
+        self.cam_servo_pin = SERVO_CAM
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(self.cam_servo_pin, GPIO.OUT)
+
+        self.servo = GPIO.PWM(self.cam_servo_pin, 50)
+        self.servo.start(10)
 
         # Subscribers and Publishers
         rospy.Subscriber("cv_trigger", Bool, self.is_running_callback)
@@ -47,16 +57,12 @@ class CVMain:
             ret, frame = cap.read()
 
             # Publish the original image (MOVE THIS TO TEST FUNCTIONS)
-            # self.publish_image(frame, True)
-
             self.init_image_pub.publish(self.make_compressed_msg(frame))
 
             # Image Enhancements
             frame = self.enhancement(frame)
 
             # Publish the fixed Image (MOVE THIS STATEMENT TO TEST FUNCTIONS)
-            # self.publish_image(frame, False)
-
             self.curr_image_pub.publish(self.make_compressed_msg(frame))
 
             # Segmentation
@@ -69,9 +75,9 @@ class CVMain:
             x, y = self.info_extract(frame)
 
             # Current Handler for no cords
-            # if x < 10000:
+            if x < 10000:
                 # Publish Information
-                # self.pub_cords(x, y)
+                self.pub_cords(x, y)
 
             time.sleep(.2)
 
@@ -82,36 +88,19 @@ class CVMain:
     @staticmethod
     def make_compressed_msg(frame):
         """
-
-        :param frame:
-        :return:
+        Make a compressed msg
+        :param frame: a uncompressed image
+        :return: a compressed image
         """
 
+        # Make a compressed image
         msg = CompressedImage()
         msg.header.stamp = rospy.Time.now()
         msg.format = "jpeg"
         msg.data = np.array(cv2.imencode('.jpg', frame)[1]).tostring()
 
+        # Return the compressed image
         return msg
-
-    def publish_image(self, cv_image, is_init):
-        """
-        Publishes the image to the selected topic
-        :param cv_image: an image
-        :param is_init: if it is the initial image or not
-        :return: void
-        """
-
-        if is_init:
-            try:
-                self.init_image_pub.publish(self.bridge.cv2_to_imgmsg(cv_image, "bgr8"))
-            except CvBridgeError as e:
-                print(e)
-        else:
-            try:
-                self.curr_image_pub.publish(self.bridge.cv2_to_imgmsg(cv_image, "bgr8"))
-            except CvBridgeError as e:
-                print(e)
 
     @staticmethod
     def enhancement(frame):
