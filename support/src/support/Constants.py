@@ -36,3 +36,6 @@ INTERRUPT_OUTPUT = 22
 
 # Camera Servo
 SERVO_CAM = 17
+
+# make true to activate debug statements
+DEBUG = False

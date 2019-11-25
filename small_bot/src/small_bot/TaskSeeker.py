@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 import rospy
 from data.Task import Task
-from small_bot.srv import RequestCleanTask, PassAvoidTask, RequestDumpTask, Identify
+from data.Zone import Zone
+from small_bot.srv import RequestCleanTask, RequestTask, RequestDumpTask, Identify
 #import RPi.GPIO as GPIO
 from support.Constants import *
 
@@ -29,7 +30,8 @@ class TaskSeeker:
         :param taskResponse: response received from a service
         :return: a Task
         """
-        task = Task(taskResponse.zone, taskResponse.type)
+        zone = Zone(taskResponse.zoneCorners, taskResponse.zoneID)
+        task = Task(zone, taskResponse.type)
         task.isActive = taskResponse.isActive
         task.isComplete = taskResponse.isComplete
         task.workerID = taskResponse.workerID
@@ -43,16 +45,13 @@ class TaskSeeker:
         :return:
         """
         rospy.wait_for_service('identify_worker')
-        print("trying to request")
+        print("trying to request new ID")
         try:
             rospy.loginfo("Current ID: " + str(self.smallbot.id))
             request = rospy.ServiceProxy('identify_worker', Identify)
             service_result = request(self.smallbot.id)
             self.smallbot.id = service_result.newID
             rospy.loginfo("new ID: " + str(self.smallbot.id))
-            topic_name = "robot_avoid_"+str(self.smallbot.id)
-            s = rospy.Service(topic_name, PassAvoidTask, self.update_avoid_status_handler)
-
 
         except rospy.ServiceException, e:
             rospy.loginfo("Service call (request_ID) failed: %s" % e)
@@ -64,14 +63,22 @@ class TaskSeeker:
         :return:
         """
         rospy.wait_for_service('give_zones')
-        print("trying to request")
+        print("trying to request clean task for robot:")
+        print(self.smallbot.id)
         try:
-            zone_request = rospy.ServiceProxy('give_zones', RequestCleanTask)
+            zone_request = rospy.ServiceProxy('give_zones', RequestTask)
+            if DEBUG:
+                print("sending request")
             clean_task = zone_request(self.smallbot.id)
+            if DEBUG:
+                print(clean_task)
             clean_task = self.parse_task(clean_task)
+            if DEBUG:
+                print(clean_task)
             self.smallbot.tasks.put(clean_task.priority, clean_task)
             rospy.loginfo(self.smallbot.tasks)
         except rospy.ServiceException, e:
+            print("error")
             rospy.loginfo("Service call failed: %s" % e)
 
 
@@ -103,9 +110,10 @@ class TaskSeeker:
         :return:
         """
         rospy.wait_for_service('give_dump')
-        print("trying to request")
+        if DEBUG:
+            print("trying to request dump task")
         try:
-            zone_request = rospy.ServiceProxy('give_dump', RequestDumpTask)
+            zone_request = rospy.ServiceProxy('give_dump', RequestTask)
             dump_task = zone_request(self.smallbot.id)
             dump_task = self.parse_task(dump_task)
             self.smallbot.tasks.put(dump_task.priority, dump_task)
@@ -113,3 +121,22 @@ class TaskSeeker:
             rospy.loginfo("Service call failed: %s" % e)
 
 
+    def request_avoid_status(self):
+        rospy.wait_for_service('give_avoid_status')
+        if DEBUG:
+            print("trying to request avoid status")
+        try:
+            avoid_request = rospy.ServiceProxy('give_avoid_status', RequestTask)
+            avoid_task = avoid_request(self.smallbot.id)
+            avoid_task = self.parse_task(avoid_task)
+            if DEBUG:
+                print("avoid task:")
+                print(avoid_task)
+            if avoid_task.type == "avoid":
+                if DEBUG:
+                    print("task is avoid")
+                if not self.smallbot.tasks.has(1):
+                    print("adding avoid task")
+                    self.smallbot.tasks.put(avoid_task.priority, avoid_task)
+        except rospy.ServiceException, e:
+            rospy.loginfo("Service call failed: %s" % e)

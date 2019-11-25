@@ -6,3 +6,5 @@ class Robot:
         self.pose = [[0, 0, 0], [0, 0, 0, 0]] # this will be a ros pose data type
         self.isBusy = False
         self.task = None
+        self.shouldAvoid = False
+        self.avoidCounter = 0

@@ -1,13 +1,17 @@
 # data of the different tasks to be completed by the small bots
+from geometry_msgs.msg import Pose
+from data.Zone import Zone
+from baseBot.msg import ZoneMSG
+
 class Task:
     def __init__(self, zone=None, type=None):
         self.isActive = False
         self.isComplete = False
         self.workerID = -1
         self.type = type or "clean"
-        self.zone = zone
+        self.zone = zone or Zone([], -1)
         self.priority = 3
-        self.start_point = None
+        self.start_point = Pose()
         self.set_priority()
 
     # set the priority level of the task based on the type
@@ -28,15 +32,15 @@ class Task:
         return str((self.type, self.workerID, self.zone, self.isActive, self.isComplete))
 
     def to_service_format(self):
-        return [self.isActive, self.isComplete, self.workerID, self.type, self.zone, self.start_point]
+        return [self.isActive, self.isComplete, self.workerID, self.type, self.zone.corners, self.zone.id, self.start_point]
 
     def make_safe_task(self, worker_id):
         self.isActive = False
         self.isComplete = False
         self.type = "safe"
-        self.zone = None
-        self.priority = None
-        self.start_point = None
+        self.zone = Zone([], -1)
+        self.priority = 4
+        self.start_point = Pose()
         self.workerID = worker_id
 
     def make_avoid_task(self, goal, worker_id):
@@ -44,6 +48,6 @@ class Task:
         self.isActive = False
         self.type = "avoid"
         self.set_priority()
-        self.zone = None
+        self.zone = Zone([], -1)
         self.workerID = worker_id
         self.start_point = goal

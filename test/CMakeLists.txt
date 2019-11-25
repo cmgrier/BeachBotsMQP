@@ -50,16 +50,13 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## Generate messages in the 'msg' folder
  add_message_files(
-   FILES 
-   AvoidAlert.msg
+   FILES
  )
 
 ## Generate services in the 'srv' folder
 add_service_files(
   FILES
-  PassAvoidTask.srv
-  PassDumpTask.srv
-  RequestCleanTask.srv
+  RequestTask.srv
   Identify.srv	
 )
 

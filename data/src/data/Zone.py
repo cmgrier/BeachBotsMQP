@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from geometry_msgs.msg import Pose
 class Zone:
     def __init__(self, zone_corners, id):
         self.corners = zone_corners  # list of [top left, top right, bottom right, bottom left]

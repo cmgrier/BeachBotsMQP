@@ -4,6 +4,8 @@ from small_bot.TaskSeeker import TaskSeeker
 from data.Task import Task
 from geometry_msgs.msg import Pose
 from small_bot.msg import AvoidAlert
+import rospy
+
 
 class SmallBotManager:
 
@@ -15,16 +17,18 @@ class SmallBotManager:
         self.position = Pose()
         self.taskManager = TaskManager(self)
         self.taskSeeker = TaskSeeker(self)
-        """self.request_id()
+        self.request_id()
+
         if self.id != -1:
             self.main()
-        """
+
     def main(self):
         """
         Main loop for small robot
         :return:
         """
         while self.isCleaning:
+            rospy.sleep(.1)
             self.get_info()
             task = self.tasks.get()
             if task.type == "end":
@@ -42,7 +46,7 @@ class SmallBotManager:
         clean = 3
         if self.tasks.has(clean) == False:
             self.taskSeeker.request_clean_task()
-
+        self.taskSeeker.request_avoid_status()
         #TODO update robots position as well as add more info
         #Maybe have a ros listener for current position
         #If dump satus is true then request dump task
@@ -74,7 +78,6 @@ class SmallBotManager:
             task = self.taskSeeker.parse_task(data)
             self.tasks.put(task.priority, task)
 
-
 if __name__ == "__main__":
     smallbot = SmallBotManager()
-    smallbot.main()
+    #smallbot.main()

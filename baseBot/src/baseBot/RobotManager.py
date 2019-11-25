@@ -17,6 +17,19 @@ class RobotManager:
         self.director = Director(self, cleaning_manager)
         self.map_manager = map_manager
 
+    def should_robot_avoid(self, workerID):
+        robot = self.get_robot(workerID)
+        robot.avoidCounter = robot.avoidCounter + 1
+        if DEBUG:
+            print("avoid counter:")
+            print(robot.avoidCounter)
+        if robot.avoidCounter < 50:
+            return True
+        elif 50 <= robot.avoidCounter < 200:
+            return False
+        robot.avoidCounter = 0
+        return True
+
     # for each robot this checks if they are too close to one another.
     def check_robot_safety(self):
         for robot in self.managedRobots():

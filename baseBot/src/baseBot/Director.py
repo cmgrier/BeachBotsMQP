@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 from data.Task import Task
 from data.Robot import Robot
-from baseBot.srv import RequestCleanTask, PassAvoidTask, PassDumpTask, Identify
-from baseBot.msg import AvoidAlert
+from geometry_msgs.msg import Pose
+from baseBot.srv import RequestCleanTask, RequestTask, PassDumpTask, Identify
+from baseBot.msg import AvoidAlert, ZoneMSG
+from support.Constants import *
 import rospy
 
 
@@ -17,11 +19,11 @@ class Director:
     # Set up ROS initiators
     def ros_node(self):
         rospy.init_node('base_bot_director', anonymous=True)
-        # s = rospy.Service('give_zones', RequestCleanTask, self.give_cleaning_task)
-        # s = rospy.Service('identify_worker', Identify, self.give_ID)
-        # s = rospy.Service('dump_request', PassDumpTask, self.handle_dump_request)
-        self.pub = rospy.Publisher('avoid_alert_1', AvoidAlert, queue_size=10)
-        print("ros node started")
+        s = rospy.Service('give_zones', RequestTask, self.give_cleaning_task)
+        s = rospy.Service('identify_worker', Identify, self.give_ID)
+        s = rospy.Service('dump_request', RequestTask, self.handle_dump_request)
+        s = rospy.Service('give_avoid_status', RequestTask, self.give_avoid_status)
+        print("Director node started")
 
     # The following methods will create Tasks to send to the small bots that will move them
 
@@ -38,37 +40,20 @@ class Director:
         task = Task()
         pass
 
-    def send_avoid(self, goal, workerID):
+    def give_avoid_status(self, robot_request):
         task = Task()
-        task.make_avoid_task(goal, workerID)
-        topic_name = 'avoid_alert_' + str(workerID)
-        msg = AvoidAlert()
-        msg.isActive = task.isActive
-        msg.isComplete = task.isComplete
-        msg.workerID = task.workerID
-        msg.type = task.type
-        msg.zone = task.zone
-        msg.startingPoint = task.start_point
-        self.pub.publish(msg)
-        # print(topic_name)
-        # print("end of send_avoid method")
-        pass
-
-    def send_safe(self, workerID):
-        task = Task()
-        task.make_safe_task(workerID)
-        topic_name = 'avoid_alert_' + str(workerID)
-        msg = AvoidAlert()
-        msg.isActive = task.isActive
-        msg.isComplete = task.isComplete
-        msg.workerID = task.workerID
-        msg.type = task.type
-        msg.zone = task.zone
-        msg.startingPoint = task.start_point
-        self.pub.publish(msg)
-        # print(topic_name)
-        # print("end of send_avoid method")
-        pass
+        if self.robotManager.should_robot_avoid(robot_request.workerID):
+            if DEBUG:
+                print("sending avoid task to robot with ID:")
+                print(robot_request.workerID)
+            task.make_avoid_task(Pose(), robot_request.workerID)
+            return task.to_service_format()
+        else:
+            if DEBUG:
+                print("sending safe task to robot with ID:")
+                print(robot_request.workerID)
+            task.make_safe_task(robot_request.workerID)
+            return task.to_service_format()
 
     # sends a Task to a robot to not move in order for another robot to avoid it
     # only called when all directions are unsafe to avoid to
@@ -79,19 +64,25 @@ class Director:
     # identifies new robot and gives them a worker ID
     def give_ID(self, robot_id_request):
         if robot_id_request.ID is -1:
+            print("giving new robot id:")
             new_workerID = len(self.robotManager.managedRobots) + 1
+            print(new_workerID)
             self.robotManager.add_new_robot(new_workerID)
             return new_workerID
         else:
             return robot_id_request.ID
 
-    def give_cleaning_task(self, robot_id):
-        task = self.cleaningManager.cleaningTasks.pop()
-        if task:
-            task.workerID = robot_id
+    def give_cleaning_task(self, robot_request):
+        if len(self.cleaningManager.cleaningTasks) > 0:
+            print("giving cleaning task")
+            task = self.cleaningManager.cleaningTasks.pop()
+            task.workerID = robot_request.workerID
             return task.to_service_format()
         else:
-            return Task(None).to_service_format()
+            print("no cleaning Task")
+            task = Task()
+            task.make_safe_task(robot_id)
+            return task.to_service_format()
 
     def handle_dump_request(self, dump_request):
         self.cleaningManager.dumpRequests.append(dump_request)

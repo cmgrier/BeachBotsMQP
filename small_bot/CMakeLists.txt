@@ -53,15 +53,12 @@ catkin_python_setup()
 ## Generate messages in the 'msg' folder
  add_message_files(
    FILES
-   AvoidAlert.msg
  )
 
 # Generate services in the 'srv' folder
  add_service_files(
    FILES
-   PassAvoidTask.srv
-   RequestDumpTask.srv
-   RequestCleanTask.srv
+   RequestTask.srv
    Identify.srv
    ImageTransfer.srv
 )
