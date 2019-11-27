@@ -147,7 +147,22 @@ class CVMain:
         # Get small left corner of an image
         small_seg = frame[y1:y2, x1:x2]
 
-        # Determine the histogram of the small segment
+        hsv_frame = cv2.cvtColor(small_seg, cv2.COLOR_BGR2HSV)
+
+        # Get the different channels histograms
+        hue = cv2.calcHist(hsv_frame, [0], None, [256], [0, 256])
+        sat = cv2.calcHist(hsv_frame, [1], None, [256], [0, 256])
+        value = cv2.calcHist(hsv_frame, [2], None, [256], [0, 256])
+
+        # Determine the high points
+        max_hue = max(hue)
+        hue_index = hue.index(max_hue)
+
+        max_sat = max(sat)
+        sat_index = sat.index(max_sat)
+
+        max_value = max(value)
+        value_index = value.index(max_value)
 
         # Convert to Gray scale
 
