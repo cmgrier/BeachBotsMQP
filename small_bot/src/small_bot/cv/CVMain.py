@@ -121,7 +121,10 @@ class CVMain:
         frame[:, :, 0] = cv2.equalizeHist(frame[:, :, 0])
 
         # Convert the image back to RGB
-        return cv2.cvtColor(frame, cv2.COLOR_YUV2BGR)
+        frame = cv2.cvtColor(frame, cv2.COLOR_YUV2BGR)
+
+        # Blur the image and return the image (Possibly insert crop for the sky)
+        return cv2.blur(frame, (5, 5))
 
     @staticmethod
     def segmentation(frame):
@@ -130,6 +133,21 @@ class CVMain:
         :param frame: a frame
         :return: a modified frame
         """
+        # Get the size of the image
+        height, width, channels = frame.shape
+        buffer = 10
+
+        # Calculate y1, y2, x1, x2 for small segments
+        y1 = height/2 + buffer
+        y2 = height - buffer
+
+        x1 = 0 + buffer
+        x2 = width/2 + buffer
+
+        # Get small left corner of an image
+        small_seg = frame[y1:y2, x1:x2]
+
+        # Determine the histogram of the small segment
 
         # Convert to Gray scale
 
