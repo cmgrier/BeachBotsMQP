@@ -5,7 +5,6 @@ import numpy as np
 import cv2
 import rospy
 import time
-import sys
 import RPi.GPIO as GPIO
 from support.Constants import *
 from sensor_msgs.msg import Image, CompressedImage
@@ -108,7 +107,6 @@ class CVMain:
     @staticmethod
     def enhancement(frame):
         """
-        NOTE: COULD USE MORE ENHANCEMENT FOR NOW IT LOOKS FINE TO ME
         Computer Vision Image Enhancement function
         :param frame: a frame
         :return: a modified frame
@@ -126,15 +124,9 @@ class CVMain:
         # Blur the image and return the image (Possibly insert crop for the sky)
         return cv2.blur(frame, (5, 5))
 
-    @staticmethod
-    def segmentation(frame):
+    def segmentation(self, frame):
         """
         Computer Vision Image Segmentation where we will distinguish unusual sand things
-
-        NOTES:
-        The bottom rectangle could be unreliable (FIX: look at another area and compare)
-        Consider breaking up the histogram math into a helper function
-
         :param frame: a frame
         :return: a modified frame
         """
@@ -142,16 +134,53 @@ class CVMain:
         height, width, channels = frame.shape
         buffer = 10
 
-        # Calculate y1, y2, x1, x2 for small segments
-        y1 = height/2 + buffer
-        y2 = height - buffer
+        # Calculate y1, y2, x1, x2 for small segment in bottom left
+        l_y1 = height / 2 + buffer
+        l_y2 = height - buffer
 
-        x1 = 0 + buffer
-        x2 = width/2 + buffer
+        l_x1 = 0 + buffer
+        l_x2 = width / 2 + buffer
+
+        # Calculate y1, y2, x1, x2 for small segment in bottom right
+        r_y1 = height / 2 + buffer
+        r_y2 = height - buffer
+
+        r_x1 = width / 2 + buffer
+        r_x2 = width - buffer
+
+        # Get filters from a small left corner
+        left_low_filter, left_high_filter = self.small_segment_filter_generator(frame, l_y1, l_y2, l_x1, l_x2)
+
+        # Get filters from the small right corner
+        right_low_filter, right_high_filter = self.small_segment_filter_generator(frame, r_y1, r_y2, r_x1, r_x2)
+
+        # Use the right to check the left
+        # TODO Implement a check here
+
+        # filter the image
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+        new_image = cv2.inRange(frame, left_low_filter, left_high_filter)
+
+        return new_image
+
+    @staticmethod
+    def small_segment_filter_generator(frame, y1, y2, x1, x2, expansion=20):
+        """
+        Uses coordinates and a frame to generate the lower and higher filters for a small segment of the frame
+        :param frame: a frame
+        :param y1: top left y cord
+        :param y2: bottom right y cord
+        :param x1: top left x cord
+        :param x2: bottom right x cord
+        :param expansion: expansion factor
+        :return: a lower and higher expansion tuple
+        """
 
         # Get small left corner of an image
         small_seg = frame[y1:y2, x1:x2]
 
+        # Get the hsv of that image
         hsv_frame = cv2.cvtColor(small_seg, cv2.COLOR_BGR2HSV)
 
         # Get the different channels histograms
@@ -168,8 +197,6 @@ class CVMain:
 
         max_value = max(value_hist)
         value_index = value_hist.index(max_value)
-
-        expansion = 20
 
         # Expansion of each low index
         if hue_index < expansion:
@@ -209,10 +236,7 @@ class CVMain:
         low_filter = np.array([low_hue, low_sat, low_value])
         high_filter = np.array([high_hue, high_sat, high_value])
 
-        # filter the image
-        new_image = cv2.inRange(hsv_frame, low_filter, high_filter)
-
-        return new_image
+        return low_filter, high_filter
 
     @staticmethod
     def post_processing(frame):
