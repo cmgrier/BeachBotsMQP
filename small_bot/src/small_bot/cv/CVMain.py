@@ -59,17 +59,17 @@ class CVMain:
             # Image Acquisition
             ret, frame = cap.read()
 
-            # Publish the original image (MOVE THIS TO TEST FUNCTIONS)
-            self.init_image_pub.publish(self.make_compressed_msg(frame))
-
             # Image Enhancements
             frame = self.enhancement(frame)
 
-            # Publish the fixed Image (MOVE THIS STATEMENT TO TEST FUNCTIONS)
-            self.curr_image_pub.publish(self.make_compressed_msg(frame))
+            # Publish the original image (MOVE THIS TO TEST FUNCTIONS)
+            self.init_image_pub.publish(self.make_compressed_msg(frame))
 
             # Segmentation
             frame = self.segmentation(frame)
+
+            # Publish the fixed Image (MOVE THIS STATEMENT TO TEST FUNCTIONS)
+            self.curr_image_pub.publish(self.make_compressed_msg(frame))
 
             # Post Processing
             frame = self.post_processing(frame)
@@ -130,6 +130,11 @@ class CVMain:
     def segmentation(frame):
         """
         Computer Vision Image Segmentation where we will distinguish unusual sand things
+
+        NOTES:
+        The bottom rectangle could be unreliable (FIX: look at another area and compare)
+        Consider breaking up the histogram math into a helper function
+
         :param frame: a frame
         :return: a modified frame
         """
@@ -150,25 +155,64 @@ class CVMain:
         hsv_frame = cv2.cvtColor(small_seg, cv2.COLOR_BGR2HSV)
 
         # Get the different channels histograms
-        hue = cv2.calcHist(hsv_frame, [0], None, [256], [0, 256])
-        sat = cv2.calcHist(hsv_frame, [1], None, [256], [0, 256])
-        value = cv2.calcHist(hsv_frame, [2], None, [256], [0, 256])
+        hue_hist = cv2.calcHist(hsv_frame, [0], None, [256], [0, 256])
+        sat_hist = cv2.calcHist(hsv_frame, [1], None, [256], [0, 256])
+        value_hist = cv2.calcHist(hsv_frame, [2], None, [256], [0, 256])
 
         # Determine the high points
-        max_hue = max(hue)
-        hue_index = hue.index(max_hue)
+        max_hue = max(hue_hist)
+        hue_index = hue_hist.index(max_hue)
 
-        max_sat = max(sat)
-        sat_index = sat.index(max_sat)
+        max_sat = max(sat_hist)
+        sat_index = sat_hist.index(max_sat)
 
-        max_value = max(value)
-        value_index = value.index(max_value)
+        max_value = max(value_hist)
+        value_index = value_hist.index(max_value)
 
-        # Convert to Gray scale
+        expansion = 20
 
-        # threshold them
+        # Expansion of each low index
+        if hue_index < expansion:
+            low_hue = 0
+        else:
+            low_hue = hue_index - expansion
 
-        return frame
+        if sat_index < expansion:
+            low_sat = 0
+        else:
+            low_sat = sat_index - expansion
+
+        if value_index < expansion:
+            low_value = 0
+        else:
+            low_value = value_index - expansion
+
+        hist_length = len(hue_hist)
+
+        # Expansion of each high index
+        if hue_index > hist_length - expansion:
+            high_hue = hist_length
+        else:
+            high_hue = hue_index + expansion
+
+        if sat_index > hist_length - expansion:
+            high_sat = hist_length
+        else:
+            high_sat = sat_index + expansion
+
+        if value_index > hist_length - expansion:
+            high_value = hist_length
+        else:
+            high_value = value_index + expansion
+
+        # Put together the filter
+        low_filter = np.array([low_hue, low_sat, low_value])
+        high_filter = np.array([high_hue, high_sat, high_value])
+
+        # filter the image
+        new_image = cv2.inRange(hsv_frame, low_filter, high_filter)
+
+        return new_image
 
     @staticmethod
     def post_processing(frame):
