@@ -213,17 +213,17 @@ class CVMain:
         if hue_index < expansion:
             low_hue = 0
         else:
-            low_hue = hue_index  # - expansion
+            low_hue = hue_index - expansion
 
         if sat_index < expansion:
             low_sat = 0
         else:
-            low_sat = sat_index  # - expansion
+            low_sat = sat_index - expansion
 
         if value_index < expansion:
             low_value = 0
         else:
-            low_value = value_index  # - expansion
+            low_value = value_index - expansion
 
         hist_length = len(hue_hist)
 
@@ -231,17 +231,17 @@ class CVMain:
         if hue_index > hist_length - expansion:
             high_hue = hist_length
         else:
-            high_hue = hue_index  # + expansion
+            high_hue = hue_index + expansion
 
         if sat_index > hist_length - expansion:
             high_sat = hist_length
         else:
-            high_sat = sat_index  # + expansion
+            high_sat = sat_index + expansion
 
         if value_index > hist_length - expansion:
             high_value = hist_length
         else:
-            high_value = value_index  # + expansion
+            high_value = value_index + expansion
 
         # Put together the filter
         low_filter = np.array([low_hue, low_sat, low_value])
