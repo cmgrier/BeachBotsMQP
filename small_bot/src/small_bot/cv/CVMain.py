@@ -189,14 +189,17 @@ class CVMain:
         value_hist = cv2.calcHist(hsv_frame, [2], None, [256], [0, 256])
 
         # Determine the high points
-        max_hue = max(hue_hist)
-        hue_index = hue_hist.index(max_hue)
+        # max_hue = np.amax(hue_hist)
+        hue_max_index = np.where(hue_hist == np.amax(hue_hist))
+        hue_index = hue_max_index[0]
 
-        max_sat = max(sat_hist)
-        sat_index = sat_hist.index(max_sat)
+        # max_sat = np.amax(sat_hist)
+        sat_max_index = np.where(sat_hist == np.amax(sat_hist))
+        sat_index = sat_max_index[0]
 
-        max_value = max(value_hist)
-        value_index = value_hist.index(max_value)
+        # max_value = np.amax(value_hist)
+        value_max_index = np.where(value_hist == np.amax(value_hist))
+        value_index = value_max_index[0]
 
         # Expansion of each low index
         if hue_index < expansion:
