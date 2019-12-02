@@ -154,7 +154,7 @@ class CVMain:
 
         # Get filters from a small left corner
         left_low_filter, left_high_filter = self.small_segment_filter_generator(frame, l_y1, l_y2, l_x1, l_x2,
-                                                                                expansion=80)
+                                                                                expansion=90)
 
         print(left_low_filter, left_high_filter)
 
