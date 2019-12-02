@@ -195,7 +195,7 @@ class CVMain:
         sat_hist = cv2.calcHist(small_seg, [1], None, [256], [0, 256])
         value_hist = cv2.calcHist(small_seg, [2], None, [256], [0, 256])
 
-        print(hue_hist, sat_hist, value_hist)
+        # print(hue_hist, sat_hist, value_hist)
 
         # Determine the high points
         # max_hue = np.amax(hue_hist)
@@ -212,6 +212,8 @@ class CVMain:
         value_max_index = np.where(value_hist == np.amax(value_hist))
         # print(value_max_index[0])
         value_index = int(value_max_index[0][0])
+
+        print(hue_index, sat_index, value_index)
 
         # Expansion of each low index
         if hue_index < expansion:
