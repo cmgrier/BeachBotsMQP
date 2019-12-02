@@ -44,7 +44,7 @@ class CVMain:
         self.isRunning = False
 
         self.image_buffer = 10
-        self.region_increment = 4  # This is a fraction of the image
+        self.region_increment = 2  # This is a fraction of the image
 
         print("Finished Initialization of CV")
 
@@ -154,7 +154,7 @@ class CVMain:
 
         # Get filters from a small left corner
         left_low_filter, left_high_filter = self.small_segment_filter_generator(frame, l_y1, l_y2, l_x1, l_x2,
-                                                                                expansion=60)
+                                                                                expansion=50)
 
         print(left_low_filter, left_high_filter)
 
