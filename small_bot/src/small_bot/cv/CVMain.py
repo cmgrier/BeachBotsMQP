@@ -139,11 +139,17 @@ class CVMain:
         region_inc = self.region_increment
 
         # Calculate y1, y2, x1, x2 for small segment in bottom left
-        l_y1 = height / region_inc + buffer
-        l_y2 = height - buffer
+        # l_y1 = height / region_inc + buffer
+        # l_y2 = height - buffer
+        #
+        # l_x1 = buffer
+        # l_x2 = width / region_inc + buffer
 
-        l_x1 = buffer
-        l_x2 = width / region_inc + buffer
+        l_y1 = 0
+        l_y2 = height
+
+        l_x1 = 0
+        l_x2 = width
 
         # Calculate y1, y2, x1, x2 for small segment in bottom right
         r_y1 = height / region_inc + buffer
