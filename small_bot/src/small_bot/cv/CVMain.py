@@ -58,11 +58,11 @@ class CVMain:
             # Image Acquisition
             ret, frame = cap.read()
 
-            # Image Enhancements
-            frame = self.enhancement(frame)
-
             # Publish the original image (MOVE THIS TO TEST FUNCTIONS)
             self.init_image_pub.publish(self.make_compressed_msg(frame))
+
+            # Image Enhancements
+            frame = self.enhancement(frame)
 
             # Segmentation
             frame = self.segmentation(frame)
