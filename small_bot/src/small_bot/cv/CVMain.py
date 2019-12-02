@@ -191,16 +191,15 @@ class CVMain:
         # Determine the high points
         # max_hue = np.amax(hue_hist)
         hue_max_index = np.where(hue_hist == np.amax(hue_hist))
-        hue_index = hue_max_index[0]
-        print(int(hue_index))
+        hue_index = int(hue_max_index[0])
 
         # max_sat = np.amax(sat_hist)
         sat_max_index = np.where(sat_hist == np.amax(sat_hist))
-        sat_index = sat_max_index[0]
+        sat_index = int(sat_max_index[0])
 
         # max_value = np.amax(value_hist)
         value_max_index = np.where(value_hist == np.amax(value_hist))
-        value_index = value_max_index[0]
+        value_index = int(value_max_index[0])
 
         # Expansion of each low index
         if hue_index < expansion:
