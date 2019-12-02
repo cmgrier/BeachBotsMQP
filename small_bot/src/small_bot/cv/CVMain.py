@@ -43,6 +43,8 @@ class CVMain:
         self.bridge = CvBridge()
         self.isRunning = False
 
+        self.image_buffer = 10
+
         print("Finished Initialization of CV")
 
     def main_process(self):
@@ -132,13 +134,13 @@ class CVMain:
         """
         # Get the size of the image
         height, width, channels = frame.shape
-        buffer = 10
+        buffer = self.image_buffer
 
         # Calculate y1, y2, x1, x2 for small segment in bottom left
         l_y1 = height / 5 + buffer
         l_y2 = height - buffer
 
-        l_x1 = 0 + buffer
+        l_x1 = buffer
         l_x2 = width / 5 + buffer
 
         # Calculate y1, y2, x1, x2 for small segment in bottom right
@@ -149,7 +151,10 @@ class CVMain:
         r_x2 = width - buffer
 
         # Get filters from a small left corner
-        left_low_filter, left_high_filter = self.small_segment_filter_generator(frame, l_y1, l_y2, l_x1, l_x2)
+        left_low_filter, left_high_filter = self.small_segment_filter_generator(frame, l_y1, l_y2, l_x1, l_x2,
+                                                                                expansion=10)
+
+        print(left_low_filter, left_high_filter)
 
         # Get filters from the small right corner
         right_low_filter, right_high_filter = self.small_segment_filter_generator(frame, r_y1, r_y2, r_x1, r_x2)
