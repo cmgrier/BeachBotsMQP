@@ -122,7 +122,7 @@ class CVMain:
         frame = cv2.cvtColor(frame, cv2.COLOR_YUV2BGR)
 
         # Blur the image and return the image (Possibly insert crop for the sky)
-        return cv2.blur(frame, (5, 5))
+        return frame  # cv2.blur(frame, (5, 5))
 
     def segmentation(self, frame):
         """
@@ -150,8 +150,8 @@ class CVMain:
 
         # Get filters from a small left corner
         left_low_filter, left_high_filter = self.small_segment_filter_generator(frame, l_y1, l_y2, l_x1, l_x2)
-        print(left_low_filter)
-        print(left_high_filter)
+        # print(left_low_filter)
+        # print(left_high_filter)
 
         # Get filters from the small right corner
         right_low_filter, right_high_filter = self.small_segment_filter_generator(frame, r_y1, r_y2, r_x1, r_x2)
@@ -164,7 +164,7 @@ class CVMain:
 
         new_image = cv2.inRange(frame, left_low_filter, left_high_filter)
 
-        return new_image
+        return frame
 
     @staticmethod
     def small_segment_filter_generator(frame, y1, y2, x1, x2, expansion=20):
