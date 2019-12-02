@@ -28,7 +28,7 @@ class CVMain:
 
         self.servo = GPIO.PWM(self.cam_servo_pin, 50)
 
-        self.servo.start(5)  # Start
+        self.servo.start(3)  # Start
         time.sleep(.5)  # Wait
         self.servo.stop()  # Stop
 
