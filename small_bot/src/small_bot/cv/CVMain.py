@@ -135,17 +135,17 @@ class CVMain:
         buffer = 10
 
         # Calculate y1, y2, x1, x2 for small segment in bottom left
-        l_y1 = height / 2 + buffer
+        l_y1 = height / 5 + buffer
         l_y2 = height - buffer
 
         l_x1 = 0 + buffer
-        l_x2 = width / 2 + buffer
+        l_x2 = width / 5 + buffer
 
         # Calculate y1, y2, x1, x2 for small segment in bottom right
-        r_y1 = height / 2 + buffer
+        r_y1 = height / 5 + buffer
         r_y2 = height - buffer
 
-        r_x1 = width / 2 + buffer
+        r_x1 = width / 5 + buffer
         r_x2 = width - buffer
 
         # Get filters from a small left corner
