@@ -186,12 +186,12 @@ class CVMain:
         small_seg = frame[y1:y2, x1:x2]
 
         # Get the hsv of that image
-        hsv_frame = cv2.cvtColor(small_seg, cv2.COLOR_BGR2HSV)
+        # hsv_frame = cv2.cvtColor(small_seg, cv2.COLOR_BGR2HSV)
 
         # Get the different channels histograms
-        hue_hist = cv2.calcHist(hsv_frame, [0], None, [256], [0, 256])
-        sat_hist = cv2.calcHist(hsv_frame, [1], None, [256], [0, 256])
-        value_hist = cv2.calcHist(hsv_frame, [2], None, [256], [0, 256])
+        hue_hist = cv2.calcHist(small_seg, [0], None, [256], [0, 256])
+        sat_hist = cv2.calcHist(small_seg, [1], None, [256], [0, 256])
+        value_hist = cv2.calcHist(small_seg, [2], None, [256], [0, 256])
 
         # Determine the high points
         # max_hue = np.amax(hue_hist)
