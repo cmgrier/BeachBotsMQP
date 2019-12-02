@@ -44,6 +44,7 @@ class CVMain:
         self.isRunning = False
 
         self.image_buffer = 10
+        self.region_increment = 4  # This is a fraction of the image
 
         print("Finished Initialization of CV")
 
@@ -135,19 +136,20 @@ class CVMain:
         # Get the size of the image
         height, width, channels = frame.shape
         buffer = self.image_buffer
+        region_inc = self.region_increment
 
         # Calculate y1, y2, x1, x2 for small segment in bottom left
-        l_y1 = height / 3 + buffer
+        l_y1 = height / region_inc + buffer
         l_y2 = height - buffer
 
         l_x1 = buffer
-        l_x2 = width / 3 + buffer
+        l_x2 = width / region_inc + buffer
 
         # Calculate y1, y2, x1, x2 for small segment in bottom right
-        r_y1 = height / 3 + buffer
+        r_y1 = height / region_inc + buffer
         r_y2 = height - buffer
 
-        r_x1 = width / 3 + buffer
+        r_x1 = width / region_inc + buffer
         r_x2 = width - buffer
 
         # Get filters from a small left corner
