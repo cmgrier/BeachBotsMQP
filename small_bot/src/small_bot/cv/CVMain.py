@@ -160,7 +160,7 @@ class CVMain:
         # TODO Implement a check here
 
         # filter the image
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        # frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
         new_image = cv2.inRange(frame, left_low_filter, left_high_filter)
 
