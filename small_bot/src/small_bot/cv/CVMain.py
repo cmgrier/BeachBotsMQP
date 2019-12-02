@@ -58,8 +58,6 @@ class CVMain:
             # Image Acquisition
             ret, frame = cap.read()
 
-            print("Took Image")
-
             # Image Enhancements
             frame = self.enhancement(frame)
 
