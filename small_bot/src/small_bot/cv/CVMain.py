@@ -166,7 +166,7 @@ class CVMain:
 
         # filter the image
         # frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        arr1 = np.array([105, 105, 105])
+        arr1 = np.array([75, 75, 75])
         arr2 = np.array([255, 255, 255])
 
         new_image = cv2.inRange(frame, arr1, arr2)  # left_low_filter, left_high_filter)
