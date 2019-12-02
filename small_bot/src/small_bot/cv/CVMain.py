@@ -68,7 +68,7 @@ class CVMain:
             frame = self.segmentation(frame)
 
             # Publish the fixed Image (MOVE THIS STATEMENT TO TEST FUNCTIONS)
-            self.curr_image_pub.publish(self.make_compressed_msg(frame))
+            # self.curr_image_pub.publish(self.make_compressed_msg(frame))
 
             # Post Processing
             frame = self.post_processing(frame)
@@ -162,7 +162,7 @@ class CVMain:
         # filter the image
         # frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-        new_image = cv2.inRange(frame, left_low_filter, left_high_filter)
+        # new_image = cv2.inRange(frame, left_low_filter, left_high_filter)
 
         return frame
 
