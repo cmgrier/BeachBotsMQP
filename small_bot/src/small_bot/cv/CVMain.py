@@ -100,6 +100,7 @@ class CVMain:
         msg.header.stamp = rospy.Time.now()
         msg.format = "jpeg"
         msg.data = np.array(cv2.imencode('.jpg', frame)[1]).tostring()
+        print("Attempting to publish")
 
         # Return the compressed image
         return msg
