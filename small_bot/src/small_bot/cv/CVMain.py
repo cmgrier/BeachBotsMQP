@@ -185,7 +185,6 @@ class CVMain:
 
         # Get the different channels histograms
         hue_hist = cv2.calcHist(hsv_frame, [0], None, [256], [0, 256])
-        print(hue_hist)
         sat_hist = cv2.calcHist(hsv_frame, [1], None, [256], [0, 256])
         value_hist = cv2.calcHist(hsv_frame, [2], None, [256], [0, 256])
 
@@ -193,17 +192,17 @@ class CVMain:
         # max_hue = np.amax(hue_hist)
         hue_max_index = np.where(hue_hist == np.amax(hue_hist))
         # print(hue_max_index[0])
-        hue_index = int(hue_max_index[0])
+        hue_index = int(hue_max_index[0][0])
 
         # max_sat = np.amax(sat_hist)
         sat_max_index = np.where(sat_hist == np.amax(sat_hist))
         # print(sat_max_index[0])
-        sat_index = int(sat_max_index[0])
+        sat_index = int(sat_max_index[0][0])
 
         # max_value = np.amax(value_hist)
         value_max_index = np.where(value_hist == np.amax(value_hist))
         # print(value_max_index[0])
-        value_index = int(value_max_index[0])
+        value_index = int(value_max_index[0][0])
 
         # Expansion of each low index
         if hue_index < expansion:
