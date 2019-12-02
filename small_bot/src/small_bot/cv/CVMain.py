@@ -58,17 +58,17 @@ class CVMain:
             # Image Acquisition
             ret, frame = cap.read()
 
-            # Publish the original image (MOVE THIS TO TEST FUNCTIONS)
-            self.init_image_pub.publish(self.make_compressed_msg(frame))
-
             # Image Enhancements
             frame = self.enhancement(frame)
+
+            # Publish the original image (MOVE THIS TO TEST FUNCTIONS)
+            self.init_image_pub.publish(self.make_compressed_msg(frame))
 
             # Segmentation
             frame = self.segmentation(frame)
 
             # Publish the fixed Image (MOVE THIS STATEMENT TO TEST FUNCTIONS)
-            # self.curr_image_pub.publish(self.make_compressed_msg(frame))
+            self.curr_image_pub.publish(self.make_compressed_msg(frame))
 
             # Post Processing
             frame = self.post_processing(frame)
@@ -100,7 +100,6 @@ class CVMain:
         msg.header.stamp = rospy.Time.now()
         msg.format = "jpeg"
         msg.data = np.array(cv2.imencode('.jpg', frame)[1]).tostring()
-        print("Attempting to publish")
 
         # Return the compressed image
         return msg
@@ -123,7 +122,7 @@ class CVMain:
         frame = cv2.cvtColor(frame, cv2.COLOR_YUV2BGR)
 
         # Blur the image and return the image (Possibly insert crop for the sky)
-        return frame  # cv2.blur(frame, (5, 5))
+        return cv2.blur(frame, (5, 5))
 
     def segmentation(self, frame):
         """
@@ -151,8 +150,6 @@ class CVMain:
 
         # Get filters from a small left corner
         left_low_filter, left_high_filter = self.small_segment_filter_generator(frame, l_y1, l_y2, l_x1, l_x2)
-        # print(left_low_filter)
-        # print(left_high_filter)
 
         # Get filters from the small right corner
         right_low_filter, right_high_filter = self.small_segment_filter_generator(frame, r_y1, r_y2, r_x1, r_x2)
@@ -161,11 +158,11 @@ class CVMain:
         # TODO Implement a check here
 
         # filter the image
-        # frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-        # new_image = cv2.inRange(frame, left_low_filter, left_high_filter)
+        new_image = cv2.inRange(frame, left_low_filter, left_high_filter)
 
-        return frame
+        return new_image
 
     @staticmethod
     def small_segment_filter_generator(frame, y1, y2, x1, x2, expansion=20):

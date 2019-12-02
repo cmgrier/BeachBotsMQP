@@ -43,7 +43,6 @@ class CVOutput:
         # Image to numpy array
         nparr = np.fromstring(msg.data, np.uint8)
         img_decode = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-        print("Recieved Image")
 
         try:
             cv_image = self.bridge.cv2_to_imgmsg(img_decode, "bgr8")
