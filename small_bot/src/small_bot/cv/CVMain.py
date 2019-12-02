@@ -156,7 +156,7 @@ class CVMain:
         left_low_filter, left_high_filter = self.small_segment_filter_generator(frame, l_y1, l_y2, l_x1, l_x2,
                                                                                 expansion=100)
 
-        print(left_low_filter, left_high_filter)
+        # print(left_low_filter, left_high_filter)
 
         # Get filters from the small right corner
         right_low_filter, right_high_filter = self.small_segment_filter_generator(frame, r_y1, r_y2, r_x1, r_x2)
@@ -194,6 +194,8 @@ class CVMain:
         hue_hist = cv2.calcHist(small_seg, [0], None, [256], [0, 256])
         sat_hist = cv2.calcHist(small_seg, [1], None, [256], [0, 256])
         value_hist = cv2.calcHist(small_seg, [2], None, [256], [0, 256])
+
+        print(hue_hist, sat_hist, value_hist)
 
         # Determine the high points
         # max_hue = np.amax(hue_hist)
