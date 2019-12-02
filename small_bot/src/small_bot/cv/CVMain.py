@@ -192,6 +192,7 @@ class CVMain:
         # max_hue = np.amax(hue_hist)
         hue_max_index = np.where(hue_hist == np.amax(hue_hist))
         hue_index = hue_max_index[0]
+        print(hue_index)
 
         # max_sat = np.amax(sat_hist)
         sat_max_index = np.where(sat_hist == np.amax(sat_hist))
