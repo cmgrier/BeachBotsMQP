@@ -1,7 +1,6 @@
 # data of the different tasks to be completed by the small bots
 from geometry_msgs.msg import Pose
 from data.Zone import Zone
-from baseBot.msg import ZoneMSG
 
 class Task:
     def __init__(self, zone=None, type=None):
