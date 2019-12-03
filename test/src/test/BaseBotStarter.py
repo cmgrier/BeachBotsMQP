@@ -7,6 +7,7 @@ from test.srv import RequestCleanTask, PassAvoidTask, PassDumpTask, Identify
 from geometry_msgs.msg import Pose
 from data.Task import Task
 from data.Zone import Zone
+import time
 
 if __name__ == "__main__":
     emptyRobotList = []
@@ -21,4 +22,5 @@ if __name__ == "__main__":
             CM.cleaningTasks.append(cleaningTask)
             print("added new cleaning task with ID:")
             print(taskID)
-        rospy.sleep(.5)
+        time.sleep(.5)
+        #rospy.sleep(.01)
