@@ -81,7 +81,7 @@ class Director:
         else:
             print("no cleaning Task")
             task = Task()
-            task.make_safe_task(robot_id)
+            task.make_safe_task(robot_request.workerID)
             return task.to_service_format()
 
     def handle_dump_request(self, dump_request):

@@ -3,8 +3,9 @@ from data.Task import Task
 
 class DumpManager:
 
-    def __init__(self, smallbot):
+    def __init__(self, smallbot, taskManager):
         self.smallbot = smallbot
+        self.taskManager = taskManager
         pass
 
     def do_task(self, task):

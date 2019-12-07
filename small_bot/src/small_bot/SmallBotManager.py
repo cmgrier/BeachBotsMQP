@@ -2,7 +2,7 @@ from support.EqualPriorityQueue import EqualPriorityQueue
 from small_bot.TaskManager import TaskManager
 from small_bot.TaskSeeker import TaskSeeker
 from data.Task import Task
-from geometry_msgs.msg import Pose
+from geometry_msgs.msg import Pose, Twist
 from small_bot.msg import AvoidAlert
 import rospy
 
@@ -28,14 +28,18 @@ class SmallBotManager:
         :return:
         """
         while self.isCleaning:
-            rospy.sleep(.1)
+            rospy.sleep(.01)
             self.get_info()
-            task = self.tasks.get()
-            if task.type == "end":
-                break
-            updated_task = self.do_task(task)
-            if not task.isComplete:
-                self.tasks.put(updated_task.priority, updated_task)
+            if len(self.tasks) > 0:
+                task = self.tasks.get()
+                if task.type == "end":
+                    break
+                updated_task = self.do_task(task)
+                if not task.isComplete:
+                    self.tasks.put(updated_task.priority, updated_task)
+                else:
+                    twist = Twist()
+                    self.taskManager.pub_vel(twist)
 
     def get_info(self):
         """
