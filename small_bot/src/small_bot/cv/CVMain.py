@@ -271,7 +271,7 @@ class CVMain:
         frame = cv2.morphologyEx(frame, cv2.MORPH_OPEN, kernel)
 
         # Improve Finally
-        # frame = cv2.dilate(frame, kernel, iterations=1)
+        frame = cv2.dilate(frame, kernel, iterations=2)
 
         return frame
 
