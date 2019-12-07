@@ -7,7 +7,7 @@ import rospy
 import time
 import RPi.GPIO as GPIO
 from support.Constants import *
-from sensor_msgs.msg import Image, CompressedImage
+from sensor_msgs.msg import CompressedImage
 from std_msgs.msg import Bool
 from geometry_msgs.msg import Point
 from cv_bridge import CvBridge, CvBridgeError
@@ -166,7 +166,7 @@ class CVMain:
 
         # filter the image
         # frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        arr1 = np.array([75, 75, 75])
+        arr1 = np.array([100, 100, 50])
         arr2 = np.array([255, 255, 255])
 
         new_image = cv2.inRange(frame, arr1, arr2)  # left_low_filter, left_high_filter)
@@ -265,9 +265,13 @@ class CVMain:
         :return: a modified frame
         """
 
+        kernel = np.ones((5, 5), np.uint8)
+
         # Get rid of any static
+        frame = cv2.morphologyEx(frame, cv2.MORPH_OPEN, kernel)
 
         # Improve Finally
+        # frame = cv2.dilate(frame, kernel, iterations=1)
 
         return frame
 
