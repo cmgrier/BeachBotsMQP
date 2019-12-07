@@ -70,11 +70,11 @@ class CVMain:
             # Segmentation
             frame = self.segmentation(frame)
 
-            # Publish the fixed Image (MOVE THIS STATEMENT TO TEST FUNCTIONS)
-            self.curr_image_pub.publish(self.make_compressed_msg(frame))
-
             # Post Processing
             frame = self.post_processing(frame)
+
+            # Publish the fixed Image (MOVE THIS STATEMENT TO TEST FUNCTIONS)
+            self.curr_image_pub.publish(self.make_compressed_msg(frame))
 
             # Information Extraction
             x, y = self.info_extract(frame)
