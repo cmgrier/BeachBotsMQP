@@ -2,7 +2,7 @@
 import smbus
 import math
 import rospy
-from navigation.msg import IMU
+from navigation.msg import IMU_msg
 
 # Register
 power_mgmt_1 = 0x6b
@@ -12,9 +12,10 @@ class IMU:
 
     def __init__(self):
         rospy.init_node("IMU", anonymous=True)
-        self.pub = rospy.Publisher('IMU', IMU, queue_size=10)
-        self.bus
-        self.address
+        self.pub = rospy.Publisher("IMU", IMU_msg, queue_size=10)
+        self.bus  = 0
+        self.address = 0
+
     def read_byte(self,reg):
         return self.bus.read_byte_data(self.address, reg)
 
@@ -82,9 +83,16 @@ class IMU:
         xRot = self.get_x_rotation(beschleunigung_xout_skaliert, beschleunigung_yout_skaliert, beschleunigung_zout_skaliert)
         yRot = self.get_y_rotation(beschleunigung_xout_skaliert, beschleunigung_yout_skaliert, beschleunigung_zout_skaliert)
 
-        msg = IMU
+        msg = IMU_msg()
         msg.xRotation = xRot
         msg.yRotation = yRot
         msg.zRotation = 0.0
 
         self.pub.publish(msg)
+
+if __name__=="__main__":
+	
+	imu = IMU()
+	while(True):
+		print("started IMU")
+		imu.pub_imu()
