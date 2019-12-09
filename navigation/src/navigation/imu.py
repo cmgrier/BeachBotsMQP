@@ -43,6 +43,10 @@ class IMU:
         radians = math.atan2(y, self.dist(x,z))
         return math.degrees(radians)
 
+    def get_z_rotation(self, x, y, z):
+        radians = math.atan2(z, self.dist(x,y))
+        return math.degrees(radians)
+
     def pub_imu(self):
 
         self.bus = smbus.SMBus(1) # bus = smbus.SMBus(0) fuer Revision 1
@@ -86,7 +90,7 @@ class IMU:
         msg = IMU_msg()
         msg.xRotation = xRot
         msg.yRotation = yRot
-        msg.zRotation = 0.0
+        msg.zRotation = gyroskop_zout
 
         self.pub.publish(msg)
 
