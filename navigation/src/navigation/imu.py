@@ -52,7 +52,7 @@ class IMU:
         return math.degrees(radians)
 
     def get_z_rotation(self, x, y, z):
-        radians = math.atan2(z, self.dist(x,y))
+        radians = math.atan2(self.dist(x, y), z)
         return math.degrees(radians)
 
     def calibrate(self):
@@ -68,14 +68,14 @@ class IMU:
             self.bus.write_byte_data(self.address, power_mgmt_1, 0)
 
             #X-axis cal
-            gyroskop_xout = self.read_word_2c(0x43)
-            gyroXAvg += gyroskop_xout / 131
+            gyro_xout = self.read_word_2c(0x43)
+            gyroXAvg += gyro_xout / 131
             accel_xout = self.read_word_2c(0x3b)
             accelXAvg += accel_xout / 16384.0
 
             #Z-axis cal
-            gyroskop_zout = self.read_word_2c(0x47)
-            gyroZAvg += gyroskop_zout/131
+            gyro_zout = self.read_word_2c(0x47)
+            gyroZAvg += gyro_zout/131
             accel_zout = self.read_word_2c(0x3f)
             accelZAvg += accel_zout/16384.0
 
@@ -93,39 +93,39 @@ class IMU:
         self.bus.write_byte_data(self.address, power_mgmt_1, 0)
 
 
-        gyroskop_xout = self.read_word_2c(0x43)
-        gyroskop_yout = self.read_word_2c(0x45)
-        gyroskop_zout = self.read_word_2c(0x47)
+        gyro_xout = self.read_word_2c(0x43)
+        gyro_yout = self.read_word_2c(0x45)
+        gyro_zout = self.read_word_2c(0x47)
 
 
-        beschleunigung_xout = self.read_word_2c(0x3b)
-        beschleunigung_yout = self.read_word_2c(0x3d)
-        beschleunigung_zout = self.read_word_2c(0x3f)
+        accel_xout = self.read_word_2c(0x3b)
+        accel_yout = self.read_word_2c(0x3d)
+        accel_zout = self.read_word_2c(0x3f)
 
-        beschleunigung_xout_skaliert = (beschleunigung_xout / 16384.0) - self.calAccelX
-        beschleunigung_yout_skaliert = beschleunigung_yout / 16384.0
-        beschleunigung_zout_skaliert = (beschleunigung_zout / 16384.0) - self.calAccelZ
+        accel_xout_scaled = (accel_xout / 16384.0) - self.calAccelX
+        accel_yout_scaled = accel_yout / 16384.0
+        accel_zout_scaled = (accel_zout / 16384.0) - self.calAccelZ
 
-        print "X Rotation: " , self.get_x_rotation(beschleunigung_xout_skaliert, beschleunigung_yout_skaliert, beschleunigung_zout_skaliert)
-        print "Y Rotation: " , self.get_y_rotation(beschleunigung_xout_skaliert, beschleunigung_yout_skaliert, beschleunigung_zout_skaliert)
-        print "Z Rotation: ",gyroskop_zout/131-self.calGyroZ
-        xRot = self.get_x_rotation(beschleunigung_xout_skaliert, beschleunigung_yout_skaliert, beschleunigung_zout_skaliert)
-        yRot = self.get_y_rotation(beschleunigung_xout_skaliert, beschleunigung_yout_skaliert, beschleunigung_zout_skaliert)
+        print "X Rotation: " , self.get_x_rotation(accel_xout_scaled, accel_yout_scaled, accel_zout_scaled)
+        print "Y Rotation: " , self.get_y_rotation(accel_xout_scaled, accel_yout_scaled, accel_zout_scaled)
+        print "Z Rotation: ", gyro_zout/131-self.calGyroZ
+        xRot = self.get_x_rotation(accel_xout, accel_yout, accel_zout)
+        yRot = self.get_y_rotation(accel_xout_scaled, accel_yout_scaled, accel_zout_scaled)
 
-        xGyro = gyroskop_xout/131 - self.calGyroX
-        zGyro = gyroskop_zout/131 - self.calGyroZ
+        xGyro = gyro_xout/131 - self.calGyroX
+        zGyro = gyro_zout/131 - self.calGyroZ
 
 
 
         #filter attempt
         a = self.constanT/(self.constanT+self.deltaT)
         gyro_ang = self.filter_angX + (xGyro*self.deltaT)
-        self.filter_angX = a * gyro_ang + (1-a) * beschleunigung_xout_skaliert
+        self.filter_angX = a * gyro_ang + (1-a) * accel_xout
 
         msg = IMU_msg()
-        msg.xRotation = self.filter_angX
-        msg.yRotation = yRot
-        msg.zRotation = zGyro
+        msg.xRotation = xRot
+        msg.yRotation = 0.0
+        msg.zRotation = 0.0
 
         self.pub.publish(msg)
 
