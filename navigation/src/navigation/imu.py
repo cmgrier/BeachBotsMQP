@@ -15,7 +15,8 @@ class IMU:
         self.pub = rospy.Publisher("IMU", IMU_msg, queue_size=10)
         self.bus  = 0
         self.address = 0
-        self.gyroZ = 0
+        self.gyroZ = 0.0
+        self.zRot = 0.0
 
     def read_byte(self,reg):
         return self.bus.read_byte_data(self.address, reg)
@@ -87,10 +88,11 @@ class IMU:
         yRot = self.get_y_rotation(beschleunigung_xout_skaliert, beschleunigung_yout_skaliert, beschleunigung_zout_skaliert)
         gyroskop_zout = gyroskop_zout/131 - self.gyroZ
 
+        self.zRot = 0.98*(self.zRot + (gyroskop_zout/131)-self.gyroZ)+(0.02*beschleunigung_zout_skaliert)
         msg = IMU_msg()
         msg.xRotation = xRot
         msg.yRotation = yRot
-        msg.zRotation = gyroskop_zout
+        msg.zRotation = self.zRot
 
         self.pub.publish(msg)
 
