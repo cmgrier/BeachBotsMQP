@@ -98,10 +98,8 @@ if __name__=="__main__":
 	
     imu = IMU()
     imu.calibrate()
-    status = True
-    while(status):
-        try:
-            print("started IMU")
-            imu.pub_imu()
-        except KeyboardInterrupt:
-            status = False
+
+    while not rospy.is_shutdown():
+        print("started IMU")
+        imu.pub_imu()
+
