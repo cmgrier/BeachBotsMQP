@@ -88,10 +88,10 @@ class IMU:
 
         print "X Rotation: " , self.get_x_rotation(beschleunigung_xout_skaliert, beschleunigung_yout_skaliert, beschleunigung_zout_skaliert)
         print "Y Rotation: " , self.get_y_rotation(beschleunigung_xout_skaliert, beschleunigung_yout_skaliert, beschleunigung_zout_skaliert)
-        print "Z Rotation: ",gyroskop_zout/131-self.gyroZ
+        print "Z Rotation: ",gyroskop_zout/131-self.calGyroZ
         xRot = self.get_x_rotation(beschleunigung_xout_skaliert, beschleunigung_yout_skaliert, beschleunigung_zout_skaliert)
         yRot = self.get_y_rotation(beschleunigung_xout_skaliert, beschleunigung_yout_skaliert, beschleunigung_zout_skaliert)
-        gyroskop_zout = gyroskop_zout/131 - self.gyroZ
+        gyroskop_zout = gyroskop_zout/131 - self.calGyroZ
 
         self.zRot = 0.98*(self.zRot + gyroskop_zout)+(0.02*beschleunigung_zout_skaliert)
         msg = IMU_msg()
