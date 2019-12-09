@@ -13,12 +13,17 @@ class IMU:
     def __init__(self):
         rospy.init_node("IMU", anonymous=True)
         self.pub = rospy.Publisher("IMU", IMU_msg, queue_size=10)
-        self.bus  = 0
+        self.bus = 0
         self.address = 0
+        self.calGyroX = 0.0
         self.calGyroZ = 0.0
+        self.calAccelX = 0.0
         self.calAccelZ = 0.0
-        self.zRot = 0.0
 
+        self.filter_angX= 0.0 
+        self.deltaT =0.04
+        self.constanT = 1
+    
     def read_byte(self,reg):
         return self.bus.read_byte_data(self.address, reg)
 
@@ -53,17 +58,32 @@ class IMU:
     def calibrate(self):
         gyroZAvg = 0.0
         accelZAvg = 0.0
+        gyroXAvg = 0.0
+        accelXAvg = 0.0
+
         for x in range(1,5):
             self.bus = smbus.SMBus(1)  # bus = smbus.SMBus(0) fuer Revision 1
             self.address = 0x68  # via i2cdetect
 
             self.bus.write_byte_data(self.address, power_mgmt_1, 0)
+
+            #X-axis cal
+            gyroskop_xout = self.read_word_2c(0x43)
+            gyroXAvg += gyroskop_xout / 131
+            accel_xout = self.read_word_2c(0x3b)
+            accelXAvg += accel_xout / 16384.0
+
+            #Z-axis cal
             gyroskop_zout = self.read_word_2c(0x47)
             gyroZAvg += gyroskop_zout/131
             accel_zout = self.read_word_2c(0x3f)
-            accel_zout = accel_zout/16384.0
+            accelZAvg += accel_zout/16384.0
+
         self.calGyroZ = gyroZAvg/5.0
         self.calAccelZ = accelZAvg/5.0
+        self.calGyroX = gyroZAvg/5.0
+        self.calAccelX = accelXAvg/5.0
+
 
     def pub_imu(self):
 
@@ -82,7 +102,7 @@ class IMU:
         beschleunigung_yout = self.read_word_2c(0x3d)
         beschleunigung_zout = self.read_word_2c(0x3f)
 
-        beschleunigung_xout_skaliert = beschleunigung_xout / 16384.0
+        beschleunigung_xout_skaliert = (beschleunigung_xout / 16384.0) - self.calAccelX
         beschleunigung_yout_skaliert = beschleunigung_yout / 16384.0
         beschleunigung_zout_skaliert = (beschleunigung_zout / 16384.0) - self.calAccelZ
 
@@ -91,12 +111,21 @@ class IMU:
         print "Z Rotation: ",gyroskop_zout/131-self.calGyroZ
         xRot = self.get_x_rotation(beschleunigung_xout_skaliert, beschleunigung_yout_skaliert, beschleunigung_zout_skaliert)
         yRot = self.get_y_rotation(beschleunigung_xout_skaliert, beschleunigung_yout_skaliert, beschleunigung_zout_skaliert)
-        zRot = gyroskop_zout/131 - self.calGyroZ
+
+        xGyro = gyroskop_xout/131 - self.calGyroX
+        zGyro = gyroskop_zout/131 - self.calGyroZ
+
+
+
+        #filter attempt
+        a = self.constanT/(self.constanT+self.deltaT)
+        gyro_ang = self.filter_angX + (xGyro*self.deltaT)
+        self.filter_angX = a * gyro_ang + (1-a) * beschleunigung_xout_skaliert
 
         msg = IMU_msg()
-        msg.xRotation = xRot
+        msg.xRotation = self.filter_angX
         msg.yRotation = yRot
-        msg.zRotation = zRot
+        msg.zRotation = zGyro
 
         self.pub.publish(msg)
 
