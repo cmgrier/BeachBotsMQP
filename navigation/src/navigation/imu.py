@@ -48,6 +48,17 @@ class IMU:
         radians = math.atan2(z, self.dist(x,y))
         return math.degrees(radians)
 
+    def calibrate(self):
+        gyroZAvg = 0
+        for x in range(1,5):
+            self.bus = smbus.SMBus(1)  # bus = smbus.SMBus(0) fuer Revision 1
+            self.address = 0x68  # via i2cdetect
+
+            self.bus.write_byte_data(self.address, power_mgmt_1, 0)
+            gyroskop_zout = self.read_word_2c(0x47)
+            gyroZAvg += gyroskop_zout/131
+        self.gyroZ = gyroZAvg/5
+
     def pub_imu(self):
 
         self.bus = smbus.SMBus(1) # bus = smbus.SMBus(0) fuer Revision 1
@@ -86,6 +97,7 @@ class IMU:
 if __name__=="__main__":
 	
     imu = IMU()
+    imu.calibrate()
     status = True
     while(status):
         try:
