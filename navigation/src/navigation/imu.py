@@ -15,7 +15,8 @@ class IMU:
         self.pub = rospy.Publisher("IMU", IMU_msg, queue_size=10)
         self.bus  = 0
         self.address = 0
-        self.gyroZ = 0.0
+        self.calGyroZ = 0.0
+        self.calAccelZ = 0.0
         self.zRot = 0.0
 
     def read_byte(self,reg):
@@ -51,6 +52,7 @@ class IMU:
 
     def calibrate(self):
         gyroZAvg = 0.0
+        accelZAvg = 0.0
         for x in range(1,5):
             self.bus = smbus.SMBus(1)  # bus = smbus.SMBus(0) fuer Revision 1
             self.address = 0x68  # via i2cdetect
@@ -58,7 +60,10 @@ class IMU:
             self.bus.write_byte_data(self.address, power_mgmt_1, 0)
             gyroskop_zout = self.read_word_2c(0x47)
             gyroZAvg += gyroskop_zout/131
-        self.gyroZ = gyroZAvg/5.0
+            accel_zout = self.read_word_2c(0x3f)
+            accel_zout = accel_zout/16384.0
+        self.calGyroZ = gyroZAvg/5.0
+        self.calAccelZ = accelZAvg/5.0
 
     def pub_imu(self):
 
@@ -79,7 +84,7 @@ class IMU:
 
         beschleunigung_xout_skaliert = beschleunigung_xout / 16384.0
         beschleunigung_yout_skaliert = beschleunigung_yout / 16384.0
-        beschleunigung_zout_skaliert = beschleunigung_zout / 16384.0
+        beschleunigung_zout_skaliert = (beschleunigung_zout / 16384.0) - self.calAccelZ
 
         print "X Rotation: " , self.get_x_rotation(beschleunigung_xout_skaliert, beschleunigung_yout_skaliert, beschleunigung_zout_skaliert)
         print "Y Rotation: " , self.get_y_rotation(beschleunigung_xout_skaliert, beschleunigung_yout_skaliert, beschleunigung_zout_skaliert)
@@ -88,7 +93,7 @@ class IMU:
         yRot = self.get_y_rotation(beschleunigung_xout_skaliert, beschleunigung_yout_skaliert, beschleunigung_zout_skaliert)
         gyroskop_zout = gyroskop_zout/131 - self.gyroZ
 
-        self.zRot = 0.98*(self.zRot + (gyroskop_zout/131)-self.gyroZ)+(0.02*beschleunigung_zout_skaliert)
+        self.zRot = 0.98*(self.zRot + gyroskop_zout)+(0.02*beschleunigung_zout_skaliert)
         msg = IMU_msg()
         msg.xRotation = xRot
         msg.yRotation = yRot
