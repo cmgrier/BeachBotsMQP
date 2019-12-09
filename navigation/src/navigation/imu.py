@@ -96,7 +96,11 @@ class IMU:
 
 if __name__=="__main__":
 	
-	imu = IMU()
-	while(True):
-		print("started IMU")
-		imu.pub_imu()
+    imu = IMU()
+    status = True
+    while(status):
+        try:
+            print("started IMU")
+            imu.pub_imu()
+        except KeyboardInterrupt:
+            status = False
