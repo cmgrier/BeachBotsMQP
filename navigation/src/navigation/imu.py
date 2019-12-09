@@ -109,7 +109,7 @@ class IMU:
         print "X Rotation: " , self.get_x_rotation(accel_xout_scaled, accel_yout_scaled, accel_zout_scaled)
         print "Y Rotation: " , self.get_y_rotation(accel_xout_scaled, accel_yout_scaled, accel_zout_scaled)
         print "Z Rotation: ", gyro_zout/131-self.calGyroZ
-        xRot = self.get_x_rotation(accel_xout, accel_yout, accel_zout)
+        xRot = self.get_x_rotation(accel_xout_scaled, accel_yout_scaled, accel_zout_scaled)
         yRot = self.get_y_rotation(accel_xout_scaled, accel_yout_scaled, accel_zout_scaled)
 
         xGyro = gyro_xout/131 - self.calGyroX
