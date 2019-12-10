@@ -121,7 +121,8 @@ class IMU:
         accel_zAng = 0.0
         now = rospy.get_rostime()
         deltaT = (now.secs) - self.oldTime
-        
+        print(now.secs)
+        print(deltaT)
         self.gyro_xAng = gyro_xout * deltaT + self.gyro_xAng
         self.gyro_yAng = gyro_yout * deltaT + self.gyro_yAng
         self.gyro_zAng = gyro_zout * deltaT + self.gyro_zAng
