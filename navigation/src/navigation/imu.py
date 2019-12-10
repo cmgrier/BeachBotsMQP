@@ -133,6 +133,8 @@ class IMU:
         finalAngY = alpha * self.gyro_yAng + (1.0 - alpha)*accel_yAng
         finalAngZ = self.gyro_zAng
 
+        print ("Accel: ", accel_xAng, " : ", accel_yAng, " : ", accel_zAng)
+        print ("Gyro: ", self.gyro_xAng, " : ", self.gyro_yAng, " : ", self.gyro_zAng)
         msg = IMU_msg()
         msg.xRotation = finalAngX
         msg.yRotation = finalAngY
