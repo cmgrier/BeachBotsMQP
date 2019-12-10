@@ -15,14 +15,16 @@ class IMU:
         self.pub = rospy.Publisher("IMU", IMU_msg, queue_size=10)
         self.bus = 0
         self.address = 0
+
         self.calGyroX = 0.0
         self.calGyroZ = 0.0
         self.calAccelX = 0.0
         self.calAccelZ = 0.0
 
-        self.filter_angX= 0.0 
-        self.deltaT =0.04
-        self.constanT = 1
+        self.gyro_xAng = 0.0
+        self.gyro_yAng = 0.0
+        self.gyro_zAng = 0.0
+        self.oldTime = 0.0
     
     def read_byte(self,reg):
         return self.bus.read_byte_data(self.address, reg)
@@ -43,12 +45,12 @@ class IMU:
     def dist(self,a,b):
         return math.sqrt((a*a)+(b*b))
 
-    def get_y_rotation(self,x,y,z):
-        radians = math.atan2(x, self.dist(y,z))
+    def get_y_rotation(self, x, y, z):
+        radians = math.atan2(x, self.dist(y, z))
         return -math.degrees(radians)
 
-    def get_x_rotation(self,x,y,z):
-        radians = math.atan2(y, self.dist(x,z))
+    def get_x_rotation(self, x, y, z):
+        radians = math.atan2(y, self.dist(x, z))
         return math.degrees(radians)
 
     def get_z_rotation(self, x, y, z):
@@ -102,32 +104,41 @@ class IMU:
         accel_yout = self.read_word_2c(0x3d)
         accel_zout = self.read_word_2c(0x3f)
 
+#********************Scaled Data************************************
         accel_xout_scaled = (accel_xout / 16384.0) - self.calAccelX
         accel_yout_scaled = accel_yout / 16384.0
         accel_zout_scaled = (accel_zout / 16384.0) - self.calAccelZ
 
-        print "X Rotation: " , self.get_x_rotation(accel_xout_scaled, accel_yout_scaled, accel_zout_scaled)
-        print "Y Rotation: " , self.get_y_rotation(accel_xout_scaled, accel_yout_scaled, accel_zout_scaled)
-        print "Z Rotation: ", gyro_zout/131-self.calGyroZ
-        xRot = self.get_x_rotation(accel_xout_scaled, accel_yout_scaled, accel_zout_scaled)
-        yRot = self.get_y_rotation(accel_xout_scaled, accel_yout_scaled, accel_zout_scaled)
 
         xGyro = gyro_xout/131 - self.calGyroX
         zGyro = gyro_zout/131 - self.calGyroZ
+#*******************************************************************
 
 
+# Angles
+        accel_xAng = self.get_x_rotation(accel_xout, accel_yout, accel_zout)
+        accel_yAng = self.get_y_rotation(accel_xout_scaled, accel_yout, accel_zout)
+        accel_zAng = 0.0
+        now = rospy.get_rostime()
+        deltaT = (now.nsecs/100000) - self.oldTime
+        
+        self.gyro_xAng = gyro_xout * deltaT + self.gyro_xAng
+        self.gyro_yAng = gyro_yout * deltaT + self.gyro_yAng
+        self.gyro_zAng = gyro_zout * deltaT + self.gyro_zAng
 
-        #filter attempt
-        a = self.constanT/(self.constanT+self.deltaT)
-        gyro_ang = self.filter_angX + (xGyro*self.deltaT)
-        self.filter_angX = a * gyro_ang + (1-a) * accel_xout
+        alpha = 0.96
+
+        finalAngX = alpha * self.gyro_xAng + (1.0 - alpha)*accel_xAng
+        finalAngY = alpha * self.gyro_yAng + (1.0 - alpha)*accel_yAng
+        finalAngZ = self.gyro_zAng
 
         msg = IMU_msg()
-        msg.xRotation = xRot
-        msg.yRotation = 0.0
-        msg.zRotation = 0.0
+        msg.xRotation = finalAngX
+        msg.yRotation = finalAngY
+        msg.zRotation = finalAngZ
 
         self.pub.publish(msg)
+        self.oldTime = now.nsecs/100000
 
 if __name__=="__main__":
 	
