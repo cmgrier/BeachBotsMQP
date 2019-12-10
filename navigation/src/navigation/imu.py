@@ -120,7 +120,7 @@ class IMU:
         accel_yAng = self.get_y_rotation(accel_xout_scaled, accel_yout, accel_zout)
         accel_zAng = 0.0
         now = rospy.get_rostime()
-        deltaT = (now.nsecs/100000) - self.oldTime
+        deltaT = (now.secs) - self.oldTime
         
         self.gyro_xAng = gyro_xout * deltaT + self.gyro_xAng
         self.gyro_yAng = gyro_yout * deltaT + self.gyro_yAng
@@ -138,7 +138,7 @@ class IMU:
         msg.zRotation = finalAngZ
 
         self.pub.publish(msg)
-        self.oldTime = now.nsecs/100000
+        self.oldTime = now.secs
 
 if __name__=="__main__":
 	
