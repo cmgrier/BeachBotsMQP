@@ -25,12 +25,9 @@ class IMU:
         self.calAccelY = 0.0
         self.calAccelZ = 0.0
 
-        self.gyro_xAng = 0.0
-        self.gyro_yAng = 0.0
-        self.gyro_zAng = 0.0
-
-        self.oldTime = 0.0
-        self.currentTime = 0.0
+	self.roll = 0.0
+	self.pitch = 0.0
+	self.yaw = 0.0
 
         self.timer = time.time()
 
@@ -143,6 +140,7 @@ class IMU:
 
         print ("Accel: ", accel_xAng, " : ", accel_yAng, " : ", accel_zAng)
         print ("Gyro: ", gyro_xAng, " : ", gyro_yAng, " : ", gyro_zAng)
+        print("Z-AXIS: ",self.yaw)
         msg = IMU_msg()
         msg.xRotation = self.roll
         msg.yRotation = self.pitch
