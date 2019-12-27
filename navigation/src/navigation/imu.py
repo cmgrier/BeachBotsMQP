@@ -2,6 +2,7 @@
 import smbus
 import math
 import rospy
+import time
 from navigation.msg import IMU_msg
 
 # Register
@@ -31,6 +32,7 @@ class IMU:
         self.oldTime = 0.0
         self.currentTime = 0.0
 
+        self.timer = time.time()
 
     def read_byte(self,reg):
         return self.bus.read_byte_data(self.address, reg)
@@ -59,9 +61,6 @@ class IMU:
         radians = math.atan2(y, self.dist(x, z))
         return math.degrees(radians)
 
-    def get_z_rotation(self, x, y, z):
-        radians = math.atan2(self.dist(x, y), z)
-        return math.degrees(radians)
 
     def calibrate(self):
         gyroZAvg = 0.0
@@ -101,9 +100,8 @@ class IMU:
         self.bus.write_byte_data(self.address, power_mgmt_1, 0)
 
         #Time
-        self.oldTime = self.currentTime
-        self.currentTime = rospy.get_rostime().nsecs
-        deltaT = (self.currentTime - self.oldTime)/1000000000 #convert from nano secs to secs
+        dt = time.time() - self.timer
+        self.timer = time.time()
 
         gyro_xout = self.read_word_2c(0x43)
         gyro_yout = self.read_word_2c(0x45)
@@ -115,14 +113,14 @@ class IMU:
         accel_zout = self.read_word_2c(0x3f)
 
 #********************Scaled Data************************************
-        accel_xout_scaled = (accel_xout / 16384.0) - self.calAccelX
+        accel_xout_scaled = (accel_xout / 16384.0) #- self.calAccelX
         accel_yout_scaled = accel_yout / 16384.0
-        accel_zout_scaled = (accel_zout / 16384.0) - self.calAccelZ
+        accel_zout_scaled = (accel_zout / 16384.0) #- self.calAccelZ
 
 
-        xGyro = gyro_xout/131 - self.calGyroX
-        yGyro = gyro_yout/131 - self.calGyroY
-        zGyro = gyro_zout/131 - self.calGyroZ
+        xGyroRaw = gyro_xout/131.0 #- self.calGyroX
+        yGyroRaw = gyro_yout/131.0 #- self.calGyroY
+        zGyroRaw = gyro_zout/131.0 #- self.calGyroZ
 #*******************************************************************
 
 
@@ -131,24 +129,24 @@ class IMU:
         accel_yAng = self.get_y_rotation(accel_xout_scaled, accel_yout_scaled, accel_zout_scaled)
         accel_zAng = 0.0
 
-        print(self.currentTime)
-        print(deltaT)
-        self.gyro_xAng = (xGyro * deltaT) + self.gyro_xAng
-        self.gyro_yAng = (yGyro * deltaT) + self.gyro_yAng
-        self.gyro_zAng = (zGyro * deltaT) + self.gyro_zAng
+        print(self.timer)
+        print(dt)
+        gyro_xAng = (xGyroRaw * dt)
+        gyro_yAng = (yGyroRaw * dt)
+        gyro_zAng = (zGyroRaw * dt)
 
         alpha = 0.96
 
-        roll = (alpha * self.gyro_xAng) + ((1.0 - alpha)*accel_xAng)
-        pitch = (alpha * self.gyro_yAng)+ ((1.0 - alpha)*accel_yAng)
-        yaw = self.gyro_zAng
+        self.roll = alpha * (self.roll + gyro_xAng) + ((1.0 - alpha)*accel_xAng)
+        self.pitch = alpha * (self.pitch + gyro_yAng) + ((1.0 - alpha)*accel_yAng)
+        self.yaw = self.yaw + gyro_zAng
 
         print ("Accel: ", accel_xAng, " : ", accel_yAng, " : ", accel_zAng)
-        print ("Gyro: ", self.gyro_xAng, " : ", self.gyro_yAng, " : ", self.gyro_zAng)
+        print ("Gyro: ", gyro_xAng, " : ", gyro_yAng, " : ", gyro_zAng)
         msg = IMU_msg()
-        msg.xRotation = roll
-        msg.yRotation = pitch
-        msg.zRotation = yaw
+        msg.xRotation = self.roll
+        msg.yRotation = self.pitch
+        msg.zRotation = self.yaw
 
         self.pub.publish(msg)
 
