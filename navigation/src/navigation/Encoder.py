@@ -1,3 +1,4 @@
+#!/usr/bin/python
 
 import RPi.GPIO as GPIO
 import rospy
@@ -16,13 +17,18 @@ class Encoder:
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(ENCODER1_PIN1, GPIO.IN) #TODO add this constant
         GPIO.setup(ENCODER1_PIN2, GPIO.IN) #TODO add this constant
-        GPIO.add_event_detect(ENCODER1_PIN1, GPIO.RISING, callback=self.encoder_callback, bouncetime=300)
-        GPIO.add_event_detect(ENCODER1_PIN2, GPIO.RISING, callback=self.encoder_callback, bouncetime=300)
+        GPIO.add_event_detect(ENCODER1_PIN1, GPIO.RISING, callback=self.encoder_callback1, bouncetime=300)
+        GPIO.add_event_detect(ENCODER1_PIN2, GPIO.RISING, callback=self.encoder_callback2, bouncetime=300)
 
 
 
-    def encoder_callback(self):
+
+    def encoder_callback1(self, channel):
+        self.ticks += 1.0
+
+    def encoder_callback2(self, channel):
         self.ticks += 0.5
+
 
 
     def clearTicks(self): #TODO make this a ros serice handler
@@ -47,4 +53,6 @@ class Encoder:
 if __name__ == "__main__":
 
  encoder = Encoder()
- encoder.convertToDistance()
+ while not rospy.is_shutdown():
+ 	encoder.convertToDistance()
+ GPIO.cleanup()
