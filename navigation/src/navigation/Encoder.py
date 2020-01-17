@@ -1,3 +1,4 @@
+
 import RPi.GPIO as GPIO
 import rospy
 import math
@@ -42,3 +43,8 @@ class Encoder:
         msg.position.y = self.yDist
         msg.orientation.z = self.angle
         #pub.publish(msg)
+
+if __name__ == "__main__":
+
+ encoder = Encoder()
+ encoder.convertToDistance()
