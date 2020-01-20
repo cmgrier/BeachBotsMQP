@@ -5,15 +5,19 @@ import rospy
 import math
 from support.Constants import *
 from geometry_msgs.msg import Pose
+from navigation.msg import IMU_msg
 
 #TODO make a listener for imu angle and make a ros publisher
 class Encoder:
     def __init__(self):
+        rospy.init_node("Encoder", anonymous=True)
         self.ticks = 0.0
         self.xDist = 0.0
         self.yDist = 0.0
         self.angle = 0.0
         self.isPaused = False
+        angle_listener = rospy.Subscriber("/IMU",IMU_msg, self.angle_callback)
+        self.pub = rospy.Publisher("odom",Pose,queue_size=10)
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(ENCODER1_PIN1, GPIO.IN) #TODO add this constant
         GPIO.setup(ENCODER1_PIN2, GPIO.IN) #TODO add this constant
@@ -22,14 +26,14 @@ class Encoder:
 
 
 
-
     def encoder_callback1(self, channel):
-        self.ticks += 1.0
+        self.ticks += 0.5
 
     def encoder_callback2(self, channel):
         self.ticks += 0.5
 
-
+    def angle_callback(self, msg):
+        self.angle = msg.zRotation
 
     def clearTicks(self): #TODO make this a ros serice handler
         self.ticks = 0.0
@@ -48,11 +52,14 @@ class Encoder:
         msg.position.x = self.xDist
         msg.position.y = self.yDist
         msg.orientation.z = self.angle
-        #pub.publish(msg)
+        self.pub.publish(msg)
 
 if __name__ == "__main__":
 
  encoder = Encoder()
  while not rospy.is_shutdown():
- 	encoder.convertToDistance()
- GPIO.cleanup()
+     try:
+         encoder.convertToDistance()
+     except KeyboardInterrupt:
+        GPIO.cleanup()
+        break
