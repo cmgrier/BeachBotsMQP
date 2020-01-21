@@ -3,8 +3,8 @@ import smbus
 import math
 import rospy
 import time
-import csv
 from navigation.msg import IMU_msg
+from support.Filter import Filter
 
 # Register
 power_mgmt_1 = 0x6b
@@ -17,6 +17,9 @@ class IMU:
         self.pub = rospy.Publisher("IMU", IMU_msg, queue_size=10)
         self.bus = 0
         self.address = 0
+	self.gyroXFilter = Filter(5)
+	self.gyroYFilter = Filter(5)
+	self.gyroZFilter = Filter(5)
 
         self.calGyroX = 0.0
         self.calGyroZ = 0.0
@@ -68,7 +71,7 @@ class IMU:
 	accelYAvg = 0.0
 	accelZAvg = 0.0
 
-        for x in range(1,500):
+        for x in range(1,100):
             self.bus = smbus.SMBus(1)  # bus = smbus.SMBus(0) fuer Revision 1
             self.address = 0x68  # via i2cdetect
 
@@ -121,17 +124,20 @@ class IMU:
 
         gyro_xout = self.read_word_2c(0x43)
         gyro_yout = self.read_word_2c(0x45)
-        gyro_zout = self.read_word_2c(0x47)
+        gyro_zout = self.read_word_2c(0x47)        
 
-
-        accel_xout = self.read_word_2c(0x3b)
+	accel_xout = self.read_word_2c(0x3b)
         accel_yout = self.read_word_2c(0x3d)
         accel_zout = self.read_word_2c(0x3f)
 
 #********************Scaled Data************************************
         accel_xout_scaled = (accel_xout / 16384.0)  - self.calAccelX
-        accel_yout_scaled = (accel_yout / 16384.0) - self.calAccelY
-        accel_zout_scaled = (accel_zout / 16384.0) - self.calAccelZ
+        accel_yout_scaled = (accel_yout / 16384.0)  - self.calAccelY
+        accel_zout_scaled = (accel_zout / 16384.0)  - self.calAccelZ
+
+	print("AccelX: ",accel_xout)
+	print("AccelY: ",accel_yout)
+	#print("AccelZ: ",accel_zout)
 
 
         xGyroRaw = gyro_xout/131.0 - self.calGyroX
@@ -145,12 +151,13 @@ class IMU:
         accel_yAng = self.get_y_rotation(accel_xout_scaled, accel_yout_scaled, accel_zout_scaled)
         accel_zAng = 0.0
 
-      #  print(self.timer)
-       # print(dt)
-        print("GyroZRaw: ",zGyroRaw)
-        gyro_xAng = (xGyroRaw * dt) 
-        gyro_yAng = (yGyroRaw * dt) 
-        gyro_zAng = (zGyroRaw * dt) 
+	
+	self.gyroXFilter.addValue((xGyroRaw * dt))	
+        self.gyroYFilter.addValue((yGyroRaw * dt)) 
+        self.gyroZFilter.addValue((zGyroRaw * dt)) 
+        gyro_xAng =  self.gyroXFilter.getAverage()
+        gyro_yAng = self.gyroYFilter.getAverage()
+        gyro_zAng = self.gyroZFilter.getMedian()
 
         alpha = 0.96
 
@@ -158,10 +165,7 @@ class IMU:
         self.pitch = alpha * (self.pitch + gyro_yAng) + ((1.0 - alpha)*accel_yAng)
         self.yaw = self.yaw + gyro_zAng
 
-   #     print ("Accel: ", accel_xAng, " : ", accel_yAng, " : ", accel_zAng)
-    #    print ("Gyro: ", gyro_xAng, " : ", gyro_yAng, " : ", gyro_zAng)
-     #   print("Z-AXIS: ",self.yaw)
-        msg = IMU_msg()
+	msg = IMU_msg()
         msg.xRotation = self.roll
         msg.yRotation = self.pitch
         msg.zRotation = self.yaw
