@@ -17,9 +17,9 @@ class IMU:
         self.pub = rospy.Publisher("IMU", IMU_msg, queue_size=10)
         self.bus = 0
         self.address = 0
-	self.gyroXFilter = Filter(5)
-	self.gyroYFilter = Filter(5)
-	self.gyroZFilter = Filter(5)
+	self.gyroXFilter = Filter(1500)
+	self.gyroYFilter = Filter(1500)
+	self.gyroZFilter = Filter(1500)
 
         self.calGyroX = 0.0
         self.calGyroZ = 0.0
@@ -157,7 +157,7 @@ class IMU:
         self.gyroZFilter.addValue((zGyroRaw * dt)) 
         gyro_xAng =  self.gyroXFilter.getAverage()
         gyro_yAng = self.gyroYFilter.getAverage()
-        gyro_zAng = self.gyroZFilter.getMedian()
+        gyro_zAng = self.gyroZFilter.getAverage()
 
         alpha = 0.96
 
