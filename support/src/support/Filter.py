@@ -1,4 +1,6 @@
 #!/usr/bin/python
+import copy
+
 
 class Filter:
     def __init__(self, size):
@@ -41,7 +43,7 @@ class Filter:
         Gets the median of the list
         :return: the value at the middle index
         """
-        tempList = self.list.copy()
+        tempList = copy.deepcopy(self.list)
         tempList.sort()
         index = int(self.size/2)
         return tempList[index]
