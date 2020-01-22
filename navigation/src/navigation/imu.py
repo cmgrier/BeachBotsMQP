@@ -17,9 +17,9 @@ class IMU:
         self.pub = rospy.Publisher("IMU", IMU_msg, queue_size=10)
         self.bus = 0
         self.address = 0
-        self.gyroXFilter = Filter(1500)
-        self.gyroYFilter = Filter(1500)
-        self.gyroZFilter = Filter(1500)
+        self.gyroXFilter = Filter(15)
+        self.gyroYFilter = Filter(15)
+        self.gyroZFilter = Filter(15)
 
         self.calGyroX = 0.0
         self.calGyroZ = 0.0
@@ -35,17 +35,8 @@ class IMU:
         self.yaw = 0.0
 
         self.timer = time.time()
-
-    def checkAccl(self, gyroVal, acclVal):
-        if gyroVal >=  0:
-            if self.oldXAccel > acclVal:
-                acclVal = self.oldXAccel + abs(self.oldXAccel-acclVal)
-        elif gyroVal < 0:
-            if self.oldXAccel < acclVal:
-                acclVal = self.oldXAccel - abs(self.oldXAccel-acclVal)
-        self.oldXAccel = acclVal
-        return acclVal
-
+	self.correctTime = time.time()
+	
     def read_byte(self,reg):
         return self.bus.read_byte_data(self.address, reg)
 
@@ -70,13 +61,14 @@ class IMU:
         return -math.degrees(radians)
 
     def get_x_rotation(self, x, y, z):
-        radians = math.atan2(y, self.dist(x, z))
+        radians = math.atan2(y,self.dist(y,z))
+	print(math.degrees(radians))
         return math.degrees(radians)
 
 
     def calibrate(self):
         gyroZAvg = 0.0
-	    gyroYAvg = 0.0
+	gyroYAvg = 0.0
         gyroXAvg = 0.0
         accelXAvg = 0.0
         accelYAvg = 0.0
@@ -95,7 +87,7 @@ class IMU:
             accelXAvg += accel_xout / 16384.0
 
        	    #Y-axis cal
-	        gyro_yout = self.read_word_2c(0x45)
+	    gyro_yout = self.read_word_2c(0x45)
             gyroYAvg += gyro_yout/131.0
             accel_yout = self.read_word_2c(0x3d)
             accelYAvg += accel_yout/16384.0	   
@@ -112,7 +104,7 @@ class IMU:
             self.calAccelZ = accelZAvg/500.0
             self.calGyroX = gyroZAvg/500.0
             self.calAccelX = accelXAvg/500.0
-	        self.calGyroY = gyroYAvg/500.0
+	    self.calGyroY = gyroYAvg/500.0
             self.calAccelY = accelYAvg/500.0
 	
 	print("calGyroZ: ",self.calGyroZ)
@@ -137,7 +129,7 @@ class IMU:
         gyro_yout = self.read_word_2c(0x45)
         gyro_zout = self.read_word_2c(0x47)        
 
-	    accel_xout = self.read_word_2c(0x3b)
+	accel_xout = self.read_word_2c(0x3b)
         accel_yout = self.read_word_2c(0x3d)
         accel_zout = self.read_word_2c(0x3f)
 
@@ -145,9 +137,6 @@ class IMU:
         accel_xout_scaled = (accel_xout / 16384.0)  - self.calAccelX
         accel_yout_scaled = (accel_yout / 16384.0)  - self.calAccelY
         accel_zout_scaled = (accel_zout / 16384.0)  - self.calAccelZ
-
-	print("AccelX: ",accel_xout)
-	print("AccelY: ",accel_yout)
 	#print("AccelZ: ",accel_zout)
 
 
@@ -161,17 +150,23 @@ class IMU:
         accel_xAng = self.get_x_rotation(accel_xout_scaled, accel_yout_scaled, accel_zout_scaled)
         accel_yAng = self.get_y_rotation(accel_xout_scaled, accel_yout_scaled, accel_zout_scaled)
         accel_zAng = 0.0
-
-        accel_xAng = self.checkAccl(xGyroRaw,accel_xAng)
 	
+
+	zGyroData = (zGyroRaw * dt)
+
+	if (time.time()-self.correctTime) >= 12.0:
+	  print("12 secs!: ",time.time()-self.correctTime)
+	  self.correctTime = time.time()
+	  zGyroData = (zGyroRaw * dt)+1.0
+		
+
 	self.gyroXFilter.addValue((xGyroRaw * dt))	
         self.gyroYFilter.addValue((yGyroRaw * dt)) 
-        self.gyroZFilter.addValue((zGyroRaw * dt)) 
+        self.gyroZFilter.addValue((zGyroData))
         gyro_xAng =  self.gyroXFilter.getAverage()
         gyro_yAng = self.gyroYFilter.getAverage()
         gyro_zAng = self.gyroZFilter.getAverage()
-
-
+	
 
         alpha = 0.96
 
