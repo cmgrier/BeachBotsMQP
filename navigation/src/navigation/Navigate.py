@@ -3,38 +3,57 @@
 import rospy
 from support.PID import PID
 from support.Constants import *
+from geometry_msgs.msg import Pose
+import math
 
 class Navigate:
     def __init__(self):
         self.PID = None
         rospy.init_node('navigation', anonymous=True)
-        rospy.Subscriber("encoder", Encoder, self.positionListener())
-        rospy.Subscriber("imu", IMU, self.positionListener())
-        self.position = 0
-        self.angle = 0
+        rospy.Subscriber("odom", Pose, self.positionListener())
+        self.position = (0.0,0.0)
+        self.oldPosition = (0.0,0.0)
+        self.angle = 0.0
+        self.oldAngle = 0.0
 
     def positionListener(self, data):
         """
         Callback for the encoder topic
-        :param data: Linear position based on encoder ticks
+        :param data: Pose message
         :return:
         """
-        self.position = data.encoderDistance
+        self.position = (data.linear.x, data.linear.y)
+        self.angle = data.orientation.z
 
-    def angleListener(self, data):
+    def getDist(self, x, y, x2, y2):
         """
-        Callback for the imu topic
-        :param data: Angular position in degrees based on IMU readings
-        :return:
+        Gets the distance vetween two points
+        :param x: first x-coord in meters
+        :param y: first y-coord in meters
+        :param x2: second x-coord in meters
+        :param y2: second y-coord in meters
+        :return: distance formula
         """
-        self.angle = data.imuAngle
+        return math.sqrt(((x-x2)*(x-x2)) + ((y-y2)*(y-y2)))
 
-    def withinDistanceThreshold(self, dist):
+    def getAngle(self, x, y, x2, y2):
+        """
+        Gets the angle vetween two points
+        :param x: first x-coord in meters
+        :param y: first y-coord in meters
+        :param x2: second x-coord in meters
+        :param y2: second y-coord in meters
+        :return: angle formula
+        """
+        return math.atan((y2-y)/(x2-x))
+
+    def withinCoordinatesThreshold(self, dist):
         """
         Determines if the current position meets the threshold for the desired position
-        :param dist: Linear distance in inches
-        :return: A boolean
+        :param dist: Linear distance in meters
+        :return: True if current distance is within desired distance threshold
         """
+
         if self.position >= dist - DISTANCE_THREHOLD_MIN and self.position <= dist + DISTANCE_THRESHOLD_MAX:
             return True
         return False
@@ -70,3 +89,17 @@ class Navigate:
         while self.withinAngleThreshold(angle):
             rospy.wait_for_message("imu")
             #TODO add the beef
+
+    def driveToCoord(self, x, y):
+        """
+        Makes the rovot drive to the specified coordinate
+        :param x: Desired x-coord in meters
+        :param y: Desired y-coord in meters
+        :return: True when finished executing
+        """
+        #TODO
+
+if __name__=="__main__":
+    nav = Navigate()
+    print(nav.getDist(1,1,4,7))
+    print(nav.getAngle(1,1,4,7))
