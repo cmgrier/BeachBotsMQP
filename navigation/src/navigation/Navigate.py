@@ -6,25 +6,29 @@ from support.Constants import *
 from geometry_msgs.msg import Pose
 import math
 
+
 class Navigate:
     def __init__(self):
         self.PID = None
         rospy.init_node('navigation', anonymous=True)
-        rospy.Subscriber("odom", Pose, self.positionListener())
+        rospy.Subscriber("odom", Pose, self.positionListener)
         self.position = (0.0,0.0)
         self.oldPosition = (0.0,0.0)
         self.angle = 0.0
         self.oldAngle = 0.0
 
+#WORKS
     def positionListener(self, data):
         """
         Callback for the encoder topic
         :param data: Pose message
         :return:
         """
-        self.position = (data.linear.x, data.linear.y)
+        self.position = (data.position.x, data.position.y)
         self.angle = data.orientation.z
+        print(self.position, " : ", self.angle)
 
+#WORKS
     def getDist(self, x, y, x2, y2):
         """
         Gets the distance vetween two points
@@ -36,6 +40,7 @@ class Navigate:
         """
         return math.sqrt(((x-x2)*(x-x2)) + ((y-y2)*(y-y2)))
 
+#WORKS
     def getAngle(self, x, y, x2, y2):
         """
         Gets the angle vetween two points
@@ -45,29 +50,36 @@ class Navigate:
         :param y2: second y-coord in meters
         :return: angle formula
         """
-        return math.atan((y2-y)/(x2-x))
+        return (180/math.pi)*math.atan((y2-y)/(x2-x))
 
+
+#WORKS MAY CHAMGE
     def withinCoordinatesThreshold(self, dist):
         """
         Determines if the current position meets the threshold for the desired position
         :param dist: Linear distance in meters
         :return: True if current distance is within desired distance threshold
         """
-
-        if self.position >= dist - DISTANCE_THREHOLD_MIN and self.position <= dist + DISTANCE_THRESHOLD_MAX:
+        activeDist = self.getDist(self.oldPosition[0],self.oldPosition[1],self.position[0],self.position[1])
+        print(activeDist, " : ", dist)
+        if activeDist >= dist - DISTANCE_THRESHOLD_MIN and activeDist <= dist + DISTANCE_THRESHOLD_MAX:
             return True
         return False
 
+#WORKS MAY CHAMGE
     def withinAngleThreshold(self, angle):
         """
         Determines if the current angle meets the threshold for the desired angle
         :param angle:
         :return: A boolean
         """
-        if self.angle >= angle - ANGLE_THREHOLD_MIN and self.angle <= angle + ANGLE_THRESHOLD_MAX:
+        activeAngle = self.angle - self.oldAngle
+        print(activeAngle, " : ", angle)
+        if activeAngle >= angle - ANGLE_THRESHOLD_MIN and activeAngle <= angle + ANGLE_THRESHOLD_MAX:
             return True
         return False
 
+#
     def drive_distance(self, dist):
         """
         Drive a set distance forward
@@ -79,6 +91,7 @@ class Navigate:
             rospy.wait_for_message("encoder")
             #TODO add the beef
 
+#
     def turn_angle(self, angle):
         """
         Turn to the desired angle
@@ -90,6 +103,7 @@ class Navigate:
             rospy.wait_for_message("imu")
             #TODO add the beef
 
+#
     def driveToCoord(self, x, y):
         """
         Makes the rovot drive to the specified coordinate
@@ -103,3 +117,5 @@ if __name__=="__main__":
     nav = Navigate()
     print(nav.getDist(1,1,4,7))
     print(nav.getAngle(1,1,4,7))
+    while not rospy.is_shutdown():
+        print(nav.withinAngleThreshold(90))
