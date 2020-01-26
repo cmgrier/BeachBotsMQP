@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 
-
-
 import rospy
-import roslib
 import RPi.GPIO as GPIO 
 from support.Constants import *
 import geometry_msgs.msg

@@ -3,7 +3,7 @@
 import rospy
 from support.PID import PID
 from support.Constants import *
-from geometry_msgs.msg import Pose
+from geometry_msgs.msg import Pose, Twist
 import math
 
 
@@ -12,6 +12,7 @@ class Navigate:
         self.PID = None
         rospy.init_node('navigation', anonymous=True)
         rospy.Subscriber("odom", Pose, self.positionListener)
+        self.pub = rospy.Publisher("cmd_vel",Twist, queue_size = 10 )
         self.position = (0.0,0.0)
         self.oldPosition = (0.0,0.0)
         self.angle = 0.0
@@ -54,7 +55,7 @@ class Navigate:
 
 
 #WORKS MAY CHAMGE
-    def withinCoordinatesThreshold(self, dist):
+    def withinDistanceThreshold(self, dist):
         """
         Determines if the current position meets the threshold for the desired position
         :param dist: Linear distance in meters
@@ -80,30 +81,61 @@ class Navigate:
         return False
 
 #
+    def setSpeedLimits(self,speed):
+        if speed > 1.00:
+            return 1.00
+        elif speed < -1.00:
+            return -1.00
+        else:
+            return speed
+
+
+
     def drive_distance(self, dist):
         """
         Drive a set distance forward
         :param dist: The desired linear distance
         :return:
         """
-        self.PID = PID(DRIVE_DIST_KP, DRIVE_DIST_IP, DRIVE_DIST_DP)
-        while self.withinDistanceThreshold(dist):
-            rospy.wait_for_message("encoder")
-            #TODO add the beef
+        distPID = PID(DRIVE_DIST_KP, DRIVE_DIST_IP, DRIVE_DIST_DP)
+        distPID.SetPoint = dist
+        msg = Twist()
 
-#
+        while not self.withinDistanceThreshold(dist) and not rospy.is_shutdown():
+            activeDist = self.getDist(self.oldPosition[0],self.oldPosition[1],self.position[0],self.position[1])
+            distPID.update(activeDist)
+            msg.linear.x = self.setSpeedLimits(distPID.output/10.0)
+            msg.angular.z = 0.0
+            self.pub.publish(msg)
+            print("Dist: ",dist, "| activeDist: ", activeDist, " | PID Output: ",distPID.output)
+        msg.linear.x = 0.0
+        msg.angular.z = 0.0
+        self.pub.publish(msg)
+
+    #
     def turn_angle(self, angle):
         """
         Turn to the desired angle
         :param angle: The desired angle in degrees
         :return:
         """
-        self.PID = PID(TURN_ANGLE_KP, TURN_ANGLE_IP, TURN_ANGLE_DP)
-        while self.withinAngleThreshold(angle):
-            rospy.wait_for_message("imu")
-            #TODO add the beef
+        angPID = PID(TURN_ANGLE_KP, TURN_ANGLE_IP, TURN_ANGLE_DP)
+        angPID.SetPoint = angle
+        msg = Twist()
+        r = rospy.Rate(10)
+        while not self.withinAngleThreshold(angle) and not rospy.is_shutdown():
+            activeAng = self.angle - self.oldAngle
+            angPID.update(activeAng)
+            msg.linear.x = 0.0
+            msg.angular.z = self.setSpeedLimits(angPID.output / 10.0)
+            self.pub.publish(msg)
+            print("Amg: ", angle, "| activeAmg: ", activeAng, " | PID Output: ", angPID.output)
+            r.sleep()
+        msg.linear.x = 0.0
+        msg.angular.z = 0.0
+        self.pub.publish(msg)
 
-#
+    #
     def driveToCoord(self, x, y):
         """
         Makes the rovot drive to the specified coordinate
@@ -111,11 +143,18 @@ class Navigate:
         :param y: Desired y-coord in meters
         :return: True when finished executing
         """
-        #TODO
+        self.oldPosition = self.position
+        self.oldAngle = self.angle
+        distTarget = self.getDist(self.position[0],self.position[1],x,y)
+        angleTarget = self.getAngle(self.position[0],self.position[1],x,y)
+        self.turn_angle(angleTarget)
+        self.drive_distance(distTarget)
+        return True
 
 if __name__=="__main__":
     nav = Navigate()
     print(nav.getDist(1,1,4,7))
     print(nav.getAngle(1,1,4,7))
-    while not rospy.is_shutdown():
-        print(nav.withinAngleThreshold(90))
+    dist = nav.getDist(1, 1, 4, 7)
+    nav.oldPosition = nav.position
+    nav.turn_angle(90)
