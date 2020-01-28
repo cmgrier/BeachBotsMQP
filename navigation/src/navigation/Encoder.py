@@ -22,8 +22,8 @@ class Encoder:
         #isPaused_listener = rospy.Subscriber("/isPaused",Pause_msg, self.pause_callback)
         self.pub = rospy.Publisher("odom",Pose,queue_size=10)
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(ENCODER1_PIN1, GPIO.IN) #TODO add this constant
-        GPIO.setup(ENCODER1_PIN2, GPIO.IN) #TODO add this constant
+        GPIO.setup(ENCODER1_PIN1, GPIO.IN)
+        GPIO.setup(ENCODER1_PIN2, GPIO.IN)
         GPIO.add_event_detect(ENCODER1_PIN1, GPIO.RISING, callback=self.encoder_callback1, bouncetime=300)
         GPIO.add_event_detect(ENCODER1_PIN2, GPIO.RISING, callback=self.encoder_callback2, bouncetime=300)
 
@@ -44,7 +44,7 @@ class Encoder:
 
     def convertToDistance(self):
         totalRevs = self.ticks
-        rawDist = totalRevs * TREAD_CIRCUMFERENCE  #TODO add this constant
+        rawDist = totalRevs * TREAD_CIRCUMFERENCE
        # print("Dist: ",rawDist)
         self.yDist += (rawDist-self.oldDist) * math.sin(self.angle)
         self.xDist += (rawDist-self.oldDist) * math.cos(self.angle)
