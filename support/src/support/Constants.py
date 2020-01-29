@@ -41,12 +41,14 @@ SERVO_CAM = 17
 # make true to activate debug print statements
 DEBUG = False
 
+
 # Collector Arm D-H Frame Data
-A1 = 0
+A1 = 0.130  # meters
 ALPHA1 = 0
 D1 = 0
 THETA1 = 0
-A2 = 0
+A2 = 0.180  # meters
 ALPHA2 = 0
 D2 = 0
-THETA2 = 0
+THETA2 = 0#30  # degrees
+
