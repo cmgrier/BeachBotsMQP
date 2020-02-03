@@ -5,11 +5,7 @@ import numpy
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 
-
 class Kinematics:
-
-
-    def __init__(self):
 
     def fwkin(self, ang0, ang1):
         """ Takes the angles of the joints in the arm, ang0 and ang1 referring to the
@@ -58,17 +54,19 @@ class Kinematics:
         :param y: end effector y-coord
         :return: joint angles to result in the end effector reaching the desired position
         """
-        d3 = sqrt((y*y)+(x*x))
-        print("D3: ",d3)
-        a3 = acos(((A1*A1)+(A2*A2)-(d3*d3))/(-2*A1*A2))
-        print("A3: ", a3)
-        theta1 = 180 - a3
-        a4 = acos(((d3*d3)+(A1*A1)-(A2*A2)/(-2*A1*d3)))
-        a5 = acos(y/d3)
-        theta2 = 90 - a4 - a5
+
+        # When using invkin() put it in a try-catch for ValueError to handle the edge case of when
+        # the end effector coordinates are out of the arm's task space
+
+        x = x+A1+A2     # transform coordinates from end effector to shoulder origin
+        D3 = sqrt((y*y)+(x*x))
+        d3 = acos(round(((A1*A1)+(A2*A2)-(D3*D3))/(2*A1*A2),3))
+        theta2 = 180 - degrees(d3)
+        theta1 = 90 - degrees(acos((y/D3))) - degrees(acos(round(((A1*A1)+(D3*D3)-(A2*A2))/(2*A1*D3),3)))
+        if x < 0:
+            theta1 = -90 - degrees(acos((y/D3))) - degrees(acos(round(((A1*A1)+(D3*D3)-(A2*A2))/(2*A1*D3),3)))
         return (theta1,theta2)
 
 if __name__=="__main__":
-    k = Kinematics(2)
-    print(k.getEndEffectorFromAngles(0, 0))
-    k.getEndEffectorFromAngles(k.invkin(0,0)[0],k.invkin(0,0)[1])
+    k = Kinematics()
+    k.getEndEffectorFromAngles(k.invkin(-.62,-.13)[0],k.invkin(-.62,-.13)[1])
