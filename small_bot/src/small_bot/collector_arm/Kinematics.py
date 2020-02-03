@@ -7,34 +7,36 @@ import matplotlib.pyplot as plt
 
 class Kinematics:
 
-    def fwkin(self, ang0, ang1):
+    def fwkin(self, ang0, ang1, graph=False):
         """ Takes the angles of the joints in the arm, ang0 and ang1 referring to the
         shoulder and elbow joints respectively, and calculates the position of the
         end effector as a 3x1 matrix
         """
         ang0 = radians(ang0)
         ang1 = radians(ang1)
-        fig = plt.figure()
-        ax = fig.add_subplot(111, projection='3d')
         matrix = self.transformMatrix(ang0+THETA1, ALPHA1, A1, D1)
         matrix2 = numpy.dot(self.transformMatrix(ang0 + THETA1, ALPHA1, A1, D1), self.transformMatrix(ang1 + THETA2, ALPHA2, A2, D2))
-        ax.plot([0,matrix[0][3]], [0,matrix[1][3]], [0,matrix[2][3]],color='g',marker='o')
-        ax.plot([matrix[0][3],matrix2[0][3]], [matrix[1][3], matrix2[1][3]], [matrix[2][3],matrix2[2][3]], color='b',marker='o')
-        ax.set_xlabel('x-axis')
-        ax.set_ylabel('y-axis')
-        ax.set_zlabel('z-axis')
-        ax.set(xlim=(-.5, .5), ylim=(-.5, .5),zlim=(-.5, .5))
-        plt.show()
+        if graph == True:
+            fig = plt.figure()
+            ax = fig.add_subplot(111, projection='3d')
+            ax.plot([0,matrix[0][3]], [0,matrix[1][3]], [0,matrix[2][3]],color='g',marker='o')
+            ax.plot([matrix[0][3],matrix2[0][3]], [matrix[1][3], matrix2[1][3]], [matrix[2][3],matrix2[2][3]], color='b',marker='o')
+            ax.set_xlabel('x-axis')
+            ax.set_ylabel('y-axis')
+            ax.set_zlabel('z-axis')
+            ax.set(xlim=(-.5, .5), ylim=(-.5, .5),zlim=(-.5, .5))
+            plt.show()
         return numpy.dot(self.transformMatrix(ang0+THETA1, ALPHA1, A1, D1), self.transformMatrix(ang1+THETA2, ALPHA2, A2, D2))
 
-    def getEndEffectorFromAngles(self,ang0,ang1):
+    def getEndEffectorFromAngles(self, ang0, ang1, graph=False ):
         """
         Gets the end effector's final position after the joints rotate to a certain angle
         :param ang0: joint 0 angle
         :param ang1: joint 1 angle
+        :param graph: True to show 3D graph
         :return: [x,y,z] position in meters
         """
-        matrix = self.fwkin(ang0, ang1)
+        matrix = self.fwkin(ang0, ang1, graph)
         print(matrix)
         return [matrix[0][3], matrix[1][3], matrix[2][3]]
 
@@ -69,4 +71,4 @@ class Kinematics:
 
 if __name__=="__main__":
     k = Kinematics()
-    k.getEndEffectorFromAngles(k.invkin(-.62,-.13)[0],k.invkin(-.62,-.13)[1])
+    k.getEndEffectorFromAngles(k.invkin(-0.5,-0.2)[0], k.invkin(-0.5,-0.2)[1])
