@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 
-
-
 import rospy
-import roslib
 import RPi.GPIO as GPIO 
 from support.Constants import *
 import geometry_msgs.msg
@@ -56,7 +53,7 @@ class Drive:
 
 		#Detected linear velocity
 		elif msg.angular.z == 0.0 and msg.linear.x != 0.0:
-			print("In LINEAR")
+			print("In LINEAR: ",msg.linear.x)
 			val = (msg.linear.x * 100)
 			if val > 100:
 				val = 100
@@ -68,6 +65,10 @@ class Drive:
 				self.set_direction("B", "B")
 				val *= -1
 			self.run_wheels(val, val)
+
+		#No speed detected
+		else:
+			self.stop_wheels()
 
 		"""else:
 			turn_val = msg.angular.z
