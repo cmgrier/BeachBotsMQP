@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from baseBot.MapMaker import MapMaker
+from baseBot.MeshAnalyzer import MeshAnalyzer
 import math
 
 # This class holds the current map and passes it between the other managers
@@ -14,6 +15,211 @@ class MapManager:
         self.mapMaker = MapMaker()
         self.landing_strip = []  # [top_left, top_right, bottom_right, bottom_left]
         self.map = self.mapMaker.get_map()  # is a map of difficulty of terrain
+        self.occupancy_grid = []
+        self.cleanedZones = []
+
+    def update(self):
+        self.update_OG()
+
+    def get_center_from_zone_index(self, zone):
+        s = 1
+        w = 2
+        while zone >= math.pow(w, 2):
+            w += 2
+            s += 1
+
+        total = w * 2 + (w - 2) * 2
+        max = math.pow(w, 2) - 1
+        min = max - total + 1
+
+        x = 1
+        y = s
+        i = 0
+        while i + min != zone:
+            i += 1
+            if i < w / 2:
+                x += 1
+            elif w / 2 <= i < w - 1 + w / 2:
+                y -= 1
+            elif w - 1 + w / 2 <= i < w - 1 + w - 1 + w / 2:
+                x -= 1
+            elif w - 1 + w - 1 + w / 2 <= i < w - 1 + w - 1 + w - 1 + w / 2:
+                y += 1
+            else:
+                x += 1
+
+        rx = (x - 1) * ZONE_WIDTH + ZONE_WIDTH / 2
+        ry = (y - 1) * ZONE_LENGTH + ZONE_LENGTH / 2
+        return [rx, ry]
+
+    def get_zone_index_from_point(self, point):
+        if point[0] < 0:
+            xf = -1
+        else:
+            xf = 1
+
+        if point[1] < 0:
+            yf = -1
+        else:
+            yf = 1
+
+        x = math.ceil(math.fabs(point[0]) / ZONE_WIDTH)
+        y = math.ceil(math.fabs(point[1]) / ZONE_LENGTH)
+        x = x * xf
+        y = y * yf
+
+        if math.fabs(x) > math.fabs(y):
+            s = math.fabs(x)
+        else:
+            s = math.fabs(y)
+        w = s * 2
+        total = w * 2 + (w - 2) * 2
+        max = math.pow(w, 2) - 1
+        min = max - total + 1
+
+        if x == 0 and y == 0:
+            zone = 0.0
+
+        elif x == 0:
+            zone = min
+            if y < 0:
+                zone += total / 2
+
+        elif y == 0:
+            zone = min + w / 2 - 1
+            if x < 0:
+                zone += total / 2
+
+        elif x > 0 and y == w/2:
+            zone = min - 1
+            zone += x
+
+        elif x == w/2 and y > 0:
+            zone = min - 1 + w
+            zone -= y
+
+        elif x == w/2 and y < 0:
+            zone = min - 1 + w - 1
+            zone += math.fabs(y)
+
+        elif y == -w/2 and x > 0:
+            zone = min - 1 + 3 * w / 2 - 1
+            zone += w/2 - x
+
+        elif y == -w/2 and x < 0:
+            zone = min - 1 + w / 2 + w - 1 + w / 2 - 1
+            zone += math.fabs(x)
+
+        elif x == - w/2 and y < 0:
+            zone = min - 1 + w / 2 + w - 1 + w - 1
+            zone += w/2 + y
+
+        elif x == -w/2 and y > 0:
+            zone = max - w + 1
+            zone += y
+
+        elif y == w/2 and x < 0:
+            zone = max + 1
+            zone += x
+
+        else:
+            zone = -1
+            print("Error finding zone, no cases match")
+
+        return int(zone)
+
+    def get_corners_from_center(self, center):
+        tl = [center[0] - ZONE_WIDTH / 2, center[1] + ZONE_LENGTH / 2]
+        tr = [center[0] + ZONE_WIDTH / 2, center[1] + ZONE_LENGTH / 2]
+        br = [center[0] + ZONE_WIDTH / 2, center[1] - ZONE_LENGTH / 2]
+        bl = [center[0] - ZONE_WIDTH / 2, center[1] - ZONE_LENGTH / 2]
+        return [tl, tr, br, bl]
+
+    def get_visible_zones(self, t, o):
+        visible_area_corners = self.get_visible_area_corners(t, o)
+        visible_area_zone = Zone(visible_area_corners, -1)
+
+        mesh = self.mapMaker.mesh
+        ma = MeshAnalyzer(mesh)
+        possible_zones = set()
+        for vertex in mesh.vertices:
+            possible_zones.add(self.get_zone_index_from_point(vertex))
+
+        visible_zones = []
+        for zone in possible_zones:
+            corners = self.get_corners_from_center(self.get_center_from_zone_index(zone))
+            visible = True
+            for corner in corners:
+                if not ma.is_point_in_zone(visible_area_zone, corner):
+                    visible = False
+            if visible:
+                visible_zones.append(zone)
+        return visible_zones
+
+    def update_zones(self):
+        visible_zones = self.get_visible_zones(self.mapMaker.translation, self.mapMaker.orientation)
+        for zone in self.cleanedZones:
+            if visible_zones.__contains__(zone):
+                visible_zones.remove(zone)
+
+        for zone_index in visible_zones:
+            aZone = Zone(self.get_corners_from_center(self.get_center_from_zone_index(zone_index)), zone_index)
+            self.zones.append(aZone)
+
+    def rotate_point_around_point(self, center, point, angle):
+        rx = math.cos(angle) * (point[0] - center[0]) - math.sin(angle) * (point[1] - center[1]) + center[0]
+        ry = math.sin(angle) * (point[0] - center[0]) + math.cos(angle) * (point[1] - center[1]) + center[1]
+        return [rx, ry]
+
+    def quaternion_to_euler(self, q):
+        x = q[0]
+        y = q[1]
+        z = q[2]
+        w = q[3]
+
+        t0 = +2.0 * (w * x + y * z)
+        t1 = +1.0 - 2.0 * (x * x + y * y)
+        roll = math.atan2(t0, t1)
+        t2 = +2.0 * (w * y - z * x)
+        t2 = +1.0 if t2 > +1.0 else t2
+        t2 = -1.0 if t2 < -1.0 else t2
+        pitch = math.asin(t2)
+        t3 = +2.0 * (w * z + x * y)
+        t4 = +1.0 - 2.0 * (y * y + z * z)
+        yaw = math.atan2(t3, t4)
+        return [yaw, pitch, roll]
+
+    def get_visible_area_corners(self, t, o):
+        tl = [t[0] - X_MAX, t[1] + Y_MIN + Y_MAX]
+        tr = [t[0] + X_MAX, t[1] + Y_MIN + Y_MAX]
+        br = [t[0] + X_MAX, t[1] + Y_MIN]
+        bl = [t[0] - X_MAX, t[1] + Y_MIN]
+
+        euler = self.quaternion_to_euler(o)
+
+        tl = self.rotate_point_around_point(t, tl, euler[2])
+        tr = self.rotate_point_around_point(t, tr, euler[2])
+        br = self.rotate_point_around_point(t, br, euler[2])
+        bl = self.rotate_point_around_point(t, bl, euler[2])
+        return [tl, tr, br, bl]
+
+    def update_OG(self):
+        mesh = self.mapMaker.mesh
+        ma = MeshAnalyzer(mesh)
+        corners = self.get_visible_area_corners(self.mapMaker.translation, self.mapMaker.orientation)
+        visible_zones = self.get_visible_zones(self.mapMaker.translation, self.mapMaker.orientation)
+        full_zones = []
+        for zone_id in visible_zones:
+            center = self.get_center_from_zone_index(zone_id)
+            corners = self.get_corners_from_center(center)
+            z = Zone(corners, zone_id)
+            full_zones.append(z)
+        OG = ma.make_occupancy_grid_in_front(full_zones, corners)
+        self.occupancy_grid = OG
+
+    """
+    The Following is Legacy
+    """
 
     # sets the current map from mapMaker and creates zones
     def update_map(self):

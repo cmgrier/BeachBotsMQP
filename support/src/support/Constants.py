@@ -6,8 +6,9 @@ STORED_MAP_SIZE = 10
 SAFE_DISTANCE_BETWEEN_BOTS = 100
 AVOID_DISTANCE = 30
 
-ZONE_WIDTH = 20
-LANDING_STRIP_WIDTH = 20
+ZONE_LENGTH = 2
+ZONE_WIDTH = .5
+LANDING_STRIP_WIDTH = .25
 
 # ask Chris. Essentially we prioritize to avoiding robots by backing up first rather than trying to move forward
 AVOID_DIRECTION_PRIORITY_LIST = [3, 4, 2, 5, 1, 6, 0, 7]
@@ -37,6 +38,19 @@ TREAD_CIRCUMFERENCE = 50 # 50mm
 
 # Camera Servo
 SERVO_CAM = 17
+
+# ZED
+MESH_REFRESH_RATE = 2   # update mesh per second
+# this is the z value of the triangle's normal to indicate if the triangle is traversable
+TRIANGLE_NORMAL_Z_TRAVERSABLE = .7
+TRIANGLE_NORMAL_ANGLE_TRAVERSABLE = .523599
+MAX_INCLINE = 30    # max angle incline
+# visible area for zed (used for finding visible zones)
+Y_MIN = .5
+Y_MAX = 5.0
+X_MAX = 2.25
+# Occupancy grid width
+OG_WIDTH = 100
 
 # make true to activate debug print statements
 DEBUG = False

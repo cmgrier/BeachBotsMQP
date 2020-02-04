@@ -21,3 +21,4 @@ class CleaningManager:
     def create_cleaning_tasks(self):
         for zone in self.mapManager.zones:
             self.cleaningTasks.append(Task(zone=zone))
+
