@@ -33,7 +33,7 @@ SMALL_R_DIRECT_2 = 26
 # Small Robot Encoder Interrupts
 ENCODER1_PIN1 = 6
 ENCODER1_PIN2 = 16
-TREAD_CIRCUMFERENCE = 0.151 # mm
+TREAD_CIRCUMFERENCE = 0.151 # meters
 
 # Camera Servo
 SERVO_CAM = 17
@@ -51,4 +51,14 @@ A2 = 0.180  # meters
 ALPHA2 = 0.0
 D2 = 0.0
 THETA2 = 0.0 #30  # degrees
+
+# Collector Arm Motors
+STEP_ANGLE = 0.035  # Degrees per step
+DIR = 0  # Direction pin
+STEP = 0  # Step pin
+SWITCH = 0
+CW = 1
+CCW = 0
+
+
 

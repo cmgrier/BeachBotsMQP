@@ -1,10 +1,10 @@
 #!/usr/bin/python
 from small_bot.collector_arm.Kinematics import Kinematics
-
+import RPI.GPIO as GPIO
 
 class ArmController:
 
-    def __init__(self, pin0, pin1, pin2):
+    def __init__(self):
         """
         Constructor for ArmController class
         :param pin0: pin for joint 0 stepper motor
@@ -15,6 +15,13 @@ class ArmController:
         self.pin1 = pin1
         self.pin2 = pin2
         self.kin = Kinematics()
+        self.joint0_current = 0.0
+        self.joint1_current = 0.0
+        self.delay = 0.001
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(DIR, GPIO.OUT)
+        GPIO.setup(STEP, GPIO.OUT)
+        GPIO.setup(SWITCH, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
         self.calibrate_joints()
 
     def move_end_effector(self, x, y):
@@ -41,8 +48,18 @@ class ArmController:
         :param angle: angle of the joint to turn to in degrees
         :return:
         """
-        print("joimt0: ",angle)
-        #TODO
+        target = angle - self.joint0_current
+        if target < 0:
+            GPIO.output(DIR, CW)
+        else:
+            GPIO.output(DIR, CCW)
+        for step in range(int(target/STEP_ANGLE)):
+            GPIO.output(STEP, GPIO.HIGH)
+            sleep(self.delay)
+            GPIO.output(STEP,GPIO.LOW)
+            sleep(self.delay)
+        self.joint0_current = angle
+
 
     def turn_joint1(self, angle):
         """
@@ -59,6 +76,17 @@ class ArmController:
         :return:
         """
         #TODO
+        #Zero joint0
+        GPIO.output(DIR, CW)
+        trigger = True
+        while trigger:
+            GPIO.output(STEP, GPIO.HIGH)
+            sleep(self.delay)
+            GPIO.output(STEP,GPIO.LOW)
+            sleep(self.delay)
+            if GPIO.input(SWITCH):
+                trigger = False
+
 
     def close_gripper(self, status):
         """
@@ -70,5 +98,5 @@ class ArmController:
 
 
 if __name__=="__main__":
-    arm = ArmController(1,2,3)
+    arm = ArmController()
     arm.move_end_effector(40,0)
