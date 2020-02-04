@@ -64,11 +64,11 @@ class Kinematics:
         D3 = sqrt((y*y)+(x*x))
         d3 = acos(round(((A1*A1)+(A2*A2)-(D3*D3))/(2*A1*A2),3))
         theta2 = 180 - degrees(d3)
-        theta1 = 90 - degrees(acos((y/D3))) - degrees(acos(round(((A1*A1)+(D3*D3)-(A2*A2))/(2*A1*D3),3)))
-        if x < 0:
-            theta1 = -90 - degrees(acos((y/D3))) - degrees(acos(round(((A1*A1)+(D3*D3)-(A2*A2))/(2*A1*D3),3)))
+        a4 = atan2(y,x)
+        a2 = acos(round(((A1*A1)+(D3*D3)-(A2*A2))/(2*A1*D3),3))
+        theta1 = degrees(a4-a2)
         return (theta1,theta2)
 
 if __name__=="__main__":
     k = Kinematics()
-    k.getEndEffectorFromAngles(k.invkin(-0.5,-0.2)[0], k.invkin(-0.5,-0.2)[1])
+    k.getEndEffectorFromAngles(k.invkin(-0.12,0.2)[0], k.invkin(-0.12,0.2)[1])
