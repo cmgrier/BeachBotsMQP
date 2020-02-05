@@ -60,5 +60,9 @@ SWITCH = 0
 CW = 1
 CCW = 0
 
+COIL_A_1_PIN = 18
+COIL_A_2_PIN = 19
+COIL_B_1_PIN = 20
+COIL_B_2_PIN = 24
 
 

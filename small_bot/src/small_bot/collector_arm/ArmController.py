@@ -1,6 +1,7 @@
 #!/usr/bin/python
 from small_bot.collector_arm.Kinematics import Kinematics
 import RPI.GPIO as GPIO
+import rospy
 
 class ArmController:
 
@@ -22,6 +23,12 @@ class ArmController:
         GPIO.setup(DIR, GPIO.OUT)
         GPIO.setup(STEP, GPIO.OUT)
         GPIO.setup(SWITCH, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+
+        GPIO.setup(COIL_A_1_PIN, GPIO.OUT)
+        GPIO.setup(COIL_A_2_PIN, GPIO.OUT)
+        GPIO.setup(COIL_B_1_PIN, GPIO.OUT)
+        GPIO.setup(COIL_B_2_PIN, GPIO.OUT)
+
         self.calibrate_joints()
 
     def move_end_effector(self, x, y):
@@ -42,6 +49,12 @@ class ArmController:
             print(error)
             return False
 
+    def setStep(self,w1, w2, w3, w4):
+        GPIO.output(COIL_A_1_PIN, w1)
+        GPIO.output(COIL_A_2_PIN, w2)
+        GPIO.output(COIL_B_1_PIN, w3)
+        GPIO.output(COIL_B_2_PIN, w4)
+
     def turn_joint0(self, angle):
         """
         Turn the stepper motor for joint 0 to a specific angle
@@ -49,6 +62,33 @@ class ArmController:
         :return:
         """
         target = angle - self.joint0_current
+        steps = target//STEP_ANGLE
+
+        if target < 0:
+            for i in range(0, steps):
+                self.setStep(1, 0, 1, 0)
+                rospy.sleep(self.delay)
+                self.setStep(0, 1, 1, 0)
+                rospy.sleep(self.delay)
+                self.setStep(0, 1, 0, 1)
+                rospy.sleep(self.delay)
+                self.setStep(1, 0, 0, 1)
+                rospy.sleep(self.delay)
+
+        else:
+            # Reverse previous step sequence to reverse motor direction
+
+            for i in range(0, steps):
+                self.setStep(1, 0, 0, 1)
+                rospy.sleep(self.delay)
+                self.setStep(0, 1, 0, 1)
+                self.time.sleep(self.delay)
+                self.setStep(0, 1, 1, 0)
+                self.time.sleep(self.delay)
+                self.setStep(1, 0, 1, 0)
+                self.time.sleep(self.delay)
+
+        """
         if target < 0:
             GPIO.output(DIR, CW)
         else:
@@ -59,7 +99,7 @@ class ArmController:
             GPIO.output(STEP,GPIO.LOW)
             sleep(self.delay)
         self.joint0_current = angle
-
+        """
 
     def turn_joint1(self, angle):
         """
@@ -99,4 +139,5 @@ class ArmController:
 
 if __name__=="__main__":
     arm = ArmController()
-    arm.move_end_effector(40,0)
+    #arm.move_end_effector(40,0)
+    arm.turn_joint0(90)
