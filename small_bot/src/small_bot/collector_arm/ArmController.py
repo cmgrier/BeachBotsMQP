@@ -129,7 +129,7 @@ if __name__=="__main__":
     arm = ArmController()
     #arm.move_end_effector(40,0)
     try:
-	 arm.turn_joint0(-90)
+	 arm.turn_joint0(-180)
    	 GPIO.cleanup()
     except KeyboardInterrupt:
 	 GPIO.cleanup()
