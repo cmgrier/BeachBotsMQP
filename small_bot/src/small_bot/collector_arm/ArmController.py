@@ -1,7 +1,9 @@
 #!/usr/bin/python
 from small_bot.collector_arm.Kinematics import Kinematics
-import RPI.GPIO as GPIO
+import RPi.GPIO as GPIO
 import rospy
+from support.Constants import *
+import time
 
 class ArmController:
 
@@ -12,9 +14,6 @@ class ArmController:
         :param pin1: pin for joint 1 servo
         :param pin2: pin for gripper servo
         """
-        self.pin0 = pin0
-        self.pin1 = pin1
-        self.pin2 = pin2
         self.kin = Kinematics()
         self.joint0_current = 0.0
         self.joint1_current = 0.0
@@ -29,7 +28,7 @@ class ArmController:
         GPIO.setup(COIL_B_1_PIN, GPIO.OUT)
         GPIO.setup(COIL_B_2_PIN, GPIO.OUT)
 
-        self.calibrate_joints()
+        #self.calibrate_joints()
 
     def move_end_effector(self, x, y):
         """
@@ -62,7 +61,9 @@ class ArmController:
         :return:
         """
         target = angle - self.joint0_current
-        steps = target//STEP_ANGLE
+        steps = abs(int(target//STEP_ANGLE))/4
+	print("target: ",target)
+	print("steps: ",steps)
 
         if target < 0:
             for i in range(0, steps):
@@ -82,11 +83,11 @@ class ArmController:
                 self.setStep(1, 0, 0, 1)
                 rospy.sleep(self.delay)
                 self.setStep(0, 1, 0, 1)
-                self.time.sleep(self.delay)
+                rospy.sleep(self.delay)
                 self.setStep(0, 1, 1, 0)
-                self.time.sleep(self.delay)
+                rospy.sleep(self.delay)
                 self.setStep(1, 0, 1, 0)
-                self.time.sleep(self.delay)
+                rospy.sleep(self.delay)
 
         """
         if target < 0:
@@ -140,4 +141,8 @@ class ArmController:
 if __name__=="__main__":
     arm = ArmController()
     #arm.move_end_effector(40,0)
-    arm.turn_joint0(90)
+    try:
+	 arm.turn_joint0(90)
+   	 GPIO.cleanup()
+    except KeyboardInterrupt:
+	 GPIO.cleanup()
