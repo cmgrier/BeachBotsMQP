@@ -19,10 +19,7 @@ class ArmController:
         self.joint1_current = 0.0
         self.delay = 0.001
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(DIR, GPIO.OUT)
-        GPIO.setup(STEP, GPIO.OUT)
         GPIO.setup(SWITCH, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-
         GPIO.setup(COIL_A_1_PIN, GPIO.OUT)
         GPIO.setup(COIL_A_2_PIN, GPIO.OUT)
         GPIO.setup(COIL_B_1_PIN, GPIO.OUT)
@@ -89,18 +86,6 @@ class ArmController:
                 self.setStep(1, 0, 1, 0)
                 rospy.sleep(self.delay)
 
-        """
-        if target < 0:
-            GPIO.output(DIR, CW)
-        else:
-            GPIO.output(DIR, CCW)
-        for step in range(int(target/STEP_ANGLE)):
-            GPIO.output(STEP, GPIO.HIGH)
-            sleep(self.delay)
-            GPIO.output(STEP,GPIO.LOW)
-            sleep(self.delay)
-        self.joint0_current = angle
-        """
 
     def turn_joint1(self, angle):
         """
@@ -118,16 +103,18 @@ class ArmController:
         """
         #TODO
         #Zero joint0
-        GPIO.output(DIR, CW)
         trigger = True
         while trigger:
-            GPIO.output(STEP, GPIO.HIGH)
-            sleep(self.delay)
-            GPIO.output(STEP,GPIO.LOW)
-            sleep(self.delay)
-            if GPIO.input(SWITCH):
-                trigger = False
-
+	   self.setStep(1, 0, 0, 1)
+           rospy.sleep(self.delay)
+           self.setStep(0, 1, 0, 1)
+           rospy.sleep(self.delay)
+           self.setStep(0, 1, 1, 0)
+           rospy.sleep(self.delay)
+           self.setStep(1, 0, 1, 0)
+           rospy.sleep(self.delay)
+	   if GPIO.IN(SWITCH):
+		trigger = False
 
     def close_gripper(self, status):
         """
@@ -142,7 +129,7 @@ if __name__=="__main__":
     arm = ArmController()
     #arm.move_end_effector(40,0)
     try:
-	 arm.turn_joint0(90)
+	 arm.turn_joint0(-90)
    	 GPIO.cleanup()
     except KeyboardInterrupt:
 	 GPIO.cleanup()
