@@ -1,27 +1,26 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import math
+import pyzed.sl as sl
 import rospy
 from baseBot.MapManager import MapManager
 from support.Constants import *
 
 # for testing
 if __name__ == '__main__':
-    mapManager = MapManager()
-    map = [0] * 10000  # 100 by 100 height map of 0s
-    map_width = int(math.sqrt(len(map)))
-    mapManager.mapMaker.map = map
-    mapManager.update_map()
+    mm = MapManager()
+    timer = 0
 
-    number_of_zones = int(map_width / ZONE_WIDTH)
-    print(len(map))
-    print(number_of_zones)
+    print("Getting Frames...")
+    # Grab 500 frames and stop
+    while timer < 500:
+        mm.mapMaker.update_map_async()
+        if mm.mapMaker.get_frame() == sl.ERROR_CODE.SUCCESS:
+            # When grab() = SUCCESS, a new image, depth and pose is available.
+            # Spatial mapping automatically ingests the new data to build the mesh.
+            timer += 1
 
-    assert len(mapManager.zones) == number_of_zones
-    assert len(mapManager.landing_strip) == 4
+    print(mm.get_visible_zones(mm.mapMaker.translation, mm.mapMaker.orientation))
+    mm.update_OG()
 
-    index_list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    for i in range(0, 10):
-        map[i] = -1
-
-    assert mapManager.percent_of_indexes_safe(index_list) == 1.0
+    print(mm.occupancy_grid)
     rospy.loginfo("all tests passed")
