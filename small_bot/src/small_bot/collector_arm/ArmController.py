@@ -10,9 +10,6 @@ class ArmController:
     def __init__(self):
         """
         Constructor for ArmController class
-        :param pin0: pin for joint 0 stepper motor
-        :param pin1: pin for joint 1 servo
-        :param pin2: pin for gripper servo
         """
         self.kin = Kinematics()
         self.joint0_current = 0.0
@@ -24,6 +21,10 @@ class ArmController:
         GPIO.setup(COIL_A_2_PIN, GPIO.OUT)
         GPIO.setup(COIL_B_1_PIN, GPIO.OUT)
         GPIO.setup(COIL_B_2_PIN, GPIO.OUT)
+        GPIO.setup(JOINT1_SERVO, GPIO.OUT)
+        GPIO.setup(GRIPPER_SERVO, GPIO.OUT)
+        self.joint1_pwm = GPIO.PWM(JOINT1_SERVO, 50)
+        self.gripper_pwm = GPIO.PWM(GRIPPER_SERVO, 50)
 
         #self.calibrate_joints()
 
@@ -94,7 +95,12 @@ class ArmController:
         :return:
         """
         print("joimt1: ",angle)
-        #TODO
+        duty = angle / 18 + 2
+        GPIO.output(JOINT1_SERVO, True)
+        self.joint1_pwm.ChangeDutyCycle(duty)
+        rospy.sleep(1)
+        GPIO.output(JOINT1_SERVO, False)
+        self.joint1_pwm.ChangeDutyCycle(0)
 
     def calibrate_joints(self):
         """
@@ -102,8 +108,13 @@ class ArmController:
         :return:
         """
         #TODO
-        #Zero joint0
         trigger = True
+        #Open gripper
+        self.gripper_pwm.start(GRIPPER_OPEN)
+        #Zero joint1
+        self.joint1_pwm.start(JOINT1_START)
+
+        #Zero joint0
         while trigger:
 	   self.setStep(1, 0, 0, 1)
            rospy.sleep(self.delay)
@@ -116,13 +127,25 @@ class ArmController:
 	   if GPIO.IN(SWITCH):
 		trigger = False
 
-    def close_gripper(self, status):
+    def move_gripper(self, status):
         """
         Moves the servo for the gripper
-        :param status: True closes the gripper and False opens it
+        :param status: True opens the gripper and False closes it
         :return:
         """
-        #TODO
+        if status == False:
+            GPIO.output(GRIPPER_SERVO, True)
+            self.gripper_pwm.ChangeDutyCycle(GRIPPER_CLOSE)
+            rospy.sleep(1)
+            GPIO.output(GRIPPER_SERVO, False)
+            self.gripper_pwm.ChangeDutyCycle(0)
+        else:
+            GPIO.output(GRIPPER_SERVO, True)
+            self.gripper_pwm.ChangeDutyCycle(GRIPPER_OPEN)
+            rospy.sleep(1)
+            GPIO.output(GRIPPER_SERVO, False)
+            self.gripper_pwm.ChangeDutyCycle(0)
+
 
 
 if __name__=="__main__":

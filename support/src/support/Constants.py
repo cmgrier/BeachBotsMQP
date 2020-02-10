@@ -93,4 +93,10 @@ COIL_A_2_PIN = 19
 COIL_B_1_PIN = 20
 COIL_B_2_PIN = 24
 
+JOINT1_SERVO = 2 #TODO get this
+JOINT1_START = 0 #TODO get this
+
+GRIPPER_SERVO = 2 #TODO get this
+GRIPPER_OPEN = 2 #TODO get this
+GRIPPER_CLOSE = 2 #TODO get this
 
