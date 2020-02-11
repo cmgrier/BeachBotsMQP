@@ -1,4 +1,12 @@
 #!/usr/bin/python
+# title           :IMU.py
+# description     :IMU node for smallbot
+# author          :Sean Tidd
+# date            :2020-02-11
+# version         :0.1
+# notes           :
+# python_version  :3.5
+# ==============================================================================
 import smbus
 import math
 import rospy
@@ -54,19 +62,43 @@ class IMU:
             return val
 
     def dist(self,a,b):
+        """
+        Distance formula
+        :param a: value a
+        :param b: value b
+        :return: the distance
+        """
         return math.sqrt((a*a)+(b*b))
 
     def get_y_rotation(self, x, y, z):
+        """
+        Get the y tilt angle from accelerometer
+        :param x: accelerometer x-axis
+        :param y: accelerometer y-axis
+        :param z: accelerometer z-axis
+        :return: 
+        """
         radians = math.atan2(x, self.dist(y, z))
         return -math.degrees(radians)
 
     def get_x_rotation(self, x, y, z):
-        radians = math.atan2(y,self.dist(y,z))
+        """
+        Get the x tilt angle from accelerometer
+        :param x: accelerometer x-axis
+        :param y: accelerometer y-axis
+        :param z: accelerometer z-axis
+        :return:
+        """
+        radians = math.atan2(y,self.dist(x,z))
 	print(math.degrees(radians))
         return math.degrees(radians)
 
 
     def calibrate(self):
+        """
+        Zero the IMU data
+        :return: 
+        """
         gyroZAvg = 0.0
 	gyroYAvg = 0.0
         gyroXAvg = 0.0
@@ -115,6 +147,10 @@ class IMU:
 	print("calAccelX: ", self.calAccelX)
 
     def pub_imu(self):
+        """
+        Publish imu data along the topic /IMU
+        :return: 
+        """
 
         self.bus = smbus.SMBus(1) # bus = smbus.SMBus(0) fuer Revision 1
         self.address = 0x68       # via i2cdetect
@@ -160,12 +196,12 @@ class IMU:
 	  zGyroData = (zGyroRaw * dt)+1.0
 		
 
-	self.gyroXFilter.addValue((xGyroRaw * dt))	
-        self.gyroYFilter.addValue((yGyroRaw * dt)) 
-        self.gyroZFilter.addValue((zGyroData))
-        gyro_xAng =  self.gyroXFilter.getAverage()
-        gyro_yAng = self.gyroYFilter.getAverage()
-        gyro_zAng = self.gyroZFilter.getAverage()
+	self.gyroXFilter.add_value((xGyroRaw * dt))
+        self.gyroYFilter.add_value((yGyroRaw * dt))
+        self.gyroZFilter.add_value((zGyroData))
+        gyro_xAng =  self.gyroXFilter.get_average()
+        gyro_yAng = self.gyroYFilter.get_average()
+        gyro_zAng = self.gyroZFilter.get_average()
 	
 
         alpha = 0.96

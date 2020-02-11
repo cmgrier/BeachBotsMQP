@@ -1,9 +1,17 @@
 #!/usr/bin/python
+# title           :ArmController.py
+# description     :smallbot arm controller
+# author          :Sean Tidd
+# date            :2020-02-11
+# version         :0.1
+# notes           :
+# python_version  :3.5
+# ==============================================================================
 from small_bot.collector_arm.Kinematics import Kinematics
 import RPi.GPIO as GPIO
 import rospy
 from support.Constants import *
-import time
+
 
 class ArmController:
 
@@ -46,7 +54,15 @@ class ArmController:
             print(error)
             return False
 
-    def setStep(self,w1, w2, w3, w4):
+    def set_step(self,w1, w2, w3, w4):
+        """
+        Set the voltage for the stepper motor coils
+        :param w1: coil A pin 1 voltage
+        :param w2: coil A pin 2 voltage
+        :param w3: coil B pin 1 voltage
+        :param w4: coil B pin 2 voltage
+        :return:
+        """
         GPIO.output(COIL_A_1_PIN, w1)
         GPIO.output(COIL_A_2_PIN, w2)
         GPIO.output(COIL_B_1_PIN, w3)
@@ -65,26 +81,26 @@ class ArmController:
 
         if target < 0:
             for i in range(0, steps):
-                self.setStep(1, 0, 1, 0)
+                self.set_step(1, 0, 1, 0)
                 rospy.sleep(self.delay)
-                self.setStep(0, 1, 1, 0)
+                self.set_step(0, 1, 1, 0)
                 rospy.sleep(self.delay)
-                self.setStep(0, 1, 0, 1)
+                self.set_step(0, 1, 0, 1)
                 rospy.sleep(self.delay)
-                self.setStep(1, 0, 0, 1)
+                self.set_step(1, 0, 0, 1)
                 rospy.sleep(self.delay)
 
         else:
             # Reverse previous step sequence to reverse motor direction
 
             for i in range(0, steps):
-                self.setStep(1, 0, 0, 1)
+                self.set_step(1, 0, 0, 1)
                 rospy.sleep(self.delay)
-                self.setStep(0, 1, 0, 1)
+                self.set_step(0, 1, 0, 1)
                 rospy.sleep(self.delay)
-                self.setStep(0, 1, 1, 0)
+                self.set_step(0, 1, 1, 0)
                 rospy.sleep(self.delay)
-                self.setStep(1, 0, 1, 0)
+                self.set_step(1, 0, 1, 0)
                 rospy.sleep(self.delay)
 
 
@@ -116,13 +132,13 @@ class ArmController:
 
         #Zero joint0
         while trigger:
-	   self.setStep(1, 0, 0, 1)
+	   self.set_step(1, 0, 0, 1)
            rospy.sleep(self.delay)
-           self.setStep(0, 1, 0, 1)
+           self.set_step(0, 1, 0, 1)
            rospy.sleep(self.delay)
-           self.setStep(0, 1, 1, 0)
+           self.set_step(0, 1, 1, 0)
            rospy.sleep(self.delay)
-           self.setStep(1, 0, 1, 0)
+           self.set_step(1, 0, 1, 0)
            rospy.sleep(self.delay)
 	   if GPIO.IN(SWITCH):
 		trigger = False
@@ -152,7 +168,8 @@ if __name__=="__main__":
     arm = ArmController()
     #arm.move_end_effector(40,0)
     try:
-	 arm.turn_joint0(-180)
+	 #arm.turn_joint0(-180)
+     arm.move_gripper(True)
    	 GPIO.cleanup()
     except KeyboardInterrupt:
 	 GPIO.cleanup()

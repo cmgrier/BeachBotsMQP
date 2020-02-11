@@ -1,3 +1,12 @@
+#!/usr/bin/python
+# title           :SmallBotManager.py
+# description     :main node for smallbot
+# author          :Sean Tidd
+# date            :2020-02-11
+# version         :0.1
+# notes           :
+# python_version  :3.5
+# ==============================================================================
 from support.EqualPriorityQueue import EqualPriorityQueue
 from small_bot.TaskManager import TaskManager
 from small_bot.TaskSeeker import TaskSeeker
@@ -74,10 +83,10 @@ class SmallBotManager:
         """
         self.taskSeeker.request_ID()
         topic = "avoid_alert_" + str(self.id)
-        rospy.Subscriber(topic, AvoidAlert, self.avoidListener)
+        rospy.Subscriber(topic, AvoidAlert, self.avoid_listener)
         pass
 
-    def avoidListener(self, data):
+    def avoid_listener(self, data):
         if data.type == "avoid":
             task = self.taskSeeker.parse_task(data)
             self.tasks.put(task.priority, task)

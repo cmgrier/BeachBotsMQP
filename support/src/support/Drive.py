@@ -1,5 +1,12 @@
 #!/usr/bin/env python
-
+# title           :Drive.py
+# description     :drive node listener for smallbot
+# author          :Sean Tidd
+# date            :2020-02-11
+# version         :0.1
+# notes           :
+# python_version  :3.5
+# ==============================================================================
 import rospy
 import RPi.GPIO as GPIO 
 from support.Constants import *

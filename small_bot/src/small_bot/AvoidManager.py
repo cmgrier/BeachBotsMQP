@@ -1,3 +1,12 @@
+#!/usr/bin/python
+# title           :AvoidManager.py
+# description     :executes avoid tasks for smallbot
+# author          :Sean Tidd
+# date            :2020-02-11
+# version         :0.1
+# notes           :
+# python_version  :3.5
+# ==============================================================================
 from data.Task import Task
 from support.Constants import *
 import geometry_msgs.msg
@@ -12,8 +21,11 @@ class AvoidManager:
         pass
 
     def do_task(self, task):
-        # this will attempt to complete the given avoid task,
-        # update progress on task and return the updated task
+        """
+        Will attempt to complete the given avoid task
+        :param task: the avoid task to be executed
+        :return: the updated task
+        """
         self.counter = self.counter + 1
         twist = geometry_msgs.msg.Twist()
         twist.angular.z = 40

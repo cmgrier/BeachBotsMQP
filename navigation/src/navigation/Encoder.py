@@ -1,5 +1,12 @@
 #!/usr/bin/python
-
+# title           :Encoder.py
+# description     :node for reading and publishing positional data for smallbot
+# author          :Sean Tidd
+# date            :2020-02-11
+# version         :0.1
+# notes           :
+# python_version  :3.5
+# ==============================================================================
 import RPi.GPIO as GPIO
 import rospy
 import math
@@ -42,21 +49,29 @@ class Encoder:
     #    self.isPaused = msg
     #    return
 
-    def convertToDistance(self):
-        totalRevs = self.ticks
-        rawDist = totalRevs * TREAD_CIRCUMFERENCE
-       # print("Dist: ",rawDist)
-        self.yDist += (rawDist-self.oldDist) * math.sin(self.angle)
-        self.xDist += (rawDist-self.oldDist) * math.cos(self.angle)
-	    self.oldDist = rawDist
+    def convert_to_distance(self):
+        """
+        Converts positional data from sensors to update smallbot location
+        :return:
+        """
+        total_revs = self.ticks
+        raw_dist = total_revs * TREAD_CIRCUMFERENCE
+       # print("Dist: ",raw_dist)
+        self.yDist += (raw_dist-self.oldDist) * math.sin(self.angle)
+        self.xDist += (raw_dist-self.oldDist) * math.cos(self.angle)
+        self.oldDist = raw_dist
 
-    def pubDist(self):
-        self.convertToDistance()
+    def pub_dist(self):
+        """
+        Publishes the updated position of the smallbot
+        :return:
+        """
+        self.convert_to_distance()
         msg = Pose()
-	    msg.position.x = self.xDist
+        msg.position.x = self.xDist
         msg.position.y = self.yDist
         msg.orientation.z = self.angle
-	    print(msg.position)
+        print(msg.position)
         self.pub.publish(msg)
 
 if __name__ == "__main__":
@@ -65,7 +80,7 @@ if __name__ == "__main__":
  while not rospy.is_shutdown():
      try:
          if encoder.isPause is False:
-             encoder.pubDist()
+             encoder.pub_dist()
      except KeyboardInterrupt:
         GPIO.cleanup()
         break

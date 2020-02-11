@@ -1,5 +1,12 @@
 #!/usr/bin/env python
-
+# title           :Navigate.py
+# description     :drive smallbot to a specific coordinate
+# author          :Sean Tidd
+# date            :2020-02-11
+# version         :0.1
+# notes           :
+# python_version  :3.5
+# ==============================================================================
 import rospy
 from support.PID import PID
 from support.Constants import *
@@ -11,15 +18,15 @@ class Navigate:
     def __init__(self):
         self.PID = None
         rospy.init_node('navigation', anonymous=True)
-        rospy.Subscriber("odom", Pose, self.positionListener)
+        rospy.Subscriber("odom", Pose, self.position_listener)
         self.pub = rospy.Publisher("cmd_vel",Twist, queue_size = 10 )
         self.position = (0.0,0.0)
-        self.oldPosition = (0.0,0.0)
+        self.old_position = (0.0,0.0)
         self.angle = 0.0
-        self.oldAngle = 0.0
+        self.old_angle = 0.0
 
-#WORKS
-    def positionListener(self, data):
+
+    def position_listener(self, data):
         """
         Callback for the encoder topic
         :param data: Pose message
@@ -29,10 +36,10 @@ class Navigate:
         self.angle = data.orientation.z
         print(self.position, " : ", self.angle)
 
-#WORKS
-    def getDist(self, x, y, x2, y2):
+
+    def get_dist(self, x, y, x2, y2):
         """
-        Gets the distance vetween two points
+        Gets the distance between two points
         :param x: first x-coord in meters
         :param y: first y-coord in meters
         :param x2: second x-coord in meters
@@ -41,10 +48,10 @@ class Navigate:
         """
         return math.sqrt(((x-x2)*(x-x2)) + ((y-y2)*(y-y2)))
 
-#WORKS
-    def getAngle(self, x, y, x2, y2):
+
+    def get_angle(self, x, y, x2, y2):
         """
-        Gets the angle vetween two points
+        Gets the angle between two points
         :param x: first x-coord in meters
         :param y: first y-coord in meters
         :param x2: second x-coord in meters
@@ -55,33 +62,33 @@ class Navigate:
 
 
 #WORKS MAY CHAMGE
-    def withinDistanceThreshold(self, dist):
+    def within_distance_threshold(self, dist):
         """
         Determines if the current position meets the threshold for the desired position
         :param dist: Linear distance in meters
         :return: True if current distance is within desired distance threshold
         """
-        activeDist = self.getDist(self.oldPosition[0],self.oldPosition[1],self.position[0],self.position[1])
-        print(activeDist, " : ", dist)
-        if activeDist >= dist - DISTANCE_THRESHOLD_MIN and activeDist <= dist + DISTANCE_THRESHOLD_MAX:
+        active_dist = self.get_dist(self.old_position[0],self.old_position[1],self.position[0],self.position[1])
+        print(active_dist, " : ", dist)
+        if active_dist >= dist - DISTANCE_THRESHOLD_MIN and active_dist <= dist + DISTANCE_THRESHOLD_MAX:
             return True
         return False
 
 #WORKS MAY CHAMGE
-    def withinAngleThreshold(self, angle):
+    def within_angle_threshold(self, angle):
         """
         Determines if the current angle meets the threshold for the desired angle
         :param angle:
         :return: A boolean
         """
-        activeAngle = self.angle - self.oldAngle
+        activeAngle = self.angle - self.old_angle
         print(activeAngle, " : ", angle)
         if activeAngle >= angle - ANGLE_THRESHOLD_MIN and activeAngle <= angle + ANGLE_THRESHOLD_MAX:
             return True
         return False
 
 #
-    def setSpeedLimits(self,speed):
+    def set_speed_limits(self,speed):
         if speed > 1.00:
             return 1.00
         elif speed < -1.00:
@@ -101,13 +108,13 @@ class Navigate:
         distPID.SetPoint = dist
         msg = Twist()
 
-        while not self.withinDistanceThreshold(dist) and not rospy.is_shutdown():
-            activeDist = self.getDist(self.oldPosition[0],self.oldPosition[1],self.position[0],self.position[1])
-            distPID.update(activeDist)
-            msg.linear.x = self.setSpeedLimits(distPID.output/10.0)
+        while not self.within_distance_threshold(dist) and not rospy.is_shutdown():
+            active_dist = self.get_dist(self.old_position[0],self.old_position[1],self.position[0],self.position[1])
+            distPID.update(active_dist)
+            msg.linear.x = self.set_speed_limits(distPID.output/10.0)
             msg.angular.z = 0.0
             self.pub.publish(msg)
-            print("Dist: ",dist, "| activeDist: ", activeDist, " | PID Output: ",distPID.output)
+            print("Dist: ",dist, "| active_dist: ", active_dist, " | PID Output: ",distPID.output)
         msg.linear.x = 0.0
         msg.angular.z = 0.0
         self.pub.publish(msg)
@@ -123,11 +130,11 @@ class Navigate:
         angPID.SetPoint = angle
         msg = Twist()
         r = rospy.Rate(10)
-        while not self.withinAngleThreshold(angle) and not rospy.is_shutdown():
-            activeAng = self.angle - self.oldAngle
+        while not self.within_angle_threshold(angle) and not rospy.is_shutdown():
+            activeAng = self.angle - self.old_angle
             angPID.update(activeAng)
             msg.linear.x = 0.0
-            msg.angular.z = self.setSpeedLimits(angPID.output / 10.0)
+            msg.angular.z = self.set_speed_limits(angPID.output / 10.0)
             self.pub.publish(msg)
             print("Amg: ", angle, "| activeAmg: ", activeAng, " | PID Output: ", angPID.output)
             r.sleep()
@@ -135,26 +142,26 @@ class Navigate:
         msg.angular.z = 0.0
         self.pub.publish(msg)
 
-    #
-    def driveToCoord(self, x, y):
+
+    def drive_to_coord(self, x, y):
         """
         Makes the rovot drive to the specified coordinate
         :param x: Desired x-coord in meters
         :param y: Desired y-coord in meters
         :return: True when finished executing
         """
-        self.oldPosition = self.position
-        self.oldAngle = self.angle
-        distTarget = self.getDist(self.position[0],self.position[1],x,y)
-        angleTarget = self.getAngle(self.position[0],self.position[1],x,y)
+        self.old_position = self.position
+        self.old_angle = self.angle
+        distTarget = self.get_dist(self.position[0],self.position[1],x,y)
+        angleTarget = self.get_angle(self.position[0],self.position[1],x,y)
         self.turn_angle(angleTarget)
         self.drive_distance(distTarget)
         return True
 
 if __name__=="__main__":
     nav = Navigate()
-    print(nav.getDist(1,1,4,7))
-    print(nav.getAngle(1,1,4,7))
-    dist = nav.getDist(1, 1, 4, 7)
-    nav.oldPosition = nav.position
+    print(nav.get_dist(1,1,4,7))
+    print(nav.get_angle(1,1,4,7))
+    dist = nav.get_dist(1, 1, 4, 7)
+    nav.old_position = nav.position
     nav.turn_angle(90)
