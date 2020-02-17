@@ -10,7 +10,7 @@ ZONE_LENGTH = 2
 ZONE_WIDTH = .5
 LANDING_STRIP_WIDTH = .25
 
-# ask Chris. Essentially we prioritize to avoiding robots by backing up first rather than trying to move forward
+# Prioritize to avoiding robots by backing up first rather than trying to move forward
 AVOID_DIRECTION_PRIORITY_LIST = [3, 4, 2, 5, 1, 6, 0, 7]
 
 # AStar
@@ -94,9 +94,9 @@ COIL_B_1_PIN = 20
 COIL_B_2_PIN = 24
 
 JOINT1_SERVO = 7 #TODO get this (CE1)
-JOINT1_START = 0 #TODO get this
+JOINT1_START = 0
 
-GRIPPER_SERVO = 8 #TODO get this (CE0)
-GRIPPER_OPEN = 12 #TODO get this
-GRIPPER_CLOSE = 2 #TODO get this
+GRIPPER_SERVO = 8   # (CE0)
+GRIPPER_OPEN = 12   # Duty Cycle
+GRIPPER_CLOSE = 2   # Duty Cycle
 
