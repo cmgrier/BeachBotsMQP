@@ -78,7 +78,7 @@ THETA1 = 0.0
 A2 = 0.180  # meters
 ALPHA2 = 0.0
 D2 = 0.0
-THETA2 = 0.0 #30  # degrees
+THETA2 = 0.0
 
 # Collector Arm Motors
 STEP_ANGLE = 0.035  # Degrees per step
@@ -93,10 +93,11 @@ COIL_A_2_PIN = 19
 COIL_B_1_PIN = 20
 COIL_B_2_PIN = 24
 
-JOINT1_SERVO = 7 #TODO get this (CE1)
-JOINT1_START = 0
+JOINT1_SERVO = 7  # (CE1)
+JOINT1_START = 6
 
-GRIPPER_SERVO = 8   # (CE0)
-GRIPPER_OPEN = 12   # Duty Cycle
-GRIPPER_CLOSE = 2   # Duty Cycle
+GRIPPER_SERVO = 8  # (CE0)
+GRIPPER_OPEN = 2  # Duty Cycle
+GRIPPER_CLOSE = 10  # Duty Cycle
+
 

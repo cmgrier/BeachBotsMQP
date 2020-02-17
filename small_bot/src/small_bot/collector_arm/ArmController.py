@@ -33,6 +33,8 @@ class ArmController:
         GPIO.setup(GRIPPER_SERVO, GPIO.OUT)
         self.joint1_pwm = GPIO.PWM(JOINT1_SERVO, 50)
         self.gripper_pwm = GPIO.PWM(GRIPPER_SERVO, 50)
+        self.gripper_pwm.start(GRIPPER_OPEN) #TODO remove
+	self.joint1_pwm.start(JOINT1_START) #TODO remove
 
         #self.calibrate_joints()
 
@@ -111,7 +113,9 @@ class ArmController:
         :return:
         """
         print("joimt1: ",angle)
-        duty = angle / 18 + 2
+        duty =   (angle * 0.035) + JOINT1_START
+	if duty < 0:
+	 duty = 0
         GPIO.output(JOINT1_SERVO, True)
         self.joint1_pwm.ChangeDutyCycle(duty)
         rospy.sleep(1)
@@ -168,8 +172,9 @@ if __name__=="__main__":
     arm = ArmController()
     #arm.move_end_effector(40,0)
     try:
-	 #arm.turn_joint0(-180)
-     arm.move_gripper(True)
-   	 GPIO.cleanup()
+     arm.turn_joint1(45)
+     rospy.sleep(5)
+     arm.turn_joint1(90)
+     GPIO.cleanup()
     except KeyboardInterrupt:
 	 GPIO.cleanup()
