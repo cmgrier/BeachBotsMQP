@@ -35,6 +35,8 @@ class ArmController:
         self.gripper_pwm = GPIO.PWM(GRIPPER_SERVO, 50)
         self.gripper_pwm.start(GRIPPER_OPEN) #TODO remove
 	self.joint1_pwm.start(JOINT1_START) #TODO remove
+        for x in 3500:
+            print(GPIO.INPUT(SWITCH))
 
         #self.calibrate_joints()
 
@@ -172,9 +174,9 @@ if __name__=="__main__":
     arm = ArmController()
     #arm.move_end_effector(40,0)
     try:
-     arm.turn_joint1(45)
-     rospy.sleep(5)
-     arm.turn_joint1(90)
+    # arm.turn_joint1(45)
+     #rospy.sleep(5)
+     #arm.turn_joint1(90)
      GPIO.cleanup()
     except KeyboardInterrupt:
 	 GPIO.cleanup()

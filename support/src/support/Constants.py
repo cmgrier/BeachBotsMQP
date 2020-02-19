@@ -84,7 +84,7 @@ THETA2 = 0.0
 STEP_ANGLE = 0.035  # Degrees per step
 DIR = 0  # Direction pin
 STEP = 0  # Step pin
-SWITCH = 0
+SWITCH = 9  # Miso limit switch
 CW = 1
 CCW = 0
 
