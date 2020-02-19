@@ -33,11 +33,6 @@ class ArmController:
         GPIO.setup(GRIPPER_SERVO, GPIO.OUT)
         self.joint1_pwm = GPIO.PWM(JOINT1_SERVO, 50)
         self.gripper_pwm = GPIO.PWM(GRIPPER_SERVO, 50)
-        self.gripper_pwm.start(GRIPPER_OPEN) #TODO remove
-	self.joint1_pwm.start(JOINT1_START) #TODO remove
-        for x in 3500:
-            print(GPIO.INPUT(SWITCH))
-
         #self.calibrate_joints()
 
     def move_end_effector(self, x, y):
@@ -129,7 +124,6 @@ class ArmController:
         Moves the motors until they are zeroed
         :return:
         """
-        #TODO
         trigger = True
         #Open gripper
         self.gripper_pwm.start(GRIPPER_OPEN)
@@ -146,8 +140,9 @@ class ArmController:
            rospy.sleep(self.delay)
            self.set_step(1, 0, 1, 0)
            rospy.sleep(self.delay)
-	   if GPIO.IN(SWITCH):
+	   if GPIO.input(SWITCH):
 		trigger = False
+		break	
 
     def move_gripper(self, status):
         """
@@ -172,11 +167,10 @@ class ArmController:
 
 if __name__=="__main__":
     arm = ArmController()
-    #arm.move_end_effector(40,0)
     try:
-    # arm.turn_joint1(45)
+     #arm.turn_joint1(45)
      #rospy.sleep(5)
-     #arm.turn_joint1(90)
+     arm.turn_joint0(45)
      GPIO.cleanup()
     except KeyboardInterrupt:
 	 GPIO.cleanup()
