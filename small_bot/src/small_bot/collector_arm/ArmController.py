@@ -177,6 +177,7 @@ if __name__=="__main__":
     # arm.turn_joint1(45)
      #rospy.sleep(5)
      #arm.turn_joint1(90)
+     arm.turn_joint0(45)
      GPIO.cleanup()
     except KeyboardInterrupt:
 	 GPIO.cleanup()
