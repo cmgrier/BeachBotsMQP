@@ -60,6 +60,110 @@ def og_test():
         CM.robotManager.director.publish_og()
         rospy.sleep(.01)
 
+def continuous_og_test():
+    emptyRobotList = []
+    CM = CleaningManager(emptyRobotList)
+    timer = 0
+    print("Getting Frames...")
+    while timer < 500:
+        CM.mapManager.mapMaker.update_map_async()
+        if CM.mapManager.mapMaker.get_frame() == sl.ERROR_CODE.SUCCESS:
+            # When grab() = SUCCESS, a new image, depth and pose is available.
+            # Spatial mapping automatically ingests the new data to build the mesh.
+            timer += 1
+    CM.mapManager.update_OG()
+    timer = 0
+    while 1:
+        if CM.mapManager.mapMaker.get_frame() == sl.ERROR_CODE.SUCCESS:
+            timer += 1
+        if timer == 50:
+            "updating OG..."
+            CM.mapManager.mapMaker.update_pose_z()
+            CM.mapManager.mapMaker.update_map_async()
+            CM.mapManager.update_OG()
+            CM.robotManager.director.publish_og()
+            timer = 0
+
+def basic_test_with_camera():
+    emptyRobotList = []
+    taskID = 0
+    CM = CleaningManager(emptyRobotList)
+    timer = 0
+    print("Getting Frames...")
+    while timer < 500:
+        CM.mapManager.mapMaker.update_map_async()
+        if CM.mapManager.mapMaker.get_frame() == sl.ERROR_CODE.SUCCESS:
+            # When grab() = SUCCESS, a new image, depth and pose is available.
+            # Spatial mapping automatically ingests the new data to build the mesh.
+            timer += 1
+    CM.mapManager.update_OG()
+    timer = 0
+    cleaningTask1 = Task(Zone([Pose(), Pose(), Pose(), Pose()], taskID))
+    CM.cleaningTasks.append(cleaningTask1)
+    CM.mapManager.get_visible_zones()
+    while 1:
+        if CM.mapManager.mapMaker.get_frame() == sl.ERROR_CODE.SUCCESS:
+            timer += 1
+
+        if timer == 50:
+            "updating OG..."
+            CM.mapManager.mapMaker.update_pose_z()
+            CM.mapManager.mapMaker.update_map_async()
+            CM.mapManager.update_OG()
+            CM.robotManager.director.publish_og()
+            timer = 0
+
+        if len(CM.cleaningTasks) < 1:
+            taskID = taskID + 1
+            corners = CM.mapManager.get_corners_from_center(CM.mapManager.get_center_from_zone_index(taskID))
+            tl = Pose()
+            tl.position.x = corners[0][0]
+            tl.position.y = corners[0][1]
+            tr = Pose()
+            tr.position.x = corners[1][0]
+            tr.position.y = corners[1][1]
+            br = Pose()
+            br.position.x = corners[2][0]
+            br.position.y = corners[2][1]
+            bl = Pose()
+            bl.position.x = corners[3][0]
+            bl.position.y = corners[3][1]
+            cleaningTask = Task(Zone([tl, tr, br, bl], taskID))
+            #cleaningTask = Task(Zone([Pose(), Pose(), Pose(), Pose()], taskID))
+            CM.cleaningTasks.append(cleaningTask)
+            print("added new cleaning task with ID:")
+            print(taskID)
+        time.sleep(.5)
+
+
+def advanced_test_with_camera():
+    emptyRobotList = []
+    CM = CleaningManager(emptyRobotList)
+    timer = 0
+    print("Getting Frames...")
+    while timer < 500:
+        CM.mapManager.mapMaker.update_map_async()
+        if CM.mapManager.mapMaker.get_frame() == sl.ERROR_CODE.SUCCESS:
+            # When grab() = SUCCESS, a new image, depth and pose is available.
+            # Spatial mapping automatically ingests the new data to build the mesh.
+            timer += 1
+    CM.mapManager.update_OG()
+    timer = 0
+    CM.mapManager.update_zones()
+    CM.create_cleaning_tasks()
+    while 1:
+        if CM.mapManager.mapMaker.get_frame() == sl.ERROR_CODE.SUCCESS:
+            timer += 1
+
+        if timer == 50:
+            "updating OG..."
+            CM.mapManager.mapMaker.update_pose_z()
+            CM.mapManager.mapMaker.update_map_async()
+            CM.mapManager.update_OG()
+            CM.robotManager.director.publish_og()
+            timer = 0
+
+        time.sleep(.5)
 
 if __name__ == "__main__":
-    og_test()
+    advanced_test_with_camera()

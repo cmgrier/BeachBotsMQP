@@ -5,13 +5,13 @@ from data.Task import Task
 from data.Robot import Robot
 from geometry_msgs.msg import Pose
 from nav_msgs.msg import OccupancyGrid
-from baseBot.srv import RequestCleanTask, RequestTask, PassDumpTask, Identify
+from baseBot.srv import RequestCleanTask, RequestTask, PassDumpTask, Identify, RequestOG
 from baseBot.msg import AvoidAlert, ZoneMSG
 from support.Constants import *
 import rospy
 import numpy as np
 
-
+# This class manages all communications between smallbots and this basebot
 class Director:
     def __init__(self, robot_manager, cleaning_manager):
         self.robotManager = robot_manager
@@ -27,6 +27,7 @@ class Director:
         s = rospy.Service('identify_worker', Identify, self.give_ID)
         s = rospy.Service('dump_request', RequestTask, self.handle_dump_request)
         s = rospy.Service('give_avoid_status', RequestTask, self.give_avoid_status)
+        s = rospy.Service('give_og', RequestOG, self.handle_og_request)
         self.OGpub = rospy.Publisher('occupancy_grid', OccupancyGrid, queue_size=10)
 
         print("Director node started")
@@ -46,6 +47,7 @@ class Director:
         task = Task()
         pass
 
+    # sends an Avoid task to the requesting smallbot. If no need to avoid, sends a "safe" task
     def give_avoid_status(self, robot_request):
         task = Task()
         if self.robotManager.should_robot_avoid(robot_request.workerID):
@@ -78,6 +80,7 @@ class Director:
         else:
             return robot_id_request.ID
 
+    # sends a Cleaning Task to the requesting smallbot if a cleaning task is available, otherwise sends a "safe" task
     def give_cleaning_task(self, robot_request):
         if len(self.cleaningManager.cleaningTasks) > 0:
             print("giving cleaning task")
@@ -90,6 +93,7 @@ class Director:
             task.make_safe_task(robot_request.workerID)
             return task.to_service_format()
 
+    # sends True to the requesting smallbot if it is ok to dump
     def handle_dump_request(self, dump_request):
         self.cleaningManager.dumpRequests.append(dump_request)
         if len(self.cleaningManager.dumpRequests) != 1:
@@ -97,6 +101,7 @@ class Director:
         else:
             return False  # go ahead
 
+    # publishes the current OG to a ros topic
     def publish_og(self):
         og = self.cleaningManager.mapManager.occupancy_grid
         OG = OccupancyGrid()
@@ -105,16 +110,15 @@ class Director:
             if val == -1:
                 altered_og.append(val)
             else:
-                altered_og.append(int(val * 100 - 70))
+                altered_og.append(int(val * 100))
         OG.data = altered_og
-        for i in range(0, 3):
-            OG.data[i] = 99
         OG.info.width = int(math.sqrt(len(og)))
         OG.info.height = int(math.sqrt(len(og)))
         OG.info.resolution = (2 * X_MAX) / OG_WIDTH
         OG.info.origin = self.__get_og_origin()
         self.OGpub.publish(OG)
 
+    # returns the OG to the requesting smallbot
     def handle_og_request(self, og_request):
         og = self.cleaningManager.mapManager.occupancy_grid
         OG = OccupancyGrid()
@@ -127,17 +131,20 @@ class Director:
         OG.data = altered_og
         OG.info.width = int(math.sqrt(len(og)))
         OG.info.height = int(math.sqrt(len(og)))
-        OG.info.resolution = OG_WIDTH / (2 * X_MAX)
-        origin = Pose()
-        o_quat = self.cleaningManager.mapManager.mapMaker.orientation
-        o_euler = euler_from_quaternion(o_quat)
-        z_angle = o_euler[2]
+        OG.info.resolution = (2 * X_MAX) / OG_WIDTH
+        OG.info.origin = self.__get_og_origin()
+        baseBotPose = Pose()
+        baseBotPose.position.x = self.cleaningManager.mapManager.mapMaker.translation[0]
+        baseBotPose.position.y = self.cleaningManager.mapManager.mapMaker.translation[1]
+        baseBotPose.position.z = self.cleaningManager.mapManager.mapMaker.translation[2]
 
-        origin.position.x = self.cleaningManager.mapManager.mapMaker.translation[0]
-        origin.position.y = self.cleaningManager.mapManager.mapMaker.translation[1]
-        origin.position.z = self.cleaningManager.mapManager.mapMaker.translation[2]
-        OG.info.origin = origin
+        baseBotPose.orientation.x = self.cleaningManager.mapManager.mapMaker.orientation[0]
+        baseBotPose.orientation.y = self.cleaningManager.mapManager.mapMaker.orientation[1]
+        baseBotPose.orientation.z = self.cleaningManager.mapManager.mapMaker.orientation[2]
+        baseBotPose.orientation.w = self.cleaningManager.mapManager.mapMaker.orientation[3]
+        return [baseBotPose, OG]
 
+    # used to get where the OG origin should be based upon where the current pose is for the robot
     def __get_og_origin(self):
         origin = Pose()
         zed_quat = self.cleaningManager.mapManager.mapMaker.orientation
@@ -161,6 +168,7 @@ class Director:
         origin.orientation.w = o_quat[3]
         return origin
 
+    # converts the given quaternion values into euler angles (in radians)
     def quaternion_to_euler(self, x, y, z, w):
 
         t0 = +2.0 * (w * x + y * z)
@@ -178,6 +186,7 @@ class Director:
 
         return X, Y, Z
 
+    # converts the given euler angles (in radians) to quaternion values
     def euler_to_quaternion(self, yaw, pitch, roll):
 
         qx = np.sin(roll / 2) * np.cos(pitch / 2) * np.cos(yaw / 2) - np.cos(roll / 2) * np.sin(pitch / 2) * np.sin(

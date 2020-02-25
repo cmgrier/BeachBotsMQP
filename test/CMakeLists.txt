@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   geometry_msgs
+  nav_msgs
   message_generation
 )
 
@@ -57,7 +58,8 @@ find_package(catkin REQUIRED COMPONENTS
 add_service_files(
   FILES
   RequestTask.srv
-  Identify.srv	
+  Identify.srv
+  RequestOG.srv
 )
 
 ## Generate actions in the 'action' folder
@@ -72,6 +74,7 @@ add_service_files(
    DEPENDENCIES
    std_msgs
    geometry_msgs
+   nav_msgs
  )
 
 ################################################

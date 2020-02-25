@@ -4,6 +4,7 @@ from small_bot.TaskSeeker import TaskSeeker
 from data.Task import Task
 from geometry_msgs.msg import Pose, Twist
 from small_bot.msg import AvoidAlert
+from nav_msgs.msg import OccupancyGrid
 import rospy
 
 
@@ -15,6 +16,8 @@ class SmallBotManager:
         self.tasks = EqualPriorityQueue()
         self.id = -1
         self.position = Pose()
+        self.baseBotPose = Pose()
+        self.occupancyGrid = OccupancyGrid()
         self.taskManager = TaskManager(self)
         self.taskSeeker = TaskSeeker(self)
         self.request_id()
@@ -51,10 +54,10 @@ class SmallBotManager:
         if self.tasks.has(clean) == False:
             self.taskSeeker.request_clean_task()
         self.taskSeeker.request_avoid_status()
+        self.taskSeeker.request_og()
         #TODO update robots position as well as add more info
         #Maybe have a ros listener for current position
         #If dump satus is true then request dump task
-
 
 
     def do_task(self, task):
