@@ -40,7 +40,7 @@ SMALL_R_DIRECT_2 = 26
 # Small Robot Encoder Interrupts
 ENCODER1_PIN1 = 6
 ENCODER1_PIN2 = 16
-TREAD_CIRCUMFERENCE = 0.151 # mm
+TREAD_CIRCUMFERENCE = 0.151 # meters
 
 # Camera Servo
 SERVO_CAM = 17
@@ -74,3 +74,29 @@ DRIVE_DIST_DP = 0.01
 
 # make true to activate debug print statements
 DEBUG = False
+
+
+# Collector Arm D-H Frame Data
+A1 = 0.130  # meters
+ALPHA1 = 0.0
+D1 = 0.0
+THETA1 = 0.0
+A2 = 0.180  # meters
+ALPHA2 = 0.0
+D2 = 0.0
+THETA2 = 0.0 #30  # degrees
+
+# Collector Arm Motors
+STEP_ANGLE = 0.035  # Degrees per step
+DIR = 0  # Direction pin
+STEP = 0  # Step pin
+SWITCH = 0
+CW = 1
+CCW = 0
+
+COIL_A_1_PIN = 18
+COIL_A_2_PIN = 19
+COIL_B_1_PIN = 20
+COIL_B_2_PIN = 24
+
+
