@@ -34,7 +34,7 @@ class Navigate:
         """
         self.position = (data.position.x, data.position.y)
         self.angle = data.orientation.z
-        print(self.position, " : ", self.angle)
+       
 
 
     def get_dist(self, x, y, x2, y2):
@@ -74,6 +74,7 @@ class Navigate:
             return True
         return False
 
+
 #WORKS MAY CHAMGE
     def within_angle_threshold(self, angle):
         """
@@ -101,7 +102,7 @@ class Navigate:
     def drive_distance(self, dist):
         """
         Drive a set distance forward
-        :param dist: The desired linear distance
+        :param dist: The desired linear distance in meters
         :return:
         """
         distPID = PID(DRIVE_DIST_KP, DRIVE_DIST_IP, DRIVE_DIST_DP)
@@ -111,7 +112,7 @@ class Navigate:
         while not self.within_distance_threshold(dist) and not rospy.is_shutdown():
             active_dist = self.get_dist(self.old_position[0],self.old_position[1],self.position[0],self.position[1])
             distPID.update(active_dist)
-            msg.linear.x = self.set_speed_limits(distPID.output/10.0)
+            msg.linear.x = self.set_speed_limits(distPID.output) * -1
             msg.angular.z = 0.0
             self.pub.publish(msg)
             print("Dist: ",dist, "| active_dist: ", active_dist, " | PID Output: ",distPID.output)
@@ -160,8 +161,4 @@ class Navigate:
 
 if __name__=="__main__":
     nav = Navigate()
-    print(nav.get_dist(1,1,4,7))
-    print(nav.get_angle(1,1,4,7))
-    dist = nav.get_dist(1, 1, 4, 7)
-    nav.old_position = nav.position
-    nav.turn_angle(90)
+    nav.drive_distance(0.3048)
