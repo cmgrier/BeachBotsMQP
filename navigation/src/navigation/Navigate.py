@@ -160,8 +160,4 @@ class Navigate:
 
 if __name__=="__main__":
     nav = Navigate()
-    print(nav.get_dist(1,1,4,7))
-    print(nav.get_angle(1,1,4,7))
-    dist = nav.get_dist(1, 1, 4, 7)
-    nav.old_position = nav.position
     nav.turn_angle(90)
