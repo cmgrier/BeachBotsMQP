@@ -9,6 +9,8 @@ class Zone:
     # y 1  2  3  4
     # |    map
     # v 9 10 11 12
+    # returns True if position is within this zone on the map.
+    # this is a Legacy function and can be ignored
     def is_out_of_zone(self, position, map):
         point_corners = []
         for index in self.corners:
@@ -35,6 +37,8 @@ class Zone:
 
         return x_max > position[0] > x_min or y_max > position[1] > y_min
 
+    # This is a Legacy function and can be ignored
+    # converts a given map index to a position on the map
     def index_to_point(self, index, map):
         x = index / map.width
         y = index % map.width

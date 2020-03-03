@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 from baseBot.MapMaker import MapMaker
 from baseBot.MeshAnalyzer import MeshAnalyzer
+from geometry_msgs.msg import Pose
 import math
 
 # This class holds the current map and passes it between the other managers
+# Also this class works with the mesh from the MapMaker class and converts it into useful information, such as an OG
 from data.Zone import Zone
 from support.Constants import *
 
@@ -18,9 +20,11 @@ class MapManager:
         self.occupancy_grid = []
         self.cleanedZones = []
 
+    # method to update the
     def update(self):
         self.update_OG()
 
+    # returns center of a given zone index as [x, y]
     def get_center_from_zone_index(self, zone):
         s = 1
         w = 2
@@ -52,6 +56,7 @@ class MapManager:
         ry = (y - 1) * ZONE_LENGTH + ZONE_LENGTH / 2
         return [rx, ry]
 
+    # returns the zone index that contains the given point. point must be in [x, y] format
     def get_zone_index_from_point(self, point):
         if point[0] < 0:
             xf = -1
@@ -128,6 +133,7 @@ class MapManager:
 
         return int(zone)
 
+    # returns the corners of a zone given a zone center in [x, y] format
     def get_corners_from_center(self, center):
         tl = [center[0] - ZONE_WIDTH / 2, center[1] + ZONE_LENGTH / 2]
         tr = [center[0] + ZONE_WIDTH / 2, center[1] + ZONE_LENGTH / 2]
@@ -135,6 +141,7 @@ class MapManager:
         bl = [center[0] - ZONE_WIDTH / 2, center[1] - ZONE_LENGTH / 2]
         return [tl, tr, br, bl]
 
+    # returns the visible zones from given position (t) and orientation (o)
     def get_visible_zones(self, t, o):
         visible_area_corners = self.get_visible_area_corners(t, o)
         visible_area_zone = Zone(visible_area_corners, -1)
@@ -156,6 +163,7 @@ class MapManager:
                 visible_zones.append(zone)
         return visible_zones
 
+    # updates self.zones with all visible zones that have not been cleaned yet. This should be called in main loop
     def update_zones(self):
         visible_zones = self.get_visible_zones(self.mapMaker.translation, self.mapMaker.orientation)
         for zone in self.cleanedZones:
@@ -163,14 +171,29 @@ class MapManager:
                 visible_zones.remove(zone)
 
         for zone_index in visible_zones:
-            aZone = Zone(self.get_corners_from_center(self.get_center_from_zone_index(zone_index)), zone_index)
+            corners = self.get_corners_from_center(self.get_center_from_zone_index(zone_index))
+            tl = Pose()
+            tl.position.x = corners[0][0]
+            tl.position.y = corners[0][1]
+            tr = Pose()
+            tr.position.x = corners[1][0]
+            tr.position.y = corners[1][1]
+            br = Pose()
+            br.position.x = corners[2][0]
+            br.position.y = corners[2][1]
+            bl = Pose()
+            bl.position.x = corners[3][0]
+            bl.position.y = corners[3][1]
+            aZone = Zone([tl, tr, br, bl], zone_index)
             self.zones.append(aZone)
 
+    # returns an [x, y] rotated by a given angle (radian) around a given center point [x, y]
     def rotate_point_around_point(self, center, point, angle):
         rx = math.cos(angle) * (point[0] - center[0]) - math.sin(angle) * (point[1] - center[1]) + center[0]
         ry = math.sin(angle) * (point[0] - center[0]) + math.cos(angle) * (point[1] - center[1]) + center[1]
         return [rx, ry]
 
+    # converts given quaternion [x, y, z, w] to radian euler angles
     def quaternion_to_euler(self, q):
         x = q[0]
         y = q[1]
@@ -189,6 +212,7 @@ class MapManager:
         yaw = math.atan2(t3, t4)
         return [yaw, pitch, roll]
 
+    # returns the corners of the visible area in front of the ZED
     def get_visible_area_corners(self, t, o):
         tl = [t[0] - X_MAX, t[1] + Y_MIN + Y_MAX]
         tr = [t[0] + X_MAX, t[1] + Y_MIN + Y_MAX]
@@ -203,6 +227,7 @@ class MapManager:
         bl = self.rotate_point_around_point(t, bl, euler[2])
         return [tl, tr, br, bl]
 
+    # makes an OG of area in front of ZED and updates self.occupancy_grid with it
     def update_OG(self):
         mesh = self.mapMaker.mesh
         ma = MeshAnalyzer(mesh)
@@ -218,7 +243,7 @@ class MapManager:
         self.occupancy_grid = OG
 
     """
-    The Following is Legacy
+    The Following is Legacy and should be ignored
     """
 
     # sets the current map from mapMaker and creates zones

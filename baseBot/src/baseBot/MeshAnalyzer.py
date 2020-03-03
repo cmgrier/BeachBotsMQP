@@ -7,7 +7,8 @@ import math
 
 from support.Constants import *
 
-# creates maps for the Map Manager class
+
+# works with the given mesh data to produce useful information
 class MeshAnalyzer:
     def __init__(self, mesh):
         self.mesh = mesh
@@ -15,7 +16,7 @@ class MeshAnalyzer:
     """
     VERTICES
     """
-
+    # returns the lowest vertices that fall within the given range
     def get_lowest_vertices(self, vertices, range):
         lowest = self.get_lowest_vertex(vertices)
         lowest_vertices = []
@@ -24,6 +25,7 @@ class MeshAnalyzer:
                 lowest_vertices.append(vertex)
         return lowest_vertices
 
+    # returns the lowest vertex in the given vertices list
     def get_lowest_vertex(self, vertices):
         lowest = vertices[0]
         for vertex in vertices:
@@ -31,10 +33,12 @@ class MeshAnalyzer:
                 lowest = vertex
         return lowest
 
+    # sort the given list of vertices by z
     def sort_by_height(self, vertices):
         sorted(vertices, key=lambda x: x[2])
         return vertices
 
+    # returns the avg height (z) of the given vertices
     def get_avg_height(self, vertices):
         length = len(vertices)
         height_sum = 0
@@ -42,6 +46,7 @@ class MeshAnalyzer:
             height_sum += vertex[2]
         return height_sum / length
 
+    # makes a vector from the two given vertices from the first to the second
     def make_vector(self, vertex1, vertex2):
         vector = [0, 0, 0]
         vector[0] = vertex2[0] - vertex1[0]
@@ -49,6 +54,7 @@ class MeshAnalyzer:
         vector[2] = vertex2[2] - vertex1[2]
         return vector
 
+    # finds the vertices that exist within the center of the vertices list within given radius
     def center_vertices(self, vertices, radius):
         center_vertices = []
         y_bounds = self.get_bounds(vertices, 1)
@@ -64,6 +70,7 @@ class MeshAnalyzer:
                     center_vertices.append(vertex)
         return center_vertices
 
+    # finds the limits of the given vertices in given dimension (0, 1, or 2 representing x, y, and z respectively)
     def get_bounds(self, vertices, dimension):
         first_vertex = vertices[0]
         bounds = [first_vertex[dimension], first_vertex[dimension]]
@@ -74,6 +81,7 @@ class MeshAnalyzer:
                 bounds[1] = vertex[dimension]
         return bounds
 
+    # returns the middle half of the vertices list
     def get_median_vertices(self, vertices):
         length = len(vertices)
         median_vertices = []
@@ -86,10 +94,12 @@ class MeshAnalyzer:
     TRIANGLES
     """
 
+    # finds a surface that can be traversed by the robot
     def find_traversable_surface(self):
         triangles = self.mesh.triangles
         level_triangles = self.get_level_triangles(triangles)
 
+    # returns all triangles that are level enough to be driven across
     def get_level_triangles(self, triangles):
         level_triangles = []
         for triangle in triangles:
@@ -97,6 +107,7 @@ class MeshAnalyzer:
                 level_triangles.append(triangle)
         return level_triangles
 
+    # returns the normal of the triangle (the unit vector pointing perpendicular to the triangle)
     def get_triangle_normal(self, triangle):
         # each point in the given triangle (the triangle holds indexes of vertexes, not vertexes themselves)
         p1 = self.mesh.vertices[int(triangle[0]) - 1]
@@ -114,10 +125,12 @@ class MeshAnalyzer:
         length = math.sqrt(math.pow(normal[0], 2) + math.pow(normal[1], 2) + math.pow(normal[2], 2))
         return [normal[0] / length, normal[1] / length, normal[2] / length]
 
+    # returns true if the given triangle's normal z length is greater than a threshold value
     def is_triangle_traversable_by_z_length(self, triangle):
         normal = self.get_triangle_normal(triangle)
         return normal[2] > TRIANGLE_NORMAL_Z_TRAVERSABLE
 
+    # returns the radian angle between two vectors
     def angle_between_vectors(self, v1, v2):
         dot = float(v1[0]) * float(v2[0]) + float(v1[1]) * float(v2[1]) + float(v1[2]) * float(v2[2])
         lv1 = math.sqrt(float(math.pow(v1[0], 2) + math.pow(v1[1], 2) + math.pow(v1[2], 2)))
@@ -125,6 +138,7 @@ class MeshAnalyzer:
         x = dot / (lv1 * lv2)
         return math.acos(x)
 
+    # returns True if the difference between triangles normal angle and a vertical line is within a threshold
     def is_triangle_traversable_by_angle(self, triangle):
         normal = self.get_triangle_normal(triangle)
         vertical = [0.0, 0.0, 1.0]
@@ -133,6 +147,7 @@ class MeshAnalyzer:
         #print("angle: " + str(angle))
         return math.fabs(angle) < TRIANGLE_NORMAL_ANGLE_TRAVERSABLE
 
+    # returns the centroid [x, y, z] of the given triangle
     def get_centroid(self, triangle):
         v1 = self.mesh.vertices[int(triangle[0]) - 1]
         v2 = self.mesh.vertices[int(triangle[1]) - 1]
@@ -143,6 +158,7 @@ class MeshAnalyzer:
         z = (v1[2] + v2[2] + v3[2]) / 3.0
         return [x, y, z]
 
+    # returns True if given point is within the triangle
     def is_point_in_triangle(self, point, triangle):
         p1 = self.mesh.vertices[int(triangle[0]) - 1]
         p2 = self.mesh.vertices[int(triangle[1]) - 1]
@@ -166,6 +182,7 @@ class MeshAnalyzer:
 
         return difference_in_area < 0.0005
 
+    # returns True if given point is within triangle created by the 3 given points, p1, p2, and p3
     def is_point_in_triangle_simple(self, point, p1, p2, p3):
         """
         if (point[0] > p1[0] and point[0] > p2[0] and point[0] > p3[0]) or \
@@ -196,12 +213,14 @@ class MeshAnalyzer:
 
         return difference_in_area < 0.0005
 
+    # returns the area of the triangle created by the three given points
     def area_of_triangle(self, p1, p2, p3):
         return math.fabs(
             (p1[0] * (p2[1] - p3[1]) + p2[0] * (p3[1] - p1[1]) + p3[0] * (p1[1] - p2[1]))
             / 2
         )
 
+    # returns the triangle that contains the given point, p. Otherwise returns [-1, -1, -1]
     def get_triangle_from_point(self, p, triangles):
         #print("triangle for " + str(p) + "...")
         for triangle in triangles:
@@ -213,6 +232,7 @@ class MeshAnalyzer:
     ZONES
     """
 
+    # returns all triangles in self.mesh.triangles that are in the given zone index
     def get_triangles_in_zone(self, zone):
         triangles_in_zone = []
         for triangle in self.mesh.triangles:
@@ -222,6 +242,7 @@ class MeshAnalyzer:
 
         return triangles_in_zone
 
+    # returns True if the given point is in the given zone index
     def is_point_in_zone(self, zone, point):
         top_left = zone.corners[0]
         top_right = zone.corners[1]
@@ -250,7 +271,7 @@ class MeshAnalyzer:
         difference_in_area = math.fabs(sum_of_triangles - area)
         return difference_in_area < 0.05
 
-
+    # returns the traversable triangles from self.mesh.triangles that are in the given zone index
     def get_traversable_mesh_in_zone(self, zone):
         potential_triangles = self.get_triangles_in_zone(zone)
         traversable_triangles = []
@@ -294,6 +315,7 @@ class MeshAnalyzer:
             yi += 1
         return OG
 
+    # makes an OG from the given zones and area_corners
     def make_occupancy_grid_in_front(self, visible_zones, area_corners):
         zone_triangles = dict()
         for zone in visible_zones:

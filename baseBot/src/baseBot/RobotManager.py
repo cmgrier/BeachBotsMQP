@@ -9,6 +9,8 @@ from support.Constants import *
 
 
 # manages the robots connected to the base bot
+# A lot of this code is irrelevant to the current MQP and has ceased support due to the fact that there is only one
+# small bot. In the future (2020-2021), this code may be useful, but will need to be reworked
 class RobotManager:
     def __init__(self, robots, map_manager, cleaning_manager):
         self.managedRobots = robots
@@ -17,6 +19,7 @@ class RobotManager:
         self.director = Director(self, cleaning_manager)
         self.map_manager = map_manager
 
+    # returns true if robot with given worker ID should be avoiding
     def should_robot_avoid(self, workerID):
         robot = self.get_robot(workerID)
         robot.avoidCounter = robot.avoidCounter + 1

@@ -18,7 +18,10 @@ class Task:
         self.type = type or "clean"
         self.zone = zone or Zone([], -1)
         self.priority = 3
-        self.start_point = Pose()
+        if zone is None:
+            self.start_point = Pose()
+        else:
+            self.start_point = zone.corners[3]
         self.set_priority()
 
     # set the priority level of the task based on the type
@@ -42,23 +45,26 @@ class Task:
     def __str__(self):
         return str((self.type, self.workerID, self.zone, self.isActive, self.isComplete))
 
+    # returns the current task as a tuple to be passed as a service message
     def to_service_format(self):
         return [self.isActive, self.isComplete, self.workerID, self.type, self.zone.corners, self.zone.id, self.start_point]
 
+    # makes the current task a "safe" task with given worker ID
     def make_safe_task(self, worker_id):
         self.isActive = False
         self.isComplete = False
         self.type = "safe"
-        self.zone = Zone([], -1)
+        self.zone = Zone([Pose(), Pose(), Pose(), Pose()], -1)
         self.priority = 4
         self.start_point = Pose()
         self.workerID = worker_id
 
+    # makes the current task an "avoid" task with given goal and workerID
     def make_avoid_task(self, goal, worker_id):
         self.isComplete = False
         self.isActive = False
         self.type = "avoid"
         self.set_priority()
-        self.zone = Zone([], -1)
+        self.zone = Zone([Pose(), Pose(), Pose(), Pose()], -1)
         self.workerID = worker_id
         self.start_point = goal

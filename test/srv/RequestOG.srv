@@ -1,0 +1,4 @@
+int32 workerID
+---
+geometry_msgs/Pose baseBotPose
+nav_msgs/OccupancyGrid occupancyGrid
