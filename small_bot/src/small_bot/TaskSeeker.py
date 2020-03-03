@@ -10,7 +10,7 @@
 import rospy
 from data.Task import Task
 from data.Zone import Zone
-from small_bot.srv import RequestCleanTask, RequestTask, RequestDumpTask, Identify
+from small_bot.srv import RequestCleanTask, RequestTask, RequestDumpTask, Identify, RequestOG
 #import RPi.GPIO as GPIO
 from support.Constants import *
 
@@ -83,7 +83,10 @@ class TaskSeeker:
             clean_task = self.parse_task(clean_task)
             if DEBUG:
                 print(clean_task)
-            self.smallbot.tasks.put(clean_task.priority, clean_task)
+            if clean_task.type == "safe":
+                self.smallbot.isCleaning = False
+            else:
+                self.smallbot.tasks.put(clean_task.priority, clean_task)
             rospy.loginfo(self.smallbot.tasks)
         except rospy.ServiceException, e:
             print("error")
@@ -146,5 +149,17 @@ class TaskSeeker:
                 if not self.smallbot.tasks.has(1):
                     print("adding avoid task")
                     self.smallbot.tasks.put(avoid_task.priority, avoid_task)
+        except rospy.ServiceException, e:
+            rospy.loginfo("Service call failed: %s" % e)
+
+    def request_og(self):
+        rospy.wait_for_service('give_og')
+        if DEBUG:
+            print("trying to request og")
+        try:
+            og_request = rospy.ServiceProxy('give_og', RequestOG)
+            return_data = og_request(self.smallbot.id)
+            self.smallbot.baseBotPose = return_data.baseBotPose
+            self.smallbot.occupancyGrid = return_data.occupancyGrid
         except rospy.ServiceException, e:
             rospy.loginfo("Service call failed: %s" % e)

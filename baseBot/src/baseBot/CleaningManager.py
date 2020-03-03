@@ -17,7 +17,8 @@ class CleaningManager:
 
         self.create_cleaning_tasks()
 
-    # run on startup
+    # run on startup and repeatedly to continuously create cleaning tasks for new zones
+    # creates
     def create_cleaning_tasks(self):
         for zone in self.mapManager.zones:
             self.cleaningTasks.append(Task(zone=zone))

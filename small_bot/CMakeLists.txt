@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   geometry_msgs
+  nav_msgs
   sensor_msgs
   cv_bridge
   message_generation
@@ -61,6 +62,7 @@ catkin_python_setup()
    RequestTask.srv
    Identify.srv
    ImageTransfer.srv
+   RequestOG.srv
 )
 
 ## Generate actions in the 'action' folder
@@ -76,6 +78,7 @@ catkin_python_setup()
    std_msgs
    geometry_msgs
    sensor_msgs
+   nav_msgs
 )
 
 ################################################

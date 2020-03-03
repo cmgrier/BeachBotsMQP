@@ -9,8 +9,10 @@ from support.Constants import *
 class AStar:
 
     # given map is an array of weights
-    def __init__(self, map):
-        self.__map = map
+    def __init__(self, data):
+        self.__map = Map
+        self.__map.map = data
+        self.__map.width = OG_WIDTH
         self.__frontier = list()
         self.__investigated = list()
 
@@ -26,9 +28,13 @@ class AStar:
 
     # method to be called outside of AStar class to retrieve path
     def find_path(self, start, end):
+        if len(self.__map.map) == 0:
+            print("map DNE")
+            return [start]
         if start == end:
             rospy.loginfo("START IS LAST")
             return [start]
+        print("running ASTAR")
         self.__frontier = list()
         node = Node()
         node.index = start
@@ -42,7 +48,8 @@ class AStar:
                 return self.__create_path(start, best_node)
             self.__handle_new_nodes(self.__investigate_neighbors(best_node, end))
             self.__investigated.append(best_node)
-        return start
+        print("path not found")
+        return [start]
 
     # checks local points above, below, and to either side of given node
     # and returns a list of possible nodes

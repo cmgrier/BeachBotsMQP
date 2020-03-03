@@ -79,7 +79,7 @@ if __name__ == "__main__":
  encoder = Encoder()
  while not rospy.is_shutdown():
      try:
-         if encoder.isPause is False:
+         if encoder.isPaused is False:
              encoder.pub_dist()
      except KeyboardInterrupt:
         GPIO.cleanup()

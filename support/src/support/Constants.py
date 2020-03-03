@@ -6,11 +6,17 @@ STORED_MAP_SIZE = 10
 SAFE_DISTANCE_BETWEEN_BOTS = 100
 AVOID_DISTANCE = 30
 
+# SmallBot general
+POSITION_THRESHOLD = .1 # how close the robot needs to be to a position to count it as reached, this is for zone paths
+
+# Zones
 ZONE_LENGTH = 2
 ZONE_WIDTH = .5
 LANDING_STRIP_WIDTH = .25
+WAYPOINT_DENSITY = 10
 
-# Prioritize to avoiding robots by backing up first rather than trying to move forward
+# ask Chris. Essentially we prioritize to avoiding robots by backing up first rather than trying to move forward.
+# UPDATE: this is Legacy
 AVOID_DIRECTION_PRIORITY_LIST = [3, 4, 2, 5, 1, 6, 0, 7]
 
 # AStar
@@ -34,7 +40,7 @@ SMALL_R_DIRECT_2 = 26
 # Small Robot Encoder Interrupts
 ENCODER1_PIN1 = 6
 ENCODER1_PIN2 = 16
-TREAD_CIRCUMFERENCE = 0.151 # meters
+TREAD_CIRCUMFERENCE = 0.013 # meters
 
 # Camera Servo
 SERVO_CAM = 17
@@ -50,16 +56,16 @@ Y_MIN = .5
 Y_MAX = 5.0
 X_MAX = 2.25
 # Occupancy grid width
-OG_WIDTH = 100
+OG_WIDTH = 20
 
 # Navigation
-DISTANCE_THRESHOLD_MIN = 0.2
-DISTANCE_THRESHOLD_MAX = 0.2
+DISTANCE_THRESHOLD_MIN = 0.001
+DISTANCE_THRESHOLD_MAX = 0.001
 ANGLE_THRESHOLD_MIN = 1.0
 ANGLE_THRESHOLD_MAX = 1.0
 
 #PID
-TURN_ANGLE_KP = 1.0
+TURN_ANGLE_KP = 1.5
 TURN_ANGLE_IP = 0.1
 TURN_ANGLE_DP = 0.01
 DRIVE_DIST_KP = 1.0
