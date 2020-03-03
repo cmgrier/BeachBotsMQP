@@ -38,9 +38,10 @@ class SmallBotManager:
                 if task.type == "end":
                     break
                 updated_task = self.do_task(task)
-                if not task.isComplete:
+                if not updated_task.isComplete:
                     self.tasks.put(updated_task.priority, updated_task)
                 else:
+                    print("task " + str(task.zone.id) + " is COMPLETE")
                     twist = Twist()
                     self.taskManager.pub_vel(twist)
 

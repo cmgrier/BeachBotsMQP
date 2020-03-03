@@ -13,22 +13,38 @@ class CleanManager:
         self.counter = 0    # here for testing
         self.current_task_id = -1
         self.waypoints = []
-        self.testing = True
+        self.testing = False
+        self.simulating = True
         pass
 
     def do_task(self, task):
         # this will attempt to complete the given clean task,
         # update progress on task and return the updated task
+        print("Waypoints left: " + str(len(self.waypoints)))
         if self.testing:
             return self.do_task_test(task)
         if self.current_task_id != task.zone.id:
             self.current_task_id = task.zone.id
             self.waypoints = self.make_path_in_zone(task)
+            print("added new waypoints for task " + str(task.zone.id))
         elif len(self.waypoints) > 0:
-            if self.is_at_position(self.waypoints[0]):
-                self.waypoints.pop(0)
+            self.counter += 1
+            if self.simulating:
+                if self.counter > 100:
+                    self.counter = 0
+                    self.waypoints.pop(0)
+                    print("Waypoint Reached!")
+                else:
+                    self.nav_to_point(self.waypoints[0])
             else:
-                self.nav_to_point(self.waypoints[0])
+                if self.is_at_position(self.waypoints[0]):
+                    self.waypoints.pop(0)
+                else:
+                    self.nav_to_point(self.waypoints[0])
+        elif len(self.waypoints) == 0:
+            print("Cleaning Task " + str(task.zone.id) + " COMPLETE")
+            task.isComplete = True
+        return task
 
     def do_task_test(self, task):
         self.counter = self.counter + 1
