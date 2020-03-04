@@ -11,7 +11,7 @@ import rospy
 import RPi.GPIO as GPIO 
 from support.Constants import *
 import geometry_msgs.msg
-
+from support.msg import direct_msg
 class Drive:
 	def __init__(self):
 		self.l_wheel_pin = SMALL_L_WHEEL_PIN
@@ -32,6 +32,8 @@ class Drive:
 		
 		self.l_pwm = GPIO.PWM(self.l_wheel_pin, 200)
 		self.r_pwm = GPIO.PWM(self.r_wheel_pin, 200)
+
+		self.pub = rospy.Publisher("/drive_direct",direct_msg, queue_size=10)
 		
 	def listener(self):
 		rospy.init_node('drive_listener', anonymous=True)
@@ -122,6 +124,7 @@ class Drive:
 		:return:
 		"""
 		
+		# Set pins
 		if lwheel == "F":
 			GPIO.output(self.l_direct_1, GPIO.HIGH)
 			GPIO.output(self.l_direct_2, GPIO.LOW)
@@ -138,6 +141,19 @@ class Drive:
 			GPIO.output(self.r_direct_1, GPIO.HIGH)
 			GPIO.output(self.r_direct_2, GPIO.LOW)
 
+		# Set and publish direction message
+		if lwheel == "F" and rwheel == "F":
+			msg = direct_msg()
+			msg.direct = 1
+			self.pub(msg)
+		elif lwheel == "B" and rwheel == "B":
+			msg = direct_msg()
+			msg.direct = -1
+			self.pub(msg)
+		else:
+			msg = direct_msg()
+			msg.direct = 0
+			self.pub(msg)
 
 	def cleanup(self):
 		self.stop_wheels()

@@ -1,3 +1,4 @@
+
 #!/usr/bin/python
 # title           :Encoder.py
 # description     :node for reading and publishing positional data for smallbot
@@ -14,6 +15,8 @@ from support.Constants import *
 from geometry_msgs.msg import Pose
 from navigation.msg import IMU_msg
 import time
+from navigation.msg import IMU_msg, direct_msg
+
 
 #TODO make a listener for imu angle and make a ros publisher
 class Encoder:
@@ -24,8 +27,10 @@ class Encoder:
         self.yDist = 0.0
         self.angle = 0.0
         self.oldDist = 0.0
+        self.direct = 1
         self.isPaused = False
         angle_listener = rospy.Subscriber("/IMU",IMU_msg, self.angle_callback)
+        direction_listener = rospy.Subscriber("/drive_direct",direct_msg, self.drive_direct_callback)
         #isPaused_listener = rospy.Subscriber("/isPaused",Pause_msg, self.pause_callback)
         self.pub = rospy.Publisher("odom",Pose,queue_size=10)
         GPIO.setmode(GPIO.BCM)
@@ -45,6 +50,9 @@ class Encoder:
     def angle_callback(self, msg):
         self.angle = msg.zRotation
 
+    def drive_direct_callback(self,msg):
+        self.direct = msg.direct
+
     #def pause_callback(self,msg):
     #    self.isPaused = msg
     #    return
@@ -57,8 +65,8 @@ class Encoder:
         total_revs = self.ticks
         raw_dist = total_revs # * 9.5//12 * TREAD_CIRCUMFERENCE
        # print("Dist: ",raw_dist)
-        self.yDist += (raw_dist-self.oldDist) * math.sin(self.angle)
-        self.xDist += (raw_dist-self.oldDist) * math.cos(self.angle)
+        self.yDist += (raw_dist-self.oldDist) * math.sin(self.angle) * self.direct
+        self.xDist += (raw_dist-self.oldDist) * math.cos(self.angle) * self.direct
         self.oldDist = raw_dist
 
     def pub_dist(self):

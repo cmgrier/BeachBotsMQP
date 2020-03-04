@@ -33,7 +33,7 @@ class ArmController:
         GPIO.setup(GRIPPER_SERVO, GPIO.OUT)
         self.joint1_pwm = GPIO.PWM(JOINT1_SERVO, 50)
         self.gripper_pwm = GPIO.PWM(GRIPPER_SERVO, 50)
-        #self.calibrate_joints()
+        self.calibrate_joints()
 
     def move_end_effector(self, x, y):
         """
@@ -42,7 +42,7 @@ class ArmController:
         :param y: final y coordinate with respect to the end effector in meters
         :return: True if executed properly
         """
-        #TODO
+
         try:
             angles = self.kin.invkin(x,y)
             self.turn_joint0(angles[0])
