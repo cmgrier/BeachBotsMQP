@@ -13,7 +13,7 @@ import math
 from support.Constants import *
 from geometry_msgs.msg import Pose
 from navigation.msg import IMU_msg
-
+import time
 
 #TODO make a listener for imu angle and make a ros publisher
 class Encoder:
@@ -37,10 +37,10 @@ class Encoder:
 
 
     def encoder_callback1(self, channel):
-        self.ticks += 0.5
+        self.ticks += 1
 
     def encoder_callback2(self, channel):
-        self.ticks += 0.5
+        self.ticks += 1
 
     def angle_callback(self, msg):
         self.angle = msg.zRotation
@@ -55,7 +55,7 @@ class Encoder:
         :return:
         """
         total_revs = self.ticks
-        raw_dist = total_revs * TREAD_CIRCUMFERENCE
+        raw_dist = total_revs # * 9.5//12 * TREAD_CIRCUMFERENCE
        # print("Dist: ",raw_dist)
         self.yDist += (raw_dist-self.oldDist) * math.sin(self.angle)
         self.xDist += (raw_dist-self.oldDist) * math.cos(self.angle)
@@ -77,10 +77,12 @@ class Encoder:
 if __name__ == "__main__":
 
  encoder = Encoder()
- while not rospy.is_shutdown():
+ oldTime = time.time()
+ while not rospy.is_shutdown() and time.time()-oldTime < 60:
      try:
          if encoder.isPaused is False:
              encoder.pub_dist()
      except KeyboardInterrupt:
         GPIO.cleanup()
         break
+ GPIO.cleanup()
