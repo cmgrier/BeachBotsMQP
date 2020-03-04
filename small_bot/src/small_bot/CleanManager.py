@@ -15,12 +15,14 @@ class CleanManager:
         self.waypoints = []
         self.testing = False
         self.simulating = True
+        self.sim_pos = Pose()
         pass
 
     def do_task(self, task):
         # this will attempt to complete the given clean task,
         # update progress on task and return the updated task
         print("Waypoints left: " + str(len(self.waypoints)))
+        self.smallbot.publish_zone_shape(task)
         if self.testing:
             return self.do_task_test(task)
         if self.current_task_id != task.zone.id:
@@ -30,14 +32,16 @@ class CleanManager:
         elif len(self.waypoints) > 0:
             self.counter += 1
             if self.simulating:
-                if self.counter > 100:
-                    self.counter = 0
+                if self.is_at_position(self.sim_pos, self.waypoints[0]):
                     self.waypoints.pop(0)
                     print("Waypoint Reached!")
                 else:
-                    self.nav_to_point(self.waypoints[0])
+                    self.increment_sim_pos(self.waypoints[0])
+                    print("SIM POS: ")
+                    print(self.sim_pos)
+                    self.smallbot.publish_pos(self.sim_pos)
             else:
-                if self.is_at_position(self.waypoints[0]):
+                if self.is_at_position(self.smallbot.position, self.waypoints[0]):
                     self.waypoints.pop(0)
                 else:
                     self.nav_to_point(self.waypoints[0])
@@ -66,16 +70,26 @@ class CleanManager:
             task.isComplete = True
         return task
 
+    def increment_sim_pos(self, goal):
+        change = .005
+        vector = [goal.position.x - self.sim_pos.position.x, goal.position.y - self.sim_pos.position.y]
+        mag = math.sqrt(math.pow(vector[0], 2) + math.pow(vector[1], 2))
+        norm = [vector[0] / mag, vector[1] / mag]
+        new_pos = Pose()
+        new_pos.position.x = self.sim_pos.position.x + norm[0] * change
+        new_pos.position.y = self.sim_pos.position.y + norm[1] * change
+        self.sim_pos = new_pos
+
     # returns True if this robot is at the given pose
-    def is_at_position(self, pose):
-        x = self.smallbot.position.position.x
-        y = self.smallbot.position.position.y
-        return pose.position.x - POSITION_THRESHOLD < x < pose.position.x + POSITION_THRESHOLD \
-            and pose.position.y - POSITION_THRESHOLD < y < pose.position.y + POSITION_THRESHOLD
+    def is_at_position(self, current_pose, goal_pose):
+        x = current_pose.position.x
+        y = current_pose.position.y
+        return goal_pose.position.x - POSITION_THRESHOLD < x < goal_pose.position.x + POSITION_THRESHOLD \
+            and goal_pose.position.y - POSITION_THRESHOLD < y < goal_pose.position.y + POSITION_THRESHOLD
 
     # tell robot to drive to a certain pose in a straight line
     def nav_to_point(self, pose):
-        # do the thing
+        # post to cmd_vel here or in a helper
         pass
 
     # makes a path in zone
@@ -101,7 +115,7 @@ class CleanManager:
                 point.position.x = start.position.x - ZONE_WIDTH / 4.0
             else:
                 point.position.x = start.position.x + ZONE_WIDTH / 4.0
-            point.position.y = start.position.y + y_increment
+            point.position.y = y_pos + y_increment
             waypoints.append(point)
             if left:
                 left = False
