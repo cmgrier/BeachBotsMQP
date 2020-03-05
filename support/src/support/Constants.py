@@ -40,7 +40,7 @@ SMALL_R_DIRECT_2 = 26
 # Small Robot Encoder Interrupts
 ENCODER1_PIN1 = 6
 ENCODER1_PIN2 = 16
-TREAD_CIRCUMFERENCE = 0.013 # meters
+TREAD_CIRCUMFERENCE = 0.0113 # meters/pulse
 
 # Camera Servo
 SERVO_CAM = 17
