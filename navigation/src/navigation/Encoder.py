@@ -1,4 +1,3 @@
-
 #!/usr/bin/python
 # title           :Encoder.py
 # description     :node for reading and publishing positional data for smallbot
@@ -14,8 +13,7 @@ import math
 from support.Constants import *
 from geometry_msgs.msg import Pose
 from navigation.msg import IMU_msg
-import time
-from navigation.msg import IMU_msg, direct_msg
+from navigation.msg import direct_msg
 
 
 #TODO make a listener for imu angle and make a ros publisher
@@ -63,7 +61,7 @@ class Encoder:
         :return:
         """
         total_revs = self.ticks
-        raw_dist = total_revs # * 9.5//12 * TREAD_CIRCUMFERENCE
+        raw_dist = total_revs * 4.5//12 * TREAD_CIRCUMFERENCE
        # print("Dist: ",raw_dist)
         self.yDist += (raw_dist-self.oldDist) * math.sin(self.angle) * self.direct
         self.xDist += (raw_dist-self.oldDist) * math.cos(self.angle) * self.direct
@@ -85,8 +83,7 @@ class Encoder:
 if __name__ == "__main__":
 
  encoder = Encoder()
- oldTime = time.time()
- while not rospy.is_shutdown() and time.time()-oldTime < 60:
+ while not rospy.is_shutdown():
      try:
          if encoder.isPaused is False:
              encoder.pub_dist()
