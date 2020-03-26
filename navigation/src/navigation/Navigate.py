@@ -18,7 +18,7 @@ class Navigate:
         self.angle = 0.0
         self.oldAngle = 0.0
 
-#WORKS
+
     def positionListener(self, data):
         """
         Callback for the encoder topic
@@ -29,7 +29,7 @@ class Navigate:
         self.angle = data.orientation.z
         print(self.position, " : ", self.angle)
 
-#WORKS
+
     def getDist(self, x, y, x2, y2):
         """
         Gets the distance vetween two points
@@ -41,7 +41,7 @@ class Navigate:
         """
         return math.sqrt(((x-x2)*(x-x2)) + ((y-y2)*(y-y2)))
 
-#WORKS
+
     def getAngle(self, x, y, x2, y2):
         """
         Gets the angle vetween two points
@@ -54,7 +54,7 @@ class Navigate:
         return (180/math.pi)*math.atan((y2-y)/(x2-x))
 
 
-#WORKS MAY CHAMGE
+
     def withinDistanceThreshold(self, dist):
         """
         Determines if the current position meets the threshold for the desired position
@@ -67,7 +67,7 @@ class Navigate:
             return True
         return False
 
-#WORKS MAY CHAMGE
+
     def withinAngleThreshold(self, angle):
         """
         Determines if the current angle meets the threshold for the desired angle
@@ -80,7 +80,7 @@ class Navigate:
             return True
         return False
 
-#
+
     def setSpeedLimits(self,speed):
         if speed > 1.00:
             return 1.00
@@ -112,7 +112,7 @@ class Navigate:
         msg.angular.z = 0.0
         self.pub.publish(msg)
 
-    #
+    
     def turn_angle(self, angle):
         """
         Turn to the desired angle
