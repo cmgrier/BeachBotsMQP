@@ -21,6 +21,8 @@ class CoralMain:
         """
         Initializations
         """
+        rospy.loginfo("[INFO] parsing class labels...")
+
         # Initialization of Node
         rospy.init_node('Coral')
 
