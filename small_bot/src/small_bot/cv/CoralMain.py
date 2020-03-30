@@ -50,7 +50,7 @@ class CoralMain:
 
         self.model_path = Path("Google_Model/model.tflite")
         # initialize the labels dictionary
-        print("[INFO] parsing class labels...")
+        rospy.loginfo("[INFO] parsing class labels...")
         self.labels = {}
         self.labels[0] = "Can"
 
@@ -72,6 +72,7 @@ class CoralMain:
         Main Process
         :return: void
         """
+        rospy.loginfo("In Main Process")
 
         # loop over the frames from the video stream
         while True:
