@@ -112,7 +112,7 @@ class Navigate:
         while not self.within_distance_threshold(dist) and not rospy.is_shutdown():
             active_dist = self.get_dist(self.old_position[0],self.old_position[1],self.position[0],self.position[1])
             distPID.update(active_dist)
-            msg.linear.x = self.set_speed_limits(distPID.output) * 2.5
+            msg.linear.x = self.set_speed_limits(distPID.output)
             msg.angular.z = 0.0
             self.pub.publish(msg)
             print("Dist: ",dist, "| active_dist: ", active_dist, " | PID Output: ",distPID.output)
@@ -137,7 +137,7 @@ class Navigate:
             msg.linear.x = 0.0
             msg.angular.z = self.set_speed_limits(angPID.output / 10.0)
             self.pub.publish(msg)
-            print("Amg: ", angle, "| activeAmg: ", activeAng, " | PID Output: ", angPID.output)
+            print("Ang: ", angle, "| activeAng: ", activeAng, " | PID Output: ", angPID.output)
             r.sleep()
         msg.linear.x = 0.0
         msg.angular.z = 0.0

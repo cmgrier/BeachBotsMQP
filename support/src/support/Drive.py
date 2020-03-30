@@ -154,6 +154,7 @@ class Drive:
 			msg = direct_msg()
 			msg.direct = 0
 			self.pub.publish(msg)
+		print("Message: ",msg.direct)
 
 	def cleanup(self):
 		self.stop_wheels()
