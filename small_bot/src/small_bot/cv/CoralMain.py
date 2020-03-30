@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.6
+#!/usr/bin/env python3
 # import the necessary packages
 from edgetpu.detection.engine import DetectionEngine
 from imutils.video import VideoStream
