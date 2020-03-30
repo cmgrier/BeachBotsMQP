@@ -52,6 +52,7 @@ while True:
     start = time.time()
     results = model.DetectWithImage(frame, threshold=args["confidence"],
                                     keep_aspect_ratio=True, relative_coord=False)
+    print(results)
     end = time.time()
     # loop over the results
     for r in results:
@@ -67,7 +68,7 @@ while True:
         cv2.putText(orig, text, (startX, y),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
     # show the output frame and wait for a key press
-    cv2.imshow("Frame", orig)
+    # cv2.imshow("Frame", orig)
     key = cv2.waitKey(1) & 0xFF
     # if the `q` key was pressed, break from the loop
     if key == ord("q"):
