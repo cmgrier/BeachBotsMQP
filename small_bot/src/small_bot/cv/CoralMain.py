@@ -65,6 +65,8 @@ class CoralMain:
         time.sleep(2.0)
         print("Finished Initialization of Coral")
 
+        self.main_process()
+
     def main_process(self):
         """
         Main Process
