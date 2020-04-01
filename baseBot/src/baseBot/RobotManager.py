@@ -20,6 +20,7 @@ class RobotManager:
         self.map_manager = map_manager
 
     # returns true if robot with given worker ID should be avoiding
+    # current iteration is for testing purposes
     def should_robot_avoid(self, workerID):
         robot = self.get_robot(workerID)
         robot.avoidCounter = robot.avoidCounter + 1
@@ -28,7 +29,7 @@ class RobotManager:
             print(robot.avoidCounter)
         if robot.avoidCounter < 50:
             return True
-        elif 50 <= robot.avoidCounter < 200:
+        elif 50 <= robot.avoidCounter < 500:
             return False
         robot.avoidCounter = 0
         return True

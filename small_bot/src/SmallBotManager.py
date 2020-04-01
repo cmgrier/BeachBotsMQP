@@ -11,15 +11,13 @@ from support.EqualPriorityQueue import EqualPriorityQueue
 from small_bot.TaskManager import TaskManager
 from small_bot.TaskSeeker import TaskSeeker
 from data.Task import Task
-from geometry_msgs.msg import Pose, Twist
+from geometry_msgs.msg import Pose, Twist, PointStamped, PolygonStamped, Point32
 from small_bot.msg import AvoidAlert
 from nav_msgs.msg import OccupancyGrid
 import rospy
 
 
 class SmallBotManager:
-
-
     def __init__(self):
         self.isCleaning = True
         self.tasks = EqualPriorityQueue()
@@ -30,6 +28,9 @@ class SmallBotManager:
         self.taskManager = TaskManager(self)
         self.taskSeeker = TaskSeeker(self)
         self.request_id()
+        topic_name = 'robo_pos' + str(self.id)
+        self.position_publisher = rospy.Publisher(topic_name, PointStamped, queue_size=10)
+        self.zone_publisher = rospy.Publisher('robo' + str(self.id) + 'zone', PolygonStamped, queue_size=10)
 
         if self.id != -1:
             self.main()
@@ -47,9 +48,10 @@ class SmallBotManager:
                 if task.type == "end":
                     break
                 updated_task = self.do_task(task)
-                if not task.isComplete:
+                if not updated_task.isComplete:
                     self.tasks.put(updated_task.priority, updated_task)
                 else:
+                    print("task " + str(task.zone.id) + " is COMPLETE")
                     twist = Twist()
                     self.taskManager.pub_vel(twist)
 
@@ -68,7 +70,6 @@ class SmallBotManager:
         #Maybe have a ros listener for current position
         #If dump satus is true then request dump task
 
-
     def do_task(self, task):
         """
         Sends a task to be identified and executed
@@ -76,8 +77,6 @@ class SmallBotManager:
         :return: An updated Task based on where it was left off
         """
         return self.taskManager.do_task(task)
-
-
 
     def request_id(self):
         """
@@ -94,6 +93,28 @@ class SmallBotManager:
             task = self.taskSeeker.parse_task(data)
             self.tasks.put(task.priority, task)
 
+    def publish_pos(self, pos=None):
+        ps = PointStamped()
+        ps.header.frame_id = "/map"
+        if pos is not None:
+            ps.point = pos.position
+        else:
+            ps.point = self.position.position
+        self.position_publisher.publish(ps)
+
+    def publish_zone_shape(self, task):
+        zone = PolygonStamped()
+        zone.header.frame_id = "/map"
+        points = []
+        for corner in task.zone.corners:
+            p = Point32()
+            p.x = corner.position.x
+            p.y = corner.position.y
+            p.z = corner.position.z
+            points.append(p)
+        zone.polygon.points = points
+        self.zone_publisher.publish(zone)
+
+
 if __name__ == "__main__":
     smallbot = SmallBotManager()
-    #smallbot.main()

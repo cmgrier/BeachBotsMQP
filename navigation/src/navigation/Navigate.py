@@ -26,7 +26,8 @@ class Navigate:
         self.old_angle = 0.0
 
 
-    def position_listener(self, data):
+
+    def positionListener(self, data):
         """
         Callback for the encoder topic
         :param data: Pose message
@@ -36,8 +37,7 @@ class Navigate:
         self.angle = data.orientation.z
        
 
-
-    def get_dist(self, x, y, x2, y2):
+    def getDist(self, x, y, x2, y2):
         """
         Gets the distance between two points
         :param x: first x-coord in meters
@@ -49,7 +49,7 @@ class Navigate:
         return math.sqrt(((x-x2)*(x-x2)) + ((y-y2)*(y-y2)))
 
 
-    def get_angle(self, x, y, x2, y2):
+    def getAngle(self, x, y, x2, y2):
         """
         Gets the angle between two points
         :param x: first x-coord in meters
@@ -61,8 +61,8 @@ class Navigate:
         return (180/math.pi)*math.atan((y2-y)/(x2-x))
 
 
-#WORKS MAY CHAMGE
-    def within_distance_threshold(self, dist):
+
+    def withinDistanceThreshold(self, dist):
         """
         Determines if the current position meets the threshold for the desired position
         :param dist: Linear distance in meters
@@ -75,8 +75,7 @@ class Navigate:
         return False
 
 
-#WORKS MAY CHAMGE
-    def within_angle_threshold(self, angle):
+    def withinAngleThreshold(self, angle):
         """
         Determines if the current angle meets the threshold for the desired angle
         :param angle:
@@ -88,8 +87,8 @@ class Navigate:
             return True
         return False
 
-#
-    def set_speed_limits(self,speed):
+
+    def setSpeedLimits(self,speed):
         if speed > 1.00:
             return 1.00
         elif speed < -1.00:
@@ -120,7 +119,7 @@ class Navigate:
         msg.angular.z = 0.0
         self.pub.publish(msg)
 
-    #
+    
     def turn_angle(self, angle):
         """
         Turn to the desired angle
@@ -161,5 +160,8 @@ class Navigate:
 
 if __name__=="__main__":
     nav = Navigate()
-    nav.drive_distance(0.3048)
-
+    print(nav.getDist(1,1,4,7))
+    print(nav.getAngle(1,1,4,7))
+    dist = nav.getDist(1, 1, 4, 7)
+    nav.oldPosition = nav.position
+    nav.turn_angle(90)
