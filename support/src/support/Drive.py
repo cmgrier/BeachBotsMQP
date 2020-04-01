@@ -1,10 +1,17 @@
 #!/usr/bin/env python
-
+# title           :Drive.py
+# description     :drive node listener for smallbot
+# author          :Sean Tidd
+# date            :2020-02-11
+# version         :0.1
+# notes           :
+# python_version  :3.5
+# ==============================================================================
 import rospy
 import RPi.GPIO as GPIO 
 from support.Constants import *
 import geometry_msgs.msg
-
+from support.msg import direct_msg
 class Drive:
 	def __init__(self):
 		self.l_wheel_pin = SMALL_L_WHEEL_PIN
@@ -21,13 +28,15 @@ class Drive:
 		GPIO.setup(self.r_direct_2, GPIO.OUT)
 		GPIO.setup(self.l_wheel_pin, GPIO.OUT)
 		GPIO.setup(self.r_wheel_pin, GPIO.OUT)
+                rospy.init_node('drive_listener', anonymous=True)
+		self.pub = rospy.Publisher("/drive_direct",direct_msg, queue_size=10)
 		self.set_direction("F", "F")
 		
 		self.l_pwm = GPIO.PWM(self.l_wheel_pin, 200)
 		self.r_pwm = GPIO.PWM(self.r_wheel_pin, 200)
+
 		
 	def listener(self):
-		rospy.init_node('drive_listener', anonymous=True)
                 rospy.Subscriber("/cmd_vel", geometry_msgs.msg.Twist, self.interpreter)
 		# spin() simply keeps python from exiting until this node is stopped
 		rospy.spin()
@@ -115,22 +124,37 @@ class Drive:
 		:return:
 		"""
 		
-		if lwheel == "F":
+		# Set pins
+		if lwheel == "B":
 			GPIO.output(self.l_direct_1, GPIO.HIGH)
 			GPIO.output(self.l_direct_2, GPIO.LOW)
 
-		elif lwheel == "B":
+		elif lwheel == "F":
  			GPIO.output(self.l_direct_1, GPIO.LOW)
 			GPIO.output(self.l_direct_2, GPIO.HIGH)
 
-		if rwheel == "F":
+		if rwheel == "B":
 			GPIO.output(self.r_direct_1, GPIO.LOW)
 			GPIO.output(self.r_direct_2, GPIO.HIGH)
 
-		elif rwheel == "B":
+		elif rwheel == "F":
 			GPIO.output(self.r_direct_1, GPIO.HIGH)
 			GPIO.output(self.r_direct_2, GPIO.LOW)
 
+		# Set and publish direction message
+		if lwheel == "F" and rwheel == "F":
+			msg = direct_msg()
+			msg.direct = 1
+			self.pub.publish(msg)
+		elif lwheel == "B" and rwheel == "B":
+			msg = direct_msg()
+			msg.direct = -1
+			self.pub.publish(msg)
+		else:
+			msg = direct_msg()
+			msg.direct = 0
+			self.pub.publish(msg)
+		print("Message: ",msg.direct)
 
 	def cleanup(self):
 		self.stop_wheels()

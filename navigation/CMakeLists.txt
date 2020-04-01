@@ -51,6 +51,7 @@ catkin_python_setup()
  add_message_files(
    FILES
    IMU_msg.msg
+   direct_msg.msg
  )
 
 ## Generate services in the 'srv' folder
