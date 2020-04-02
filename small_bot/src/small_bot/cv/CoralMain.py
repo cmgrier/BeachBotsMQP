@@ -80,11 +80,9 @@ class CoralMain:
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             frame = Image.fromarray(frame)
             # make predictions on the input frame
-            start = time.time()
 
             results = self.model_script.detect(frame, self.threshold)
 
-            end = time.time()
             # loop over the results
             for r in results:
                 # extract the bounding box and box and predicted class label
