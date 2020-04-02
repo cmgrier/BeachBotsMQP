@@ -29,7 +29,7 @@ class Drive:
 		GPIO.setup(self.l_wheel_pin, GPIO.OUT)
 		GPIO.setup(self.r_wheel_pin, GPIO.OUT)
                 rospy.init_node('drive_listener', anonymous=True)
-		self.pub = rospy.Publisher("/drive_direct",direct_msg, queue_size=10)
+		self.pub = rospy.Publisher("/drive_direct",direct_msg, queue_size=1)
 		self.set_direction("F", "F")
 		
 		self.l_pwm = GPIO.PWM(self.l_wheel_pin, 200)
@@ -145,15 +145,13 @@ class Drive:
 		if lwheel == "F" and rwheel == "F":
 			msg = direct_msg()
 			msg.direct = 1
-			self.pub.publish(msg)
 		elif lwheel == "B" and rwheel == "B":
 			msg = direct_msg()
 			msg.direct = -1
-			self.pub.publish(msg)
 		else:
 			msg = direct_msg()
 			msg.direct = 0
-			self.pub.publish(msg)
+		self.pub.publish(msg)
 		print("Message: ",msg.direct)
 
 	def cleanup(self):

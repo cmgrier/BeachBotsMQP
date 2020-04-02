@@ -31,22 +31,29 @@ class Encoder:
 
 
     def encoder_callback1(self, channel):
-        self.ticks += 0.5 * self.direction
-
+	#print(self.ticks)
+	print("direction: ",self.direction)
+        self.ticks += 0.5*self.direction
+ 
     def encoder_callback2(self, channel):
-        self.ticks += 0.5 * self.direction
+        print("direction: ",self.direction)
+        self.ticks += 0.5*self.direction
+	#print(self.ticks)
 
+	
     def angle_callback(self, msg):
         self.angle = msg.zRotation
 
     def direction_callback(self, msg):
 	self.direction = msg.direct
-	print("Direction: ",self.direction)
+	print("Callback direction: ",self.direction)
+	
 
     def convertToDistance(self):
+        #print(self.direction)
         totalRevs = self.ticks
+	#print("self.ticks: ",self.ticks," | self.direction: ",self.direction," | Product: ",self.ticks*self.direction)
         rawDist = totalRevs * TREAD_CIRCUMFERENCE
-       # print("Dist: ",rawDist)
         self.yDist += (rawDist-self.oldDist) * math.sin(self.angle)
         self.xDist += (rawDist-self.oldDist) * math.cos(self.angle)
 	self.oldDist = rawDist
@@ -57,8 +64,9 @@ class Encoder:
 	msg.position.x = self.xDist
         msg.position.y = self.yDist
         msg.orientation.z = self.angle
-	print(msg.position)
+	#print(msg.position)
         self.pub.publish(msg)
+	
 
 if __name__ == "__main__":
 
