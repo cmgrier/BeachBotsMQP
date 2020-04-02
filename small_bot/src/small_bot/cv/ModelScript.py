@@ -14,14 +14,14 @@ class ModelScript:
         # load the Google Coral object detection model
         print("[INFO] loading Coral model...")
         self.model = DetectionEngine(self.model_path)
-        self.threshold = 0.5
 
-    def detect(self, frame):
+    def detect(self, frame, threshold):
         """
         Detection function
         :param frame: the input frame
+        :param threshold: the threshold
         :return: results
         """
 
-        return self.model.DetectWithImage(frame, threshold=self.threshold, keep_aspect_ratio=True, relative_coord=False)
+        return self.model.DetectWithImage(frame, threshold=threshold, keep_aspect_ratio=True, relative_coord=False)
 

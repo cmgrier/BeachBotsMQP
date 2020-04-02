@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # import the necessary packages
-from edgetpu.detection.engine import DetectionEngine
 from imutils.video import VideoStream
 from PIL import Image
 import imutils
@@ -11,9 +10,7 @@ import numpy as np
 from support.Constants import *
 from sensor_msgs.msg import CompressedImage
 from std_msgs.msg import Bool
-from geometry_msgs.msg import Point
 from cv_bridge import CvBridge, CvBridgeError
-from pathlib import Path
 from ModelScript import ModelScript
 
 
@@ -45,7 +42,6 @@ class CoralMain:
         # Initialization of random variables
         self.bridge = CvBridge()
         self.isRunning = False
-
         self.threshold = 0.5
 
         # initialize the labels dictionary
@@ -58,9 +54,9 @@ class CoralMain:
         self.vs = VideoStream(src=0).start()
 
         time.sleep(2.0)
-        print("Finished Initialization of Node")
-
         self.model_script = ModelScript()
+
+        print("Finished Initialization of Node")
 
         self.main_process()
 
@@ -86,7 +82,7 @@ class CoralMain:
             # make predictions on the input frame
             start = time.time()
 
-            results = self.model_script.detect(frame)
+            results = self.model_script.detect(frame, self.threshold)
 
             end = time.time()
             # loop over the results
@@ -104,7 +100,7 @@ class CoralMain:
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
             # show the output frame and wait for a key press
 
-            self.curr_image_pub.publish(self.make_compressed_msg(frame))
+            self.curr_image_pub.publish(self.make_compressed_msg(orig))
             # cv2.imshow("Frame", orig)
 
             key = cv2.waitKey(1) & 0xFF
@@ -114,6 +110,17 @@ class CoralMain:
         # do a bit of cleanup
         cv2.destroyAllWindows()
         self.vs.stop()
+
+    def is_running_callback(self, msg):
+        """
+        Callback for running
+        :param msg: the Boolean msg
+        :return: void
+        """
+        self.isRunning = msg.data
+        print(str(msg.data))
+        if self.isRunning:
+            self.main_process()
 
     @staticmethod
     def make_compressed_msg(frame):
