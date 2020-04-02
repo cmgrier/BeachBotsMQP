@@ -168,8 +168,6 @@ class ArmController:
 if __name__=="__main__":
     arm = ArmController()
     try:
-     #arm.turn_joint1(45)
-     #rospy.sleep(5)
      arm.turn_joint0(45)
      GPIO.cleanup()
     except KeyboardInterrupt:

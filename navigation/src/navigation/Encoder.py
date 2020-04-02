@@ -29,7 +29,6 @@ class Encoder:
         GPIO.add_event_detect(ENCODER1_PIN2, GPIO.RISING, callback=self.encoder_callback2, bouncetime=300)
 
 
-
     def encoder_callback1(self, channel):
         self.ticks += 0.5 * self.direction
 
