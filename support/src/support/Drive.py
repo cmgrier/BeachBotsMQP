@@ -79,21 +79,6 @@ class Drive:
 		else:
 			self.stop_wheels()
 
-		"""else:
-			turn_val = msg.angular.z
-			lin_val = msg.linear.x
-
-			right_wheel_val = lin_val - ((turn_val / lin_val) * 25)
-			left_wheel_val = lin_val + ((turn_val / lin_val) * 25)
-
-			if left_wheel_val < 0:
-				left_wheel_val = math.abs(left_wheel_val)
-			if right_wheel_val < 0:
-				right_wheel_val = math.abs(right_wheel_val)
-
-			run_wheels(left_wheel_val, right_wheel_val)
-		"""
-
 
 
 	def run_wheels(self,l_speed,r_speed):
