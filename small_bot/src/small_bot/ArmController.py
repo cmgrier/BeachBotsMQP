@@ -7,7 +7,7 @@
 # notes           :
 # python_version  :3.5
 # ==============================================================================
-from small_bot.collector_arm.Kinematics import Kinematics
+from small_bot.Kinematics import Kinematics
 import RPi.GPIO as GPIO
 import rospy
 from support.Constants import *
@@ -33,7 +33,7 @@ class ArmController:
         GPIO.setup(GRIPPER_SERVO, GPIO.OUT)
         self.joint1_pwm = GPIO.PWM(JOINT1_SERVO, 50)
         self.gripper_pwm = GPIO.PWM(GRIPPER_SERVO, 50)
-        self.calibrate_joints()
+        self.turn_joint0(-5)
 
     def move_end_effector(self, x, y):
         """
@@ -78,6 +78,7 @@ class ArmController:
 	print("target: ",target)
 	print("steps: ",steps)
 
+	rospy.sleep(self.delay)
         if target < 0:
             for i in range(0, steps):
                 self.set_step(1, 0, 1, 0)
@@ -101,6 +102,8 @@ class ArmController:
                 rospy.sleep(self.delay)
                 self.set_step(1, 0, 1, 0)
                 rospy.sleep(self.delay)
+	self.set_step(0,0,0,0)
+
 
 
     def turn_joint1(self, angle):
@@ -125,6 +128,7 @@ class ArmController:
         :return:
         """
         trigger = True
+	trigger2 = True
         #Open gripper
         self.gripper_pwm.start(GRIPPER_OPEN)
         #Zero joint1
@@ -142,7 +146,21 @@ class ArmController:
            rospy.sleep(self.delay)
 	   if GPIO.input(SWITCH):
 		trigger = False
-		break	
+		break
+	self.set_step(0,0,0,0)
+	while trigger2:
+           self.set_step(1, 0, 1,0 )
+           rospy.sleep(self.delay)
+           self.set_step(0, 1, 1, 0)
+           rospy.sleep(self.delay)
+           self.set_step(0, 1, 0, 1)
+           rospy.sleep(self.delay)
+           self.set_step(1, 0, 0, 1)
+           rospy.sleep(self.delay)
+           if not GPIO.input(SWITCH):
+                trigger2 = False
+                break  
+	self.set_step(0,0,0,0)
 
     def move_gripper(self, status):
         """
@@ -168,8 +186,6 @@ class ArmController:
 if __name__=="__main__":
     arm = ArmController()
     try:
-     #arm.turn_joint1(45)
-     #rospy.sleep(5)
      arm.turn_joint0(45)
      GPIO.cleanup()
     except KeyboardInterrupt:

@@ -1,6 +1,5 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # import the necessary packages
-from edgetpu.detection.engine import DetectionEngine
 from imutils.video import VideoStream
 from PIL import Image
 import imutils
@@ -11,9 +10,8 @@ import numpy as np
 from support.Constants import *
 from sensor_msgs.msg import CompressedImage
 from std_msgs.msg import Bool
-from geometry_msgs.msg import Point
 from cv_bridge import CvBridge, CvBridgeError
-from pathlib import Path
+from ModelScript import ModelScript
 
 
 class CoralMain:
@@ -21,7 +19,7 @@ class CoralMain:
         """
         Initializations
         """
-        rospy.loginfo("[INFO] parsing class labels...")
+        rospy.loginfo("[INFO] Initializing Class and Node")
 
         # Initialization of Node
         rospy.init_node('Coral')
@@ -30,42 +28,35 @@ class CoralMain:
         self.cam_servo_pin = SERVO_CAM
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.cam_servo_pin, GPIO.OUT)
-
         self.servo = GPIO.PWM(self.cam_servo_pin, 50)
 
+        # Move Servo
         self.servo.start(5)  # Start
         time.sleep(.5)  # Wait
         self.servo.stop()  # Stop
 
         # Subscribers and Publishers
-        rospy.Subscriber("cv_trigger", Bool, self.is_running_callback)
-        self.pub = rospy.Publisher("blob_cords", Point, queue_size=1)
-
-        # self.init_image_pub = rospy.Publisher("init_image", CompressedImage, queue_size=1)
+        # rospy.Subscriber("cv_trigger", Bool, self.is_running_callback)
         self.curr_image_pub = rospy.Publisher("curr_image", CompressedImage, queue_size=1)
 
-        # Initialization of variables
+        # Initialization of random variables
         self.bridge = CvBridge()
         self.isRunning = False
-
         self.threshold = 0.5
 
-        self.model_path = Path("Google_Model/model.tflite")
         # initialize the labels dictionary
         rospy.loginfo("[INFO] parsing class labels...")
         self.labels = {}
         self.labels[0] = "Can"
-
-        # load the Google Coral object detection model
-        print("[INFO] loading Coral model...")
-        self.model = DetectionEngine(self.model_path)
 
         # initialize the video stream and allow the camera sensor to warmup
         print("[INFO] starting video stream...")
         self.vs = VideoStream(src=0).start()
 
         time.sleep(2.0)
-        print("Finished Initialization of Coral")
+        self.model_script = ModelScript()
+
+        print("Finished Initialization of Node")
 
         self.main_process()
 
@@ -89,11 +80,9 @@ class CoralMain:
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             frame = Image.fromarray(frame)
             # make predictions on the input frame
-            start = time.time()
-            results = self.model.DetectWithImage(frame, threshold=self.threshold, keep_aspect_ratio=True,
-                                                 relative_coord=False)
-            # print(results)
-            end = time.time()
+
+            results = self.model_script.detect(frame, self.threshold)
+
             # loop over the results
             for r in results:
                 # extract the bounding box and box and predicted class label
@@ -109,7 +98,7 @@ class CoralMain:
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
             # show the output frame and wait for a key press
 
-            self.curr_image_pub.publish(self.make_compressed_msg(frame))
+            self.curr_image_pub.publish(self.make_compressed_msg(orig))
             # cv2.imshow("Frame", orig)
 
             key = cv2.waitKey(1) & 0xFF
@@ -119,6 +108,17 @@ class CoralMain:
         # do a bit of cleanup
         cv2.destroyAllWindows()
         self.vs.stop()
+
+    def is_running_callback(self, msg):
+        """
+        Callback for running
+        :param msg: the Boolean msg
+        :return: void
+        """
+        self.isRunning = msg.data
+        print(str(msg.data))
+        if self.isRunning:
+            self.main_process()
 
     @staticmethod
     def make_compressed_msg(frame):

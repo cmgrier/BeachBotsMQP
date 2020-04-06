@@ -7,9 +7,7 @@
 # notes		:
 # python_version :3.5
 # =============================================================================
-import sys
-sys.path.insert(1,'/catkin_ws/src/BeachCleanersMQP/small_bot/src/small_bot/collector_arm/ArmController')
-import ArmController
+from small_bot.ArmController import ArmController
 import RPi.GPIO as GPIO
 import rospy
 from support.Constants import *
