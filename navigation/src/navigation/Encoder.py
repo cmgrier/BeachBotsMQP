@@ -29,10 +29,10 @@ class Encoder:
         GPIO.add_event_detect(ENCODER1_PIN2, GPIO.RISING, callback=self.encoder_callback2, bouncetime=300)
 
     def encoder_callback1(self, channel):
-        self.ticks += 0.5
+	self.ticks += 0.5
  
     def encoder_callback2(self, channel):
-        self.ticks += 0.5
+	self.ticks += 0.5
 
     def angle_callback(self, msg):
         self.angle = msg.zRotation
@@ -53,7 +53,7 @@ class Encoder:
         msg.position.x = self.xDist
         msg.position.y = self.yDist
         msg.orientation.z = self.angle
-	    #print(msg.position)
+	print(msg.position)
         self.pub.publish(msg)
 	
 
