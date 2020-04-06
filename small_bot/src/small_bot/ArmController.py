@@ -7,7 +7,7 @@
 # notes           :
 # python_version  :3.5
 # ==============================================================================
-from small_bot.collector_arm.Kinematics import Kinematics
+from small_bot.Kinematics import Kinematics
 import RPi.GPIO as GPIO
 import rospy
 from support.Constants import *
