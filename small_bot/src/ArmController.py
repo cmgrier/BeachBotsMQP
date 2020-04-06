@@ -7,7 +7,7 @@
 # notes           :
 # python_version  :3.5
 # ==============================================================================
-from small_bot.collector_arm.Kinematics import Kinematics
+from small_bot.Kinematics import Kinematics
 import RPi.GPIO as GPIO
 import rospy
 from support.Constants import *
@@ -25,15 +25,13 @@ class ArmController:
         self.delay = 0.001
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(SWITCH, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-        GPIO.setup(COIL_A_1_PIN, GPIO.OUT)
-        GPIO.setup(COIL_A_2_PIN, GPIO.OUT)
-        GPIO.setup(COIL_B_1_PIN, GPIO.OUT)
-        GPIO.setup(COIL_B_2_PIN, GPIO.OUT)
+        GPIO.setup(SM_DIRECTION, GPIO.OUT, pull_up_down=GPIO.PUD_DOWN)
+        GPIO.setup(SM_STEP, GPIO.OUT, pull_up_down=GPIO.PUD_DOWN)
         GPIO.setup(JOINT1_SERVO, GPIO.OUT)
         GPIO.setup(GRIPPER_SERVO, GPIO.OUT)
         self.joint1_pwm = GPIO.PWM(JOINT1_SERVO, 50)
         self.gripper_pwm = GPIO.PWM(GRIPPER_SERVO, 50)
-        self.calibrate_joints()
+        self.turn_joint0(-5)
 
     def move_end_effector(self, x, y):
         """
@@ -53,7 +51,7 @@ class ArmController:
             print(error)
             return False
 
-    def set_step(self,w1, w2, w3, w4):
+    #def set_step(self,w1, w2, w3, w4):
         """
         Set the voltage for the stepper motor coils
         :param w1: coil A pin 1 voltage
@@ -62,10 +60,10 @@ class ArmController:
         :param w4: coil B pin 2 voltage
         :return:
         """
-        GPIO.output(COIL_A_1_PIN, w1)
-        GPIO.output(COIL_A_2_PIN, w2)
-        GPIO.output(COIL_B_1_PIN, w3)
-        GPIO.output(COIL_B_2_PIN, w4)
+     #   GPIO.output(COIL_A_1_PIN, w1)
+      #  GPIO.output(COIL_A_2_PIN, w2)
+       # GPIO.output(COIL_B_1_PIN, w3)
+        #GPIO.output(COIL_B_2_PIN, w4)
 
     def turn_joint0(self, angle):
         """
@@ -75,32 +73,42 @@ class ArmController:
         """
         target = angle - self.joint0_current
         steps = abs(int(target//STEP_ANGLE))/4
+        num_steps = 0
 	print("target: ",target)
 	print("steps: ",steps)
-
         if target < 0:
-            for i in range(0, steps):
-                self.set_step(1, 0, 1, 0)
-                rospy.sleep(self.delay)
-                self.set_step(0, 1, 1, 0)
-                rospy.sleep(self.delay)
-                self.set_step(0, 1, 0, 1)
-                rospy.sleep(self.delay)
-                self.set_step(1, 0, 0, 1)
-                rospy.sleep(self.delay)
-
+            GPIO.output(SM_DIRECTION,GPIO.HIGH)
         else:
+            GPIO.output(SM_DIRECTION,GPIO.LOW)
+        while num_steps < steps:
+            GPIO.output(SM_STEP,GPIO.HIGH)
+            GPIO.output(SM_STEP,GPIO.LOW)
+            num_steps += 1
+
+
+        #if target < 0:
+         #   for i in range(0, steps):
+          #      self.set_step(1, 0, 1, 0)
+           #     rospy.sleep(self.delay)
+            #    self.set_step(0, 1, 1, 0)
+             #   rospy.sleep(self.delay)
+              #  self.set_step(0, 1, 0, 1)
+               # rospy.sleep(self.delay)
+                #self.set_step(1, 0, 0, 1)
+                #rospy.sleep(self.delay)
+
+        #else:
             # Reverse previous step sequence to reverse motor direction
 
-            for i in range(0, steps):
-                self.set_step(1, 0, 0, 1)
-                rospy.sleep(self.delay)
-                self.set_step(0, 1, 0, 1)
-                rospy.sleep(self.delay)
-                self.set_step(0, 1, 1, 0)
-                rospy.sleep(self.delay)
-                self.set_step(1, 0, 1, 0)
-                rospy.sleep(self.delay)
+         #   for i in range(0, steps):
+          #      self.set_step(1, 0, 0, 1)
+           #     rospy.sleep(self.delay)
+            #    self.set_step(0, 1, 0, 1)
+             #   rospy.sleep(self.delay)
+              #  self.set_step(0, 1, 1, 0)
+               # rospy.sleep(self.delay)
+                #self.set_step(1, 0, 1, 0)
+                #rospy.sleep(self.delay)
 
 
     def turn_joint1(self, angle):
