@@ -88,16 +88,9 @@ THETA2 = 0.0
 
 # Collector Arm Motors
 STEP_ANGLE = 0.035  # Degrees per step
-DIR = 0  # Direction pin
-STEP = 0  # Step pin
-SWITCH = 9  # Miso limit switch
-CW = 1
-CCW = 0
-
-COIL_A_1_PIN = 18
-COIL_A_2_PIN = 19
-COIL_B_1_PIN = 20
-COIL_B_2_PIN = 24
+SWITCH = 9  # MiSo limit switch for stepper calibration
+SM_STEP = 24  # Stepper motor driver step pin
+SM_DIRECTION = 18  # Stepper motor driver direction pin
 
 JOINT1_SERVO = 7  # (CE1)
 JOINT1_START = 6
