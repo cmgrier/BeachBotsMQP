@@ -1,3 +1,14 @@
+#!/usr/bin/python
+# title           :EqualPriorityQueue.py
+# description     :a priority queue that replaces a value with an updated value witht he same priority
+# author          :Sean Tidd
+# date            :2020-02-11
+# version         :0.1
+# notes           :
+# python_version  :3.5
+# =======================================================================================================
+
+
 """
 This class is similar to the default PriorityQueue class except it handles the case of two entities with equal priority
 by adding the new one and removing the other entity found in the queue

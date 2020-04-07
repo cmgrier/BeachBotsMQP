@@ -1,3 +1,12 @@
+#!/usr/bin/python
+# title           :CleanManager.py
+# description     :executes clean tasks for smallbot
+# author          :Sean Tidd
+# date            :2020-02-11
+# version         :0.1
+# notes           :
+# python_version  :3.5
+# ==============================================================================
 from data.Task import Task
 from support.Constants import *
 import geometry_msgs.msg
@@ -19,6 +28,11 @@ class CleanManager:
         pass
 
     def do_task(self, task):
+        """
+        Will attempt to complete the given clean task
+        :param task: the clean task to be executed
+        :return: the updated task
+        """
         # this will attempt to complete the given clean task,
         # update progress on task and return the updated task
         print("Waypoints left: " + str(len(self.waypoints)))

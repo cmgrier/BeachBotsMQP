@@ -1,4 +1,12 @@
 #!/usr/bin/python
+# title           :Kinematics.py
+# description     :kinematic functions for the smallbot arm
+# author          :Sean Tidd
+# date            :2020-02-11
+# version         :0.1
+# notes           :
+# python_version  :3.5
+# ==============================================================================
 from math import *
 from support.Constants import *
 import numpy
@@ -7,14 +15,18 @@ import matplotlib.pyplot as plt
 class Kinematics:
 
     def fwkin(self, ang0, ang1, graph=False):
-        """ Takes the angles of the joints in the arm, ang0 and ang1 referring to the
-        shoulder and elbow joints respectively, and calculates the position of the
-        end effector as a 3x1 matrix
+        """
+        Takes the joint angles from joint0 and joint1 of the arm (shoulder and elcow)
+        to get the end effector final position coordinates
+        :param ang0: shoulder angle in degrees
+        :param ang1: elvow angle in degrees
+        :param graph: set to True to see a 3D representation
+        :return:
         """
         ang0 = radians(ang0)
         ang1 = radians(ang1)
-        matrix = self.transformMatrix(ang0+THETA1, ALPHA1, A1, D1)
-        matrix2 = numpy.dot(self.transformMatrix(ang0 + THETA1, ALPHA1, A1, D1), self.transformMatrix(ang1 + THETA2, ALPHA2, A2, D2))
+        matrix = self.transform_matrix(ang0+THETA1, ALPHA1, A1, D1)
+        matrix2 = numpy.dot(self.transform_matrix(ang0 + THETA1, ALPHA1, A1, D1), self.transform_matrix(ang1 + THETA2, ALPHA2, A2, D2))
         if graph == True:
             fig = plt.figure()
             ax = fig.add_subplot(111, projection='3d')
@@ -25,9 +37,9 @@ class Kinematics:
             ax.set_zlabel('z-axis')
             ax.set(xlim=(-.5, .5), ylim=(-.5, .5),zlim=(-.5, .5))
             plt.show()
-        return numpy.dot(self.transformMatrix(ang0+THETA1, ALPHA1, A1, D1), self.transformMatrix(ang1+THETA2, ALPHA2, A2, D2))
+        return numpy.dot(self.transform_matrix(ang0+THETA1, ALPHA1, A1, D1), self.transform_matrix(ang1+THETA2, ALPHA2, A2, D2))
 
-    def getEndEffectorFromAngles(self, ang0, ang1, graph=False ):
+    def get_end_effector_from_angles(self, ang0, ang1, graph=False ):
         """
         Gets the end effector's final position after the joints rotate to a certain angle
         :param ang0: joint 0 angle
@@ -39,7 +51,15 @@ class Kinematics:
         print(matrix)
         return [matrix[0][3], matrix[1][3], matrix[2][3]]
 
-    def transformMatrix(self, theta, alpha, a, d):
+    def transform_matrix(self, theta, alpha, a, d):
+        """
+         A single transformation from one frame to another using DH parameters
+        :param theta: angle along the normal
+        :param alpha: angle along the axis of rotation (Z-axis)
+        :param a:  distance along the axis of rotation
+        :param d: distance along the normal
+        :return: a 4x4 transformation matrix
+        """
         T = [
                 [cos(theta), -sin(theta)*cos(alpha), sin(theta)*sin(alpha), a*cos(theta)],
                 [sin(theta), cos(theta)*cos(alpha), -cos(theta)*sin(alpha), a*sin(theta)],
@@ -51,8 +71,8 @@ class Kinematics:
     def invkin(self,x,y):
         """
         Inverse kinematics of 2-deg of freedom arm
-        :param x: end effector x-coord
-        :param y: end effector y-coord
+        :param x: end effector x-coord (in terms of end effector origin)
+        :param y: end effector y-coord (in terms of end effector origin)
         :return: joint angles to result in the end effector reaching the desired position
         """
 
@@ -70,4 +90,4 @@ class Kinematics:
 
 if __name__=="__main__":
     k = Kinematics()
-    k.getEndEffectorFromAngles(k.invkin(-0.12,0.2)[0], k.invkin(-0.12,0.2)[1])
+    k.get_end_effector_from_angles(k.invkin(-0.12,0.2)[0], k.invkin(-0.12,0.2)[1])
