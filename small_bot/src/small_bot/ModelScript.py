@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 from edgetpu.detection.engine import DetectionEngine
 from PIL import Image
 from pathlib import Path
