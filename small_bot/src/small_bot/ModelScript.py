@@ -10,7 +10,7 @@ class ModelScript:
         Initialization
         """
 
-        self.model_path = Path("Google_Model/model.tflite")
+        self.model_path = Path("model.tflite")
 
         # load the Google Coral object detection model
         print("[INFO] loading Coral model...")
