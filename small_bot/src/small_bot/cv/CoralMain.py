@@ -9,11 +9,10 @@ import numpy as np
 from support.Constants import *
 from sensor_msgs.msg import CompressedImage
 from cv_bridge import CvBridge, CvBridgeError
-from ModelScript import ModelScript
 
 
 class CoralMain:
-    def __init__(self):
+    def __init__(self, model_script):
         """
         Initializations
         """
@@ -52,7 +51,7 @@ class CoralMain:
         self.vs = VideoStream(src=0).start()
 
         time.sleep(2.0)
-        self.model_script = ModelScript()
+        self.model_script = ms
 
         print("Finished Initialization of Node")
 
@@ -134,3 +133,4 @@ class CoralMain:
 
         # Return the compressed image
         return msg
+
