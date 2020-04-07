@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # import the necessary packages
+from small_bot.ModelScript import ModelScript
 from imutils.video import VideoStream
 import imutils
 import time
@@ -12,7 +13,7 @@ from cv_bridge import CvBridge, CvBridgeError
 
 
 class CoralMain:
-    def __init__(self, model_script):
+    def __init__(self):
         """
         Initializations
         """
@@ -51,7 +52,7 @@ class CoralMain:
         self.vs = VideoStream(src=0).start()
 
         time.sleep(2.0)
-        self.model_script = ms
+        self.model_script = ModelScript()
 
         print("Finished Initialization of Node")
 
