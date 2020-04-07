@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # import the necessary packages
 from imutils.video import VideoStream
-from PIL import Image
 import imutils
 import time
 import cv2
@@ -9,7 +8,6 @@ import rospy
 import numpy as np
 from support.Constants import *
 from sensor_msgs.msg import CompressedImage
-from std_msgs.msg import Bool
 from cv_bridge import CvBridge, CvBridgeError
 from ModelScript import ModelScript
 
@@ -78,9 +76,9 @@ class CoralMain:
             # from BGR to RGB channel ordering and then (2) from a NumPy
             # array to PIL image format
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            frame = Image.fromarray(frame)
-            # make predictions on the input frame
 
+            # make predictions on the input frame
+            frame = self.model_script.image(frame)
             results = self.model_script.detect(frame, self.threshold)
 
             # loop over the results

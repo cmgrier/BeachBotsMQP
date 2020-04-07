@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from edgetpu.detection.engine import DetectionEngine
+from PIL import Image
 from pathlib import Path
 
 
@@ -25,3 +26,11 @@ class ModelScript:
 
         return self.model.DetectWithImage(frame, threshold=threshold, keep_aspect_ratio=True, relative_coord=False)
 
+    def image(self, frame):
+        """
+        PIL Stuff
+        :param frame: frame
+        :return: image
+        """
+
+        return Image.fromarray(frame)
