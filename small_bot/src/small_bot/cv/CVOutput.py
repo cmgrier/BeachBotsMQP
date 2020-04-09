@@ -66,7 +66,7 @@ class CVOutput:
             frame_data = self.data[:msg_size]
             self.data = self.data[msg_size:]
 
-            frame = pickle.loads(frame_data, encoding="bytes")
+            frame = pickle.loads(frame_data)
             frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
             self.curr_image_sender(frame)
             cv2.waitKey(1)
