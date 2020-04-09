@@ -101,7 +101,7 @@ class CoralMain:
             # show the output frame and wait for a key press
 
             # Socket Connection occurs here
-            self.socket_con(frame)
+            self.socket_con(orig)
 
             key = cv2.waitKey(1) & 0xFF
             # if the `q` key was pressed, break from the loop
