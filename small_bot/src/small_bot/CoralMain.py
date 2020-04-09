@@ -2,6 +2,7 @@
 # import the necessary packages
 from imutils.video import VideoStream
 from edgetpu.detection.engine import DetectionEngine
+import RPi.GPIO as GPIO
 import imutils
 from PIL import Image
 import time
