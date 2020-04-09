@@ -1,15 +1,16 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # import the necessary packages
-from small_bot.ModelScript import ModelScript
 from imutils.video import VideoStream
+from edgetpu.detection.engine import DetectionEngine
 import imutils
+from PIL import Image
 import time
+import pickle
 import cv2
-import rospy
-import numpy as np
+import socket
+import struct
 from support.Constants import *
-from sensor_msgs.msg import CompressedImage
-from cv_bridge import CvBridge, CvBridgeError
+from pathlib import Path
 
 
 class CoralMain:
@@ -17,10 +18,6 @@ class CoralMain:
         """
         Initializations
         """
-        rospy.loginfo("[INFO] Initializing Class and Node")
-
-        # Initialization of Node
-        rospy.init_node('Coral')
 
         # Configure the Camera Servo
         self.cam_servo_pin = SERVO_CAM
@@ -33,28 +30,33 @@ class CoralMain:
         time.sleep(.5)  # Wait
         self.servo.stop()  # Stop
 
-        # Subscribers and Publishers
-        # rospy.Subscriber("cv_trigger", Bool, self.is_running_callback)
-        self.curr_image_pub = rospy.Publisher("curr_image", CompressedImage, queue_size=1)
-
         # Initialization of random variables
-        self.bridge = CvBridge()
-        self.isRunning = False
         self.threshold = 0.5
 
         # initialize the labels dictionary
-        rospy.loginfo("[INFO] parsing class labels...")
         self.labels = {}
         self.labels[0] = "Can"
 
+        self.model_path = Path("model.tflite")
+
+        # load the Google Coral object detection model
+        print("[INFO] loading Coral model...")
+        self.model = DetectionEngine(self.model_path)
+
         # initialize the video stream and allow the camera sensor to warmup
-        print("[INFO] starting video stream...")
         self.vs = VideoStream(src=0).start()
 
         time.sleep(2.0)
-        self.model_script = ModelScript()
 
-        print("Finished Initialization of Node")
+        print("Finished Initialization of Model and Video")
+
+        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.client_socket.connect(('192.168.1.230', 8485))
+        self.connection = self.client_socket.makefile('wb')
+
+        self.img_counter = 0
+
+        self.encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
 
         self.main_process()
 
@@ -63,7 +65,6 @@ class CoralMain:
         Main Process
         :return: void
         """
-        rospy.loginfo("In Main Process")
 
         # loop over the frames from the video stream
         while True:
@@ -78,8 +79,8 @@ class CoralMain:
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
             # make predictions on the input frame
-            frame = self.model_script.image(frame)
-            results = self.model_script.detect(frame, self.threshold)
+            frame = Image.fromarray(frame)
+            results = self.model.DetectWithImage(frame, threshold=self.threshold, keep_aspect_ratio=True, relative_coord=False)
 
             # loop over the results
             for r in results:
@@ -96,8 +97,8 @@ class CoralMain:
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
             # show the output frame and wait for a key press
 
-            self.curr_image_pub.publish(self.make_compressed_msg(orig))
-            # cv2.imshow("Frame", orig)
+            # Socket Connection occurs here
+            self.socket_con(frame)
 
             key = cv2.waitKey(1) & 0xFF
             # if the `q` key was pressed, break from the loop
@@ -107,31 +108,16 @@ class CoralMain:
         cv2.destroyAllWindows()
         self.vs.stop()
 
-    def is_running_callback(self, msg):
+    def socket_con(self, frame):
         """
-        Callback for running
-        :param msg: the Boolean msg
-        :return: void
+        Socket Connection
+        :param frame:
+        :return:
         """
-        self.isRunning = msg.data
-        print(str(msg.data))
-        if self.isRunning:
-            self.main_process()
+        result, frame = cv2.imencode('.jpg', frame, self.encode_param)
+        data = pickle.dumps(frame, 0)
+        size = len(data)
 
-    @staticmethod
-    def make_compressed_msg(frame):
-        """
-        Make a compressed msg
-        :param frame: a uncompressed image
-        :return: a compressed image
-        """
-
-        # Make a compressed image
-        msg = CompressedImage()
-        msg.header.stamp = rospy.Time.now()
-        msg.format = "jpeg"
-        msg.data = np.array(cv2.imencode('.jpg', frame)[1]).tostring()
-
-        # Return the compressed image
-        return msg
-
+        print("{}: {}".format(self.img_counter, size))
+        self.client_socket.sendall(struct.pack(">L", size) + data)
+        self.img_counter += 1
