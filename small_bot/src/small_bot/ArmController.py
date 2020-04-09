@@ -31,7 +31,7 @@ class ArmController:
         GPIO.setup(GRIPPER_SERVO, GPIO.OUT)
         self.joint1_pwm = GPIO.PWM(JOINT1_SERVO, 50)
         self.gripper_pwm = GPIO.PWM(GRIPPER_SERVO, 50)
-        self.turn_joint0(-45)
+        self.calibrate_joints()
 
     def move_end_effector(self, x, y):
         """
@@ -51,20 +51,7 @@ class ArmController:
             print(error)
             return False
 
-    #def set_step(self,w1, w2, w3, w4):
-        """
-        Set the voltage for the stepper motor coils
-        :param w1: coil A pin 1 voltage
-        :param w2: coil A pin 2 voltage
-        :param w3: coil B pin 1 voltage
-        :param w4: coil B pin 2 voltage
-        :return:
-        """
-     #   GPIO.output(COIL_A_1_PIN, w1)
-      #  GPIO.output(COIL_A_2_PIN, w2)
-       # GPIO.output(COIL_B_1_PIN, w3)
-        #GPIO.output(COIL_B_2_PIN, w4)
-
+    
     def turn_joint0(self, angle):
         """
         Turn the stepper motor for joint 0 to a specific angle
@@ -109,24 +96,35 @@ class ArmController:
         :return:
         """
         trigger = True
+	trigger2 = True
         #Open gripper
         self.gripper_pwm.start(GRIPPER_OPEN)
         #Zero joint1
         self.joint1_pwm.start(JOINT1_START)
 
         #Zero joint0
-        while trigger:
-	   self.set_step(1, 0, 0, 1)
+	#Move arm until it triggers the switch
+	GPIO.output(SM_DIRECTION,GPIO.LOW)
+        while trigger:				
+	   GPIO.output(SM_STEP,GPIO.HIGH)
            rospy.sleep(self.delay)
-           self.set_step(0, 1, 0, 1)
-           rospy.sleep(self.delay)
-           self.set_step(0, 1, 1, 0)
-           rospy.sleep(self.delay)
-           self.set_step(1, 0, 1, 0)
+           GPIO.output(SM_STEP,GPIO.LOW)
            rospy.sleep(self.delay)
 	   if GPIO.input(SWITCH):
 		trigger = False
-		break	
+		break
+	#Move arm off of switch until it deactivates
+	GPIO.output(SM_DIRECTION,GPIO.HIGH)
+        while trigger2:
+           GPIO.output(SM_STEP,GPIO.HIGH)
+           rospy.sleep(self.delay)
+           GPIO.output(SM_STEP,GPIO.LOW)
+           rospy.sleep(self.delay)
+           if not GPIO.input(SWITCH):
+                trigger2 = False
+                break
+	
+	
 
     def move_gripper(self, status):
         """
