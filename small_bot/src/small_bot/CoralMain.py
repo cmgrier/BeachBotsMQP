@@ -58,8 +58,6 @@ class CoralMain:
 
         self.encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
 
-        self.main_process()
-
     def main_process(self):
         """
         Main Process
@@ -121,3 +119,8 @@ class CoralMain:
         print("{}: {}".format(self.img_counter, size))
         self.client_socket.sendall(struct.pack(">L", size) + data)
         self.img_counter += 1
+
+
+if __name__ == "__main__":
+    cm = CoralMain()
+    cm.main_process()
