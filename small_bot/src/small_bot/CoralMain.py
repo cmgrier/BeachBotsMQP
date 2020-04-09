@@ -9,9 +9,9 @@ import time
 import pickle
 import cv2
 import socket
+import argparse
 import struct
 from support.Constants import *
-from pathlib import Path
 
 
 class CoralMain:
@@ -38,11 +38,15 @@ class CoralMain:
         self.labels = {}
         self.labels[0] = "Can"
 
-        self.model_path = Path("model.tflite")
+        ap = argparse.ArgumentParser()
+        ap.add_argument("-m", "--model", required=True,
+                        help="path to TensorFlow Lite object detection model")
+
+        args = vars(ap.parse_args())
 
         # load the Google Coral object detection model
         print("[INFO] loading Coral model...")
-        self.model = DetectionEngine(self.model_path)
+        self.model = DetectionEngine(args["model"])
 
         # initialize the video stream and allow the camera sensor to warmup
         self.vs = VideoStream(src=0).start()
