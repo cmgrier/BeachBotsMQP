@@ -97,6 +97,6 @@ JOINT1_START = 6
 
 GRIPPER_SERVO = 8  # (CE0)
 GRIPPER_OPEN = 2  # Duty Cycle
-GRIPPER_CLOSE = 10  # Duty Cycle
+GRIPPER_CLOSE = 12  # Duty Cycle
 
 

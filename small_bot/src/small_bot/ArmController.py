@@ -84,11 +84,10 @@ class ArmController:
         duty =   (angle * 0.035) + JOINT1_START
 	if duty < 0:
 	 duty = 0
-        GPIO.output(JOINT1_SERVO, True)
         self.joint1_pwm.ChangeDutyCycle(duty)
-        rospy.sleep(1)
-        GPIO.output(JOINT1_SERVO, False)
+        rospy.sleep(.6)
         self.joint1_pwm.ChangeDutyCycle(0)
+	rospy.sleep(.6)
 
     def calibrate_joints(self):
         """
@@ -133,26 +132,14 @@ class ArmController:
         :return:
         """
         if status == False:
-            GPIO.output(GRIPPER_SERVO, True)
             self.gripper_pwm.ChangeDutyCycle(GRIPPER_CLOSE)
-            rospy.sleep(1)
-            GPIO.output(GRIPPER_SERVO, False)
+            rospy.sleep(.6)
             self.gripper_pwm.ChangeDutyCycle(0)
+	    rospy.sleep(.6)
         else:
-            GPIO.output(GRIPPER_SERVO, True)
             self.gripper_pwm.ChangeDutyCycle(GRIPPER_OPEN)
-            rospy.sleep(1)
-            GPIO.output(GRIPPER_SERVO, False)
+            rospy.sleep(.6)
             self.gripper_pwm.ChangeDutyCycle(0)
+	    rospy.sleep(.6)
 
 
-
-if __name__=="__main__":
-    arm = ArmController()
-    try:
-     #arm.turn_joint1(45)
-     #rospy.sleep(5)
-     arm.turn_joint0(45)
-     GPIO.cleanup()
-    except KeyboardInterrupt:
-	 GPIO.cleanup()

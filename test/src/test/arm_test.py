@@ -23,13 +23,21 @@ class ArmTest:
                  print("3.3V")
              else:
                  print("0.0V")
-		
+	
+	def test_can_grab(self):
+	     #rospy.sleep(3)
+	     #self.arm.turn_joint1(-35)
+	     rospy.sleep(3)
+	     self.arm.move_gripper(False)
+             rospy.sleep(9)
+	     #self.arm.turn_joint1(0)
+	     #rospy.sleep(3)		
+
 
 if __name__ == "__main__":
 	try:
 	   armTest = ArmTest()
-           #while True:
-	    #  armTest.test_switch()
+	   armTest.test_can_grab()
 	except KeyboardInterrupt:
 	  GPIO.cleanup()	
      
