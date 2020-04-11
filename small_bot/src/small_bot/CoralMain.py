@@ -136,9 +136,9 @@ class CoralMain:
 
         video_centroid = (self.w/2, self.h/2)
         if centroid[1] > video_centroid[1]:
-            self.position += twitch
-        if centroid[1] < video_centroid[1]:
             self.position -= twitch
+        if centroid[1] < video_centroid[1]:
+            self.position += twitch
         if 100.0 > self.position > 0.0:
             self.servo.ChangeDutyCycle(self.position)
             print(self.position)
