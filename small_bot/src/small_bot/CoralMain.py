@@ -26,8 +26,9 @@ class CoralMain:
         GPIO.setup(self.cam_servo_pin, GPIO.OUT)
         self.servo = GPIO.PWM(self.cam_servo_pin, 50)
 
+        self.position = 3
         # Move Servo
-        self.servo.start(5)  # Start
+        self.servo.start(self.position)  # Start
         time.sleep(.5)  # Wait
         self.servo.stop()  # Stop
 
@@ -62,6 +63,8 @@ class CoralMain:
         self.img_counter = 0
 
         self.encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
+        self.h = None
+        self.w = 500  # DO NOT CHANGE
 
     def main_process(self):
         """
@@ -74,6 +77,8 @@ class CoralMain:
             # grab the frame from the threaded video stream and resize it
             # to have a maximum width of 500 pixels
             frame = self.vs.read()
+            if self.h is None:
+                self.h, w, c = frame.shape
             frame = imutils.resize(frame, width=500)
             orig = frame.copy()
             # prepare the frame for object detection by converting (1) it
@@ -85,11 +90,17 @@ class CoralMain:
             frame = Image.fromarray(frame)
             results = self.model.DetectWithImage(frame, threshold=self.threshold, keep_aspect_ratio=True, relative_coord=False)
 
+            largest_area = -999
+            centroid = None
             # loop over the results
             for r in results:
                 # extract the bounding box and box and predicted class label
                 box = r.bounding_box.flatten().astype("int")
                 (startX, startY, endX, endY) = box
+                area = (endY - startY) * (endX - startX)
+                if area > largest_area:
+                    largest_area = area
+                    centroid = (startX + (endX - startX)/2, startY - (endY - startY)/2)
                 label = self.labels[r.label_id]
                 # draw the bounding box and label on the image
                 cv2.rectangle(orig, (startX, startY), (endX, endY),
@@ -98,7 +109,9 @@ class CoralMain:
                 text = "{}: {:.2f}%".format(label, r.score * 100)
                 cv2.putText(orig, text, (startX, y),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-            # show the output frame and wait for a key press
+
+            if centroid is not None:
+                self.go_to(centroid)
 
             # Socket Connection occurs here
             self.socket_con(orig)
@@ -110,6 +123,26 @@ class CoralMain:
         # do a bit of cleanup
         cv2.destroyAllWindows()
         self.vs.stop()
+
+    def go_to(self, centroid, threshold=50, twitch=0.5):
+        """
+        Sends the servo to a given position
+        :param centroid: tuple of coordinates
+        :param threshold: threshold
+        :param twitch: how much the servo moves.
+        :return: void
+        """
+
+        video_centroid = (self.w/2, self.h/2)
+        while abs(centroid[1] - video_centroid[1]) > threshold:
+            if centroid[1] > video_centroid[1]:
+                self.position += twitch
+            if centroid[1] < video_centroid[1]:
+                self.position -= twitch
+
+            self.servo.ChangeDutyCycle(self.position)
+            time.sleep(.05)
+            self.servo.stop()
 
     def socket_con(self, frame):
         """
