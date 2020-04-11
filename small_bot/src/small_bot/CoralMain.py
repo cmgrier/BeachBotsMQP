@@ -30,7 +30,7 @@ class CoralMain:
         # Move Servo
         self.servo.start(self.position)  # Start
         time.sleep(.5)  # Wait
-        self.servo.stop()  # Stop
+        # self.servo.stop()  # Stop
 
         # Initialization of random variables
         self.threshold = 0.5
@@ -123,6 +123,7 @@ class CoralMain:
         # do a bit of cleanup
         cv2.destroyAllWindows()
         self.vs.stop()
+        self.servo.stop()
 
     def go_to(self, centroid, threshold=50, twitch=0.5):
         """
