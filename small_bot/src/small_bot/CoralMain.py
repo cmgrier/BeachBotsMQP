@@ -115,6 +115,7 @@ class CoralMain:
                 cv2.putText(orig, text, (startX, y),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
+            cv2.circle(orig, centroid, 1, (0, 0, 255), -1)
             if centroid is not None:
                 self.go_to_test(centroid)
 
