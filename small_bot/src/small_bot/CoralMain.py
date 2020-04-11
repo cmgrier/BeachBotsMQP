@@ -152,7 +152,7 @@ class CoralMain:
             print(self.position)
             # time.sleep(.1)
 
-    def go_to_test(self, centroid, threshold=50, twitch=50):
+    def go_to_test(self, centroid, threshold=70, twitch=70):
         """
         Sends the servo to a given position
         :param centroid: tuple of coordinates
@@ -167,11 +167,11 @@ class CoralMain:
         elif centroid[1] < video_centroid[1] + threshold:
             self.position += twitch
 
-        if 2000.0 > self.position > 0.0:
+        if 2200.0 > self.position > 0.0:
             self.pi.set_servo_pulsewidth(self.cam_servo_pin, self.position)
             time.sleep(0.5)
             # print(self.position)
-            time.sleep(.5)
+            # time.sleep(.5)
 
 
     def socket_con(self, frame):
