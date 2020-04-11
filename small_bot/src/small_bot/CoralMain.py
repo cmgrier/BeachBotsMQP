@@ -125,7 +125,7 @@ class CoralMain:
         self.vs.stop()
         self.servo.stop()
 
-    def go_to(self, centroid, threshold=50, twitch=0.5):
+    def go_to(self, centroid, threshold=50, twitch=0.2):
         """
         Sends the servo to a given position
         :param centroid: tuple of coordinates
@@ -135,15 +135,15 @@ class CoralMain:
         """
 
         video_centroid = (self.w/2, self.h/2)
-        if centroid[1] > video_centroid[1]:
-            self.position -= twitch
-        if centroid[1] < video_centroid[1]:
-            self.position += twitch
-        if 100.0 > self.position > 0.0:
-            self.servo.ChangeDutyCycle(self.position)
-            print(self.position)
-            time.sleep(.05)
-            # self.servo.stop()
+        while abs(video_centroid[1] - centroid[1]) > threshold:
+            if centroid[1] > video_centroid[1]:
+                self.position -= twitch
+            if centroid[1] < video_centroid[1]:
+                self.position += twitch
+            if 100.0 > self.position > 0.0:
+                self.servo.ChangeDutyCycle(self.position)
+                print(self.position)
+                time.sleep(.05)
 
     def socket_con(self, frame):
         """
