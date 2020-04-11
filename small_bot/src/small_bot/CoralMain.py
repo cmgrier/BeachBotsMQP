@@ -116,7 +116,7 @@ class CoralMain:
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
             cv2.circle(orig, centroid, 4, (0, 255, 0), 2)
-            cv2.circle(orig, (int(self.w/2), int(self.h/2) - 10), 4, (0, 0, 255), 2)
+            cv2.circle(orig, (int(self.w/2), int(self.h/2) - 20), 4, (0, 0, 255), 2)
             if centroid is not None:
                 self.go_to_test(centroid)
 
@@ -142,7 +142,7 @@ class CoralMain:
         :return: void
         """
 
-        video_centroid = (self.w/2, self.h/2)
+        video_centroid = (self.w/2, self.h/2 - 20)
         if centroid[1] > video_centroid[1] + threshold:
             self.position -= twitch
         elif centroid[1] < video_centroid[1] + threshold:
@@ -153,7 +153,7 @@ class CoralMain:
             print(self.position)
             # time.sleep(.1)
 
-    def go_to_test(self, centroid, threshold=70, twitch=70):
+    def go_to_test(self, centroid, threshold=40, twitch=70):
         """
         Sends the servo to a given position
         :param centroid: tuple of coordinates
@@ -162,10 +162,10 @@ class CoralMain:
         :return: void
         """
 
-        video_centroid = (self.w / 2, self.h / 2)
+        video_centroid = (self.w / 2, self.h / 2 - 20)
         if centroid[1] > video_centroid[1] + threshold:
             self.position -= twitch
-        elif centroid[1] < video_centroid[1] + threshold:
+        elif centroid[1] < video_centroid[1] - threshold:
             self.position += twitch
 
         if 2200.0 > self.position > 0.0:
