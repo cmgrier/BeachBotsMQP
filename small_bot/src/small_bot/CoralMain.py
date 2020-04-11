@@ -139,10 +139,10 @@ class CoralMain:
                 self.position += twitch
             if centroid[1] < video_centroid[1]:
                 self.position -= twitch
-
-            self.servo.ChangeDutyCycle(self.position)
-            time.sleep(.05)
-            self.servo.stop()
+            if 100.0 > self.position > 0.0:
+                self.servo.ChangeDutyCycle(self.position)
+                time.sleep(.05)
+                self.servo.stop()
 
     def socket_con(self, frame):
         """
