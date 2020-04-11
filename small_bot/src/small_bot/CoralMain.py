@@ -105,7 +105,7 @@ class CoralMain:
                 area = (endY - startY) * (endX - startX)
                 if area > largest_area:
                     largest_area = area
-                    centroid = (int(startX + (endX - startX)/2), int(startY - (endY - startY)/2))
+                    centroid = (int(startX + (endX - startX)/2), int(startY + (endY - startY)/2))
                 label = self.labels[r.label_id]
                 # draw the bounding box and label on the image
                 cv2.rectangle(orig, (startX, startY), (endX, endY),
