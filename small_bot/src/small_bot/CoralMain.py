@@ -151,7 +151,7 @@ class CoralMain:
             print(self.position)
             # time.sleep(.1)
 
-    def go_to_test(self, centroid, threshold=50, twitch=50):
+    def go_to_test(self, centroid, threshold=0, twitch=50):
         """
         Sends the servo to a given position
         :param centroid: tuple of coordinates
