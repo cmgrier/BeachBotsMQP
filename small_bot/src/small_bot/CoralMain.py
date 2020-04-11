@@ -162,9 +162,9 @@ class CoralMain:
 
         video_centroid = (self.w / 2, self.h / 2)
         if centroid[1] > video_centroid[1] + threshold:
-            self.position += twitch
-        elif centroid[1] < video_centroid[1] + threshold:
             self.position -= twitch
+        elif centroid[1] < video_centroid[1] + threshold:
+            self.position += twitch
 
         if 2000.0 > self.position > 0.0:
             self.pi.set_servo_pulsewidth(self.cam_servo_pin, self.position)
