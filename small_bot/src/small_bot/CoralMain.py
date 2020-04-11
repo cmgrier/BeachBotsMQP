@@ -142,7 +142,7 @@ class CoralMain:
         if 100.0 > self.position > 0.0:
             self.servo.ChangeDutyCycle(self.position)
             time.sleep(.05)
-            self.servo.stop()
+            # self.servo.stop()
 
     def socket_con(self, frame):
         """
