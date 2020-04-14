@@ -184,8 +184,8 @@ class CoralMain:
         :return:
         """
         result, frame = cv2.imencode('.jpg', frame, self.encode_param)
-        data = pickle.dumps(frame, 0)
-        data += pickle.dumps(centroid, 0)
+        data = pickle.dumps(centroid, 0)
+        data += pickle.dumps(frame, 0)
         size = len(data)
         
         print("{}: {}".format(self.img_counter, size))
