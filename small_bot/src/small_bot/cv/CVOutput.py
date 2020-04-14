@@ -9,6 +9,7 @@ import pickle
 import struct
 from sensor_msgs.msg import Image, CompressedImage
 from cv_bridge import CvBridge, CvBridgeError
+from support.Constants import *
 
 
 class CVOutput:

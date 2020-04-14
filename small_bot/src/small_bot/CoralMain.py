@@ -10,7 +10,6 @@ import cv2
 import socket
 import argparse
 import struct
-from support.Constants import *
 
 
 class CoralMain:
