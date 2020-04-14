@@ -60,13 +60,14 @@ class CVOutput:
             print("Done Recv: {}".format(len(self.data)))
             packed_msg_size = self.data[:self.payload_size]
             self.data = self.data[self.payload_size:]
-            rospy.loginfo(packed_msg_size)
             msg_size = struct.unpack(">L", packed_msg_size)[0]
             print("msg_size: {}".format(msg_size))
             while len(self.data) < msg_size:
                 self.data += self.conn.recv(4096)
             frame_data = self.data[:msg_size]
             self.data = self.data[msg_size:]
+            rospy.loginfo("WHAT IS THIS")
+            rospy.loginfo(self.data)
 
             frame = pickle.loads(frame_data)
             frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
