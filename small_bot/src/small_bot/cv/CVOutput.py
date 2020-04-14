@@ -56,7 +56,6 @@ class CVOutput:
                 print("Recv: {}".format(len(self.data)))
                 self.data += self.conn.recv(4096)
 
-
             print("Done Recv: {}".format(len(self.data)))
             packed_msg_size = self.data[:self.payload_size]
             self.data = self.data[self.payload_size:]
