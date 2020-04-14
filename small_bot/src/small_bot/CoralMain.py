@@ -121,6 +121,8 @@ class CoralMain:
                 self.go_to_test(centroid)
 
             # Socket Connection occurs here
+            if centroid is None:
+                centroid = (0, 0)
             self.socket_con(orig, centroid)
 
             key = cv2.waitKey(1) & 0xFF
