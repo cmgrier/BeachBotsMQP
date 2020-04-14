@@ -15,11 +15,11 @@ class CamTest:
         pi = pigpio.pi()  # Connect to local Pi.
 
         pi.set_PWM_frequency(self.cam_servo_pin, 40000)
-        pi.set_PWM_dutycycle(self.cam_servo_pin, 255)
+        # pi.set_PWM_dutycycle(self.cam_servo_pin, 255)
         # pi.set_pull_up_down(self.cam_servo_pin, pigpio.PUD_UP)
-        pi.set_servo_pulsewidth(self.cam_servo_pin, 500)
+        pi.set_servo_pulsewidth(self.cam_servo_pin, 1500)
         time.sleep(0.5)
-        pi.set_servo_pulsewidth(self.cam_servo_pin, 750)
+        pi.set_servo_pulsewidth(self.cam_servo_pin, 2100)
         time.sleep(0.5)
 
         # switch servo off
