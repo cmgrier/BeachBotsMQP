@@ -183,8 +183,9 @@ class CoralMain:
         """
         result, frame = cv2.imencode('.jpg', frame, self.encode_param)
         data = pickle.dumps(frame, 0)
-        # data += pickle.dumps(centroid)
         size = len(data)
+        #data += pickle.dumps(centroid)
+        print(data)
 
         print("{}: {}".format(self.img_counter, size))
         self.client_socket.sendall(struct.pack(">L", size) + data)

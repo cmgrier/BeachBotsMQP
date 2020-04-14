@@ -56,10 +56,10 @@ class CVOutput:
                 print("Recv: {}".format(len(self.data)))
                 self.data += self.conn.recv(4096)
 
+
             print("Done Recv: {}".format(len(self.data)))
             packed_msg_size = self.data[:self.payload_size]
             self.data = self.data[self.payload_size:]
-            rospy.loginfo("SIZE OF DATA: ==========")
             rospy.loginfo(packed_msg_size)
             msg_size = struct.unpack(">L", packed_msg_size)[0]
             print("msg_size: {}".format(msg_size))
@@ -76,7 +76,7 @@ class CVOutput:
     def curr_image_sender(self, frame):
         """
         Image Callback (Displays an image)
-        :param msg: the image message
+        :param frame: the image message
         :return: void
         """
 
