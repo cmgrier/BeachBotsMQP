@@ -57,14 +57,19 @@ class CVOutput:
                 self.data += self.conn.recv(4096)
 
             print("Done Recv: {}".format(len(self.data)))
-            packed_msg_size = self.data[:self.payload_size]
-            self.data = self.data[self.payload_size:]
-            msg_size = struct.unpack(">L", packed_msg_size)[0]
+            packed_msg_size = self.data[:self.payload_size]  # Size of the full transfer
+            self.data = self.data[self.payload_size:]  # Image data
+            msg_size = struct.unpack(">L", packed_msg_size)[0]  # Size of message at beginning
             print("msg_size: {}".format(msg_size))
             while len(self.data) < msg_size:
                 self.data += self.conn.recv(4096)
-            frame_data = self.data[:msg_size]
-            self.data = self.data[msg_size:]
+            frame_data = self.data[4:msg_size]
+            array_data = self.data[0:4]
+
+            array = pickle.loads(array_data)
+            rospy.loginfo("THIS IS THE ARRAY: ====")
+            rospy.loginfo(array)
+            # self.data = self.data[msg_size:]
             # rospy.loginfo("WHAT IS THIS")
             # rospy.loginfo(self.data)
 
