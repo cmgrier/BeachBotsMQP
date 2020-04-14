@@ -63,8 +63,8 @@ class CVOutput:
             print("msg_size: {}".format(msg_size))
             while len(self.data) < msg_size:
                 self.data += self.conn.recv(4096)
-            frame_data = self.data[10:msg_size]
-            array_data = self.data[0:10]
+            frame_data = self.data[14:msg_size]
+            array_data = self.data[0:14]
 
             array = pickle.loads(array_data)
             rospy.loginfo("THIS IS THE ARRAY: ====")
