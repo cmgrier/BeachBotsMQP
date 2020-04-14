@@ -121,7 +121,7 @@ class CoralMain:
                 self.go_to_test(centroid)
 
             # Socket Connection occurs here
-            self.socket_con(orig)
+            self.socket_con(orig, centroid)
 
             key = cv2.waitKey(1) & 0xFF
             # if the `q` key was pressed, break from the loop
@@ -174,16 +174,18 @@ class CoralMain:
             # print(self.position)
             # time.sleep(.5)
 
-
-    def socket_con(self, frame):
+    def socket_con(self, frame, centroid):
         """
         Socket Connection
         :param frame:
+        :param centroid:
         :return:
         """
         result, frame = cv2.imencode('.jpg', frame, self.encode_param)
         data = pickle.dumps(frame, 0)
         size = len(data)
+        #data += pickle.dumps(centroid)
+        print(data)
 
         print("{}: {}".format(self.img_counter, size))
         self.client_socket.sendall(struct.pack(">L", size) + data)
