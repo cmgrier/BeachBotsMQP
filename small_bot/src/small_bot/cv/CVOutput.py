@@ -71,6 +71,8 @@ class CVOutput:
             # rospy.loginfo(array)
 
             (frame, centroid) = pickle.loads(frame_and_centroid)
+            print("THIS IS CENTROID:")
+            print(centroid)
             frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
             self.curr_image_sender(frame)
             cv2.waitKey(1)
