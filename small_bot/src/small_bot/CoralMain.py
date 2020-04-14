@@ -65,6 +65,8 @@ class CoralMain:
             frame = self.vs.read()
             if self.h is None:
                 self.h, w, c = frame.shape
+                print("THIS IS THE VIDEO HEIGHT:")
+                print(self.h)
             frame = imutils.resize(frame, width=500)
             orig = frame.copy()
             # prepare the frame for object detection by converting (1) it

@@ -101,7 +101,7 @@ class CVOutput:
         :return: void
         """
 
-        video_centroid = (self.w / 2, self.h / 2 - 20)
+        video_centroid = (250, 250 / 2 - 20)
         if centroid[1] > video_centroid[1] + threshold:
             self.position -= twitch
         elif centroid[1] < video_centroid[1] - threshold:
