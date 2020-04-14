@@ -66,8 +66,8 @@ class CVOutput:
                 self.data += self.conn.recv(4096)
             frame_data = self.data[:msg_size]
             self.data = self.data[msg_size:]
-            rospy.loginfo("WHAT IS THIS")
-            rospy.loginfo(self.data)
+            # rospy.loginfo("WHAT IS THIS")
+            # rospy.loginfo(self.data)
 
             frame = pickle.loads(frame_data)
             frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
