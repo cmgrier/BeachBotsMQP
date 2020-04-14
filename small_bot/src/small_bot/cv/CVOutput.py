@@ -63,15 +63,14 @@ class CVOutput:
             print("msg_size: {}".format(msg_size))
             while len(self.data) < msg_size:
                 self.data += self.conn.recv(4096)
-            frame_data = self.data[14:msg_size]
-            array_data = self.data[0:14]
+            frame_and_centroid = self.data[:msg_size]
             self.data = self.data[msg_size:]
 
-            array = pickle.loads(array_data)
-            rospy.loginfo("THIS IS THE ARRAY: ====")
-            rospy.loginfo(array)
+            # array = pickle.loads(array_data)
+            # rospy.loginfo("THIS IS THE ARRAY: ====")
+            # rospy.loginfo(array)
 
-            frame = pickle.loads(frame_data)
+            (frame, centroid) = pickle.loads(frame_and_centroid)
             frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
             self.curr_image_sender(frame)
             cv2.waitKey(1)
