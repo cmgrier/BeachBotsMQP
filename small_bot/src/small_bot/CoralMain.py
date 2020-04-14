@@ -49,7 +49,7 @@ class CoralMain:
         self.img_counter = 0
 
         self.encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
-        self.h = None
+        self.h = 480
         self.w = 500  # DO NOT CHANGE
 
     def main_process(self):
@@ -63,10 +63,6 @@ class CoralMain:
             # grab the frame from the threaded video stream and resize it
             # to have a maximum width of 500 pixels
             frame = self.vs.read()
-            if self.h is None:
-                self.h, w, c = frame.shape
-                print("THIS IS THE VIDEO HEIGHT:")
-                print(self.h)
             frame = imutils.resize(frame, width=500)
             orig = frame.copy()
             # prepare the frame for object detection by converting (1) it

@@ -25,7 +25,8 @@ class CVOutput:
         self.cam_servo_pin = SERVO_CAM
 
         self.position = 1000
-        # self.position = 3
+        self.h = 480
+        self.w = 500
 
         self.pi = pigpio.pi()  # Connect to local Pi.
         # Move Servo
@@ -86,7 +87,7 @@ class CVOutput:
             (frame, centroid) = pickle.loads(frame_and_centroid)
             print("THIS IS CENTROID:")
             print(centroid)
-            if centroid is not None:
+            if centroid[0] > 0 and centroid[1] > 0:
                 self.go_to_test(centroid)
             frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
             self.curr_image_sender(frame)
@@ -101,7 +102,7 @@ class CVOutput:
         :return: void
         """
 
-        video_centroid = (250, 250 / 2 - 20)
+        video_centroid = (self.w / 2, self.h / 2 - 20)
         if centroid[1] > video_centroid[1] + threshold:
             self.position -= twitch
         elif centroid[1] < video_centroid[1] - threshold:
