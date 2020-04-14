@@ -2,8 +2,6 @@
 # import the necessary packages
 from imutils.video import VideoStream
 from edgetpu.detection.engine import DetectionEngine
-import RPi.GPIO as GPIO
-import pigpio
 import imutils
 from PIL import Image
 import time
@@ -21,24 +19,8 @@ class CoralMain:
         Initializations
         """
 
-        # Configure the Camera Servo
-        self.cam_servo_pin = SERVO_CAM
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(self.cam_servo_pin, GPIO.OUT)
-        self.servo = GPIO.PWM(self.cam_servo_pin, 50)
-
-        self.position = 1000
-        # self.position = 3
-
-        self.pi = pigpio.pi()  # Connect to local Pi.
-        # Move Servo
-        self.pi.set_servo_pulsewidth(self.cam_servo_pin, self.position)
-        time.sleep(0.5)
-        # self.servo.start(self.position)  # Start
-        # time.sleep(.5)  # Wait
-
         # Initialization of random variables
-        self.threshold = 0.5
+        self.threshold = 0.6
 
         # initialize the labels dictionary
         self.labels = {}
@@ -117,12 +99,10 @@ class CoralMain:
 
             cv2.circle(orig, centroid, 4, (0, 255, 0), 2)
             cv2.circle(orig, (int(self.w/2), int(self.h/2) - 20), 4, (0, 0, 255), 2)
-            if centroid is not None:
-                self.go_to_test(centroid)
 
             # Socket Connection occurs here
             if centroid is None:
-                centroid = (0, 0)
+                centroid = (-99, -99)
             self.socket_con(orig, centroid)
 
             key = cv2.waitKey(1) & 0xFF
@@ -134,47 +114,6 @@ class CoralMain:
         self.vs.stop()
         # self.servo.stop()
         self.pi.stop()
-
-    def go_to(self, centroid, threshold=50, twitch=0.1):
-        """
-        Sends the servo to a given position
-        :param centroid: tuple of coordinates
-        :param threshold: threshold
-        :param twitch: how much the servo moves.
-        :return: void
-        """
-
-        video_centroid = (self.w/2, self.h/2 - 20)
-        if centroid[1] > video_centroid[1] + threshold:
-            self.position -= twitch
-        elif centroid[1] < video_centroid[1] + threshold:
-            self.position += twitch
-
-        if 100.0 > self.position > 0.0:
-            self.servo.ChangeDutyCycle(self.position)
-            print(self.position)
-            # time.sleep(.1)
-
-    def go_to_test(self, centroid, threshold=40, twitch=70):
-        """
-        Sends the servo to a given position
-        :param centroid: tuple of coordinates
-        :param threshold: threshold
-        :param twitch: how much the servo moves.
-        :return: void
-        """
-
-        video_centroid = (self.w / 2, self.h / 2 - 20)
-        if centroid[1] > video_centroid[1] + threshold:
-            self.position -= twitch
-        elif centroid[1] < video_centroid[1] - threshold:
-            self.position += twitch
-
-        if 2200.0 > self.position > 0.0:
-            self.pi.set_servo_pulsewidth(self.cam_servo_pin, self.position)
-            time.sleep(0.5)
-            # print(self.position)
-            # time.sleep(.5)
 
     def socket_con(self, frame, centroid):
         """
