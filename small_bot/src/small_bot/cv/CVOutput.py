@@ -87,10 +87,10 @@ class CVOutput:
             (frame, centroid) = pickle.loads(frame_and_centroid)
             print("THIS IS CENTROID:")
             print(centroid)
-            print(centroid[0])
+            cent = (centroid[0], centroid[1])
 
             if centroid[0] > 0 and centroid[1] > 0:
-                self.go_to_test(centroid)
+                self.go_to_test(cent)
             frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
             self.curr_image_sender(frame)
             cv2.waitKey(1)
