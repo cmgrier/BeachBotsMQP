@@ -87,9 +87,7 @@ class CVOutput:
             (frame, centroid) = pickle.loads(frame_and_centroid)
             print("THIS IS CENTROID:")
             print(centroid)
-            first = centroid[0] - "L"
-            second = centroid[1] - "L"
-            centroid = (first, second)
+            print(centroid[0])
 
             if centroid[0] > 0 and centroid[1] > 0:
                 self.go_to_test(centroid)
