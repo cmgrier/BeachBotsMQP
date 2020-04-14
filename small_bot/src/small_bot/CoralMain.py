@@ -109,8 +109,6 @@ class CoralMain:
         # do a bit of cleanup
         cv2.destroyAllWindows()
         self.vs.stop()
-        # self.servo.stop()
-        self.pi.stop()
 
     def socket_con(self, frame, centroid):
         """
