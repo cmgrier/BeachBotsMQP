@@ -138,7 +138,7 @@ class ArmController:
         """
 
         if not status:
-            self.pi.set_servo_pulsewidth(self.gripper_servo_pin, 1000)
+            self.pi.set_servo_pulsewidth(self.gripper_servo_pin, 700)
             rospy.sleep(0.5)
 
             # self.gripper_pwm.ChangeDutyCycle(GRIPPER_CLOSE)
@@ -146,7 +146,7 @@ class ArmController:
             # self.gripper_pwm.ChangeDutyCycle(0)
             # rospy.sleep(.6)
         else:
-            self.pi.set_servo_pulsewidth(self.gripper_servo_pin, 1000)
+            self.pi.set_servo_pulsewidth(self.gripper_servo_pin, 500)
             rospy.sleep(0.5)
             # self.gripper_pwm.ChangeDutyCycle(GRIPPER_OPEN)
             # rospy.sleep(.6)
@@ -157,3 +157,4 @@ class ArmController:
 if __name__ == "__main__":
     ac = ArmController()
     ac.move_gripper(False)
+    ac.move_gripper(True)
