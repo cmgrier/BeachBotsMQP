@@ -65,13 +65,11 @@ class CVOutput:
                 self.data += self.conn.recv(4096)
             frame_data = self.data[14:msg_size]
             array_data = self.data[0:14]
+            self.data = self.data[msg_size:]
 
             array = pickle.loads(array_data)
             rospy.loginfo("THIS IS THE ARRAY: ====")
             rospy.loginfo(array)
-            # self.data = self.data[msg_size:]
-            # rospy.loginfo("WHAT IS THIS")
-            # rospy.loginfo(self.data)
 
             frame = pickle.loads(frame_data)
             frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
