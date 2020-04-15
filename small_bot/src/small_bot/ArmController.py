@@ -106,8 +106,9 @@ class ArmController:
         Moves the motors until they are zeroed
         :return:
         """
-        
-        self.turn_joint1(JOINT1_START)
+
+        self.joint1_pwm.start(JOINT1_START)
+        #self.turn_joint1(8)
 
         # trigger = True
         # trigger2 = True
