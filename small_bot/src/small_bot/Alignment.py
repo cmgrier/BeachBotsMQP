@@ -25,7 +25,7 @@ class Alignment:
 
         # Configure the Camera Servo
         self.cam_servo_pin = SERVO_CAM
-        self.position = 600
+        self.position = 600 # DO NOT FORGET TO CHANGE THIS BASED ON CVOUTPUT
         self.h = 480
         self.w = 500
 
@@ -57,7 +57,9 @@ class Alignment:
         else:
             self.pi.set_servo_pulsewidth(self.cam_servo_pin, self.position)
 
-        self.yaw_alignment(centroid, video_centroid)
+        move = self.yaw_alignment(centroid, video_centroid)
+        if move:
+            self.drive_forward()
 
     def yaw_alignment(self, centroid, video_centroid, yaw_thresh=100):
         """
@@ -65,15 +67,18 @@ class Alignment:
         :param centroid: the centroid tuple
         :param video_centroid: the video streams centroid
         :param yaw_thresh: the yaw threshold
-        :return: void
+        :return: move_trigger
         """
         turn_angle = 0
+        move_trigger = False
 
         if centroid[0] > 0 and centroid[1] > 0:
-            if centroid[0] > 250 + yaw_thresh:
+            if centroid[0] > video_centroid[0] + yaw_thresh:
                 turn_angle = -.35
-            if centroid[0] < 250 - yaw_thresh:
+            elif centroid[0] < video_centroid[0] - yaw_thresh:
                 turn_angle = .35
+            else:
+                move_trigger = True
 
             msg = Twist()
             msg.linear.x = 0
@@ -94,6 +99,33 @@ class Alignment:
             msg.angular.z = 0
 
         self.yaw_pub.publish(msg)
+        return move_trigger
+
+    def drive_forward(self):
+        """
+        Drive the robot forward a small amount
+        :return: void
+        """
+        for i in range(4):
+            msg = Twist()
+            msg.linear.x = .5
+            msg.linear.y = 0
+            msg.linear.z = 0
+
+            msg.angular.x = 0
+            msg.angular.y = 0
+            msg.angular.z = 0
+            self.yaw_pub.publish(msg)
+
+        msg = Twist()
+        msg.linear.x = 0
+        msg.linear.y = 0
+        msg.linear.z = 0
+
+        msg.angular.x = 0
+        msg.angular.y = 0
+        msg.angular.z = 0
+        self.yaw_pub.publish(msg)
 
     def cleanup(self):
         """
@@ -110,5 +142,3 @@ if __name__ == "__main__":
         rospy.spin()
     except KeyboardInterrupt:
         align_node.cleanup()
-
-
