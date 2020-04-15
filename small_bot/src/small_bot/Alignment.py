@@ -26,7 +26,7 @@ class Alignment:
 
         # Configure the Camera Servo
         self.cam_servo_pin = SERVO_CAM
-        self.position = 650  # DO NOT FORGET TO CHANGE THIS BASED ON CVOUTPUT
+        self.position = 700  # DO NOT FORGET TO CHANGE THIS BASED ON CVOUTPUT
         self.h = 480
         self.w = 500
         self.area = 0
