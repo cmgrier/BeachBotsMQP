@@ -10,7 +10,7 @@
 import rospy
 from support.PID import PID
 from support.Constants import *
-from geometry_msgs.msg import Pose, Twist
+from geometry_msgs.msg import Pose, Twist, Point
 import math
 
 
@@ -19,11 +19,21 @@ class Navigate:
         self.PID = None
         rospy.init_node('navigation', anonymous=True)
         rospy.Subscriber("odom", Pose, self.position_listener)
+        rospy.Subscriber('cam_yaw', Point, self.cam_yaw_callback)
         self.pub = rospy.Publisher("cmd_vel", Twist, queue_size=10)
         self.position = (0.0, 0.0)
         self.old_position = (0.0, 0.0)
         self.angle = 0.0
         self.old_angle = 0.0
+
+    def cam_yaw_callback(self, msg):
+        """
+        Callback for camera yaw
+        :param msg: Point (Only need x)
+        :return: void
+        """
+        turn_angle = msg.x
+        self.turn_angle(turn_angle + self.angle)
 
     def position_listener(self, data):
         """

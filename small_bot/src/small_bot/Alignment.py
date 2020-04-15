@@ -19,6 +19,7 @@ class Alignment:
 
         # Subscribers
         rospy.Subscriber('near_centroid', Point, self.centroid_callback)
+        self.yaw_pub = rospy.Publisher('cam_yaw', Point, queue_size=10)
 
         # Connect to local Pi.
         self.pi = pigpio.pi()
@@ -63,12 +64,19 @@ class Alignment:
         :param yaw_thresh: the yaw threshold
         :return: void
         """
+        turn_angle = 0
 
-        nav = Nav()
         if centroid[0] > video_centroid[0] + yaw_thresh:
-            nav.turn_angle(nav.angle - 5)
+            turn_angle = -5
         if centroid[0] < video_centroid[0] + yaw_thresh:
-            nav.turn_angle(nav.angle + 5)
+            turn_angle = 5
+
+        msg = Point()
+        msg.x = turn_angle
+        msg.y = 0
+        msg.z = 0
+
+        self.yaw_pub.publish(msg)
 
 
 if __name__ == "__main__":
