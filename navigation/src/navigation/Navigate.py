@@ -34,6 +34,7 @@ class Navigate:
         """
         turn_angle = msg.x
         self.turn_angle(turn_angle + self.angle)
+        print("cam_yaw_callback")
 
     def position_listener(self, data):
         """

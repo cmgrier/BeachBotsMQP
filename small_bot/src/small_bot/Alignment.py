@@ -5,7 +5,6 @@ import rospy
 import pigpio
 from geometry_msgs.msg import Point
 from support.Constants import *
-from navigation.Navigate import Navigate as Nav
 
 
 class Alignment:
@@ -67,9 +66,9 @@ class Alignment:
         turn_angle = 0
 
         if centroid[0] > video_centroid[0] + yaw_thresh:
-            turn_angle = -5
+            turn_angle = -10
         if centroid[0] < video_centroid[0] + yaw_thresh:
-            turn_angle = 5
+            turn_angle = 10
 
         msg = Point()
         msg.x = turn_angle
