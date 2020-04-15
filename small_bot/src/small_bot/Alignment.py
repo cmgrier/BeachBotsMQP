@@ -129,7 +129,7 @@ class Alignment:
             msg.angular.y = 0
             msg.angular.z = 0
             self.yaw_pub.publish(msg)
-            rospy.sleep(.1)
+            rospy.sleep(.2)
         else:
             msg = Twist()
             msg.linear.x = 0

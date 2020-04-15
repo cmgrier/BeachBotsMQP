@@ -87,7 +87,6 @@ class CVOutput:
 
             (frame, centroid, area) = pickle.loads(frame_and_centroid)
             cent = (centroid[0], centroid[1])
-            print(area)
 
             self.area_sender(area)
             self.centroid_sender(cent)
