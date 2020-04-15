@@ -156,10 +156,12 @@ class ArmController:
         :param msg: Bool
         :return: void
         """
+        print("Picking Up Can")
         self.move_gripper(True)
         self.turn_joint1(3)
         rospy.sleep(1)
         self.turn_joint1(6)
+        self.move_gripper(False)
 
 
 if __name__ == "__main__":
