@@ -29,8 +29,8 @@ class Alignment:
         self.h = 480
         self.w = 500
 
-        self.threshold = 40
-        self.twitch = 70
+        self.threshold = 30
+        self.twitch = 50
 
     def centroid_callback(self, msg):
         """
@@ -59,7 +59,7 @@ class Alignment:
 
         move = self.yaw_alignment(centroid, video_centroid)
         if move:
-            self.drive_forward()
+            self.drive_forward(centroid)
 
     def yaw_alignment(self, centroid, video_centroid, yaw_thresh=60):
         """
@@ -101,15 +101,17 @@ class Alignment:
         self.yaw_pub.publish(msg)
         return move_trigger
 
-    def drive_forward(self):
+    def drive_forward(self, centroid):
         """
         Drive the robot forward a small amount
         :return: void
         """
         print("Driving Forward +++++++++++++++++++++")
-        for i in range(30):
+        print(centroid[0]*centroid[1])
+
+        if centroid[0] * centroid[1] < 6000:
             msg = Twist()
-            msg.linear.x = 1
+            msg.linear.x = .5
             msg.linear.y = 0
             msg.linear.z = 0
 
@@ -117,16 +119,16 @@ class Alignment:
             msg.angular.y = 0
             msg.angular.z = 0
             self.yaw_pub.publish(msg)
+        else:
+            msg = Twist()
+            msg.linear.x = 0
+            msg.linear.y = 0
+            msg.linear.z = 0
 
-        msg = Twist()
-        msg.linear.x = 0
-        msg.linear.y = 0
-        msg.linear.z = 0
-
-        msg.angular.x = 0
-        msg.angular.y = 0
-        msg.angular.z = 0
-        self.yaw_pub.publish(msg)
+            msg.angular.x = 0
+            msg.angular.y = 0
+            msg.angular.z = 0
+            self.yaw_pub.publish(msg)
 
     def cleanup(self):
         """
