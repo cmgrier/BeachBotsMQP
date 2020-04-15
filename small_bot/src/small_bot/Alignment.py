@@ -144,6 +144,12 @@ class Alignment:
             msg.angular.z = 0
             self.yaw_pub.publish(msg)
 
+    def pickup(self):
+        """
+
+        :return:
+        """
+
     def cleanup(self):
         """
         Cleanup
