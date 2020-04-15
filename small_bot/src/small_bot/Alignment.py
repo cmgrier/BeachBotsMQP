@@ -3,7 +3,7 @@
 # Imports
 import rospy
 import pigpio
-from geometry_msgs.msg import Point
+from geometry_msgs.msg import Point, Twist
 from support.Constants import *
 
 
@@ -18,7 +18,7 @@ class Alignment:
 
         # Subscribers
         rospy.Subscriber('near_centroid', Point, self.centroid_callback)
-        self.yaw_pub = rospy.Publisher('cam_yaw', Point, queue_size=10)
+        self.yaw_pub = rospy.Publisher('cam_yaw', Twist, queue_size=10)
 
         # Connect to local Pi.
         self.pi = pigpio.pi()
@@ -70,10 +70,14 @@ class Alignment:
         if centroid[0] < video_centroid[0] + yaw_thresh:
             turn_angle = 10
 
-        msg = Point()
-        msg.x = turn_angle
-        msg.y = 0
-        msg.z = 0
+        msg = Twist()
+        msg.linear.x = 0
+        msg.linear.y = 0
+        msg.linear.z = 0
+
+        msg.angular.x = 0
+        msg.angular.y = 0
+        msg.angular.z = turn_angle
 
         self.yaw_pub.publish(msg)
 

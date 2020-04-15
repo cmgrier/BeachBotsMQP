@@ -10,8 +10,8 @@
 import rospy
 import RPi.GPIO as GPIO
 from support.Constants import *
-import geometry_msgs.msg
 from support.msg import direct_msg
+from geometry_msgs.msg import Twist
 
 
 class Drive:
@@ -33,11 +33,13 @@ class Drive:
 
         rospy.init_node('drive_listener', anonymous=True)
         self.pub = rospy.Publisher("/drive_direct", direct_msg, queue_size=10)
-        rospy.Subscriber("/cmd_vel", geometry_msgs.msg.Twist, self.interpreter)
+        rospy.Subscriber("/cmd_vel", Twist, self.interpreter)
         self.set_direction("F", "F")
 
         self.l_pwm = GPIO.PWM(self.l_wheel_pin, 200)
         self.r_pwm = GPIO.PWM(self.r_wheel_pin, 200)
+
+        rospy.Subscriber('cam_yaw', Twist, self.interpreter)
 
     def interpreter(self, msg):
         print("In CALLBACK")
