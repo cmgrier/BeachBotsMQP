@@ -11,6 +11,7 @@ from small_bot.Kinematics import Kinematics
 import RPi.GPIO as GPIO
 import pigpio
 import rospy
+from std_msgs.msg import Bool
 from support.Constants import *
 
 
@@ -33,11 +34,12 @@ class ArmController:
         GPIO.setup(SM_DIRECTION, GPIO.OUT)
         GPIO.setup(SM_STEP, GPIO.OUT)
         GPIO.setup(JOINT1_SERVO, GPIO.OUT)
+
         self.gripper_servo_pin = GRIPPER_SERVO
-        # GPIO.setup(GRIPPER_SERVO, GPIO.OUT)
         self.joint1_pwm = GPIO.PWM(JOINT1_SERVO, 50)
 
-        # self.gripper_pwm = GPIO.PWM(GRIPPER_SERVO, 50)
+        rospy.Subscriber('pickup_flag', Bool, self.pickup_can)
+
         self.calibrate_joints()
 
     def move_end_effector(self, x, y):
@@ -141,20 +143,22 @@ class ArmController:
             self.pi.set_servo_pulsewidth(self.gripper_servo_pin, 700)
             rospy.sleep(0.5)
 
-            # self.gripper_pwm.ChangeDutyCycle(GRIPPER_CLOSE)
-            # rospy.sleep(.6)
-            # self.gripper_pwm.ChangeDutyCycle(0)
-            # rospy.sleep(.6)
         else:
             self.pi.set_servo_pulsewidth(self.gripper_servo_pin, 500)
             rospy.sleep(0.5)
-            # self.gripper_pwm.ChangeDutyCycle(GRIPPER_OPEN)
-            # rospy.sleep(.6)
-            # self.gripper_pwm.ChangeDutyCycle(0)
-            # rospy.sleep(.6)
+
+    def pickup_can(self, msg):
+        """
+        pickup can callback
+        :param msg: Bool
+        :return: void
+        """
+        self.move_gripper(True)
+        self.turn_joint1(3)
+        rospy.sleep(1)
+        self.turn_joint1(6)
 
 
 if __name__ == "__main__":
     ac = ArmController()
-    ac.move_gripper(False)
-    ac.move_gripper(True)
+    rospy.spin()

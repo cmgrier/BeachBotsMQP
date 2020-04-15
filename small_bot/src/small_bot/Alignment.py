@@ -4,6 +4,7 @@
 import rospy
 import pigpio
 from geometry_msgs.msg import Point, Twist
+from std_msgs.msg import Bool
 from support.Constants import *
 
 
@@ -20,6 +21,7 @@ class Alignment:
         rospy.Subscriber('near_centroid', Point, self.centroid_callback)
         rospy.Subscriber('large_box', Point, self.box_callback)
         self.yaw_pub = rospy.Publisher('cam_yaw', Twist, queue_size=10)
+        self.pickup_ready = rospy.Publisher('pickup_flag', Bool, queue_size=10)
 
         # Connect to local Pi.
         self.pi = pigpio.pi()
@@ -33,6 +35,7 @@ class Alignment:
 
         self.threshold = 30
         self.twitch = 50
+        self.stopped_flag = False
 
     def box_callback(self, msg):
         """
@@ -132,6 +135,8 @@ class Alignment:
             msg.angular.z = 0
             self.yaw_pub.publish(msg)
             rospy.sleep(.2)
+            self.stopped_flag = False
+
         else:
             print("Stopped -----------------------------")
             msg = Twist()
@@ -143,12 +148,12 @@ class Alignment:
             msg.angular.y = 0
             msg.angular.z = 0
             self.yaw_pub.publish(msg)
+            self.stopped_flag = True
 
-    def pickup(self):
-        """
-
-        :return:
-        """
+        if self.area > 30000 and self.stopped_flag:
+            msg = Bool()
+            msg.data = True
+            self.pickup_ready.publish(msg)
 
     def cleanup(self):
         """
