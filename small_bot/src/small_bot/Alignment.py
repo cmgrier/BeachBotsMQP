@@ -109,7 +109,7 @@ class Alignment:
         print("Driving Forward +++++++++++++++++++++")
         print(centroid[0]*centroid[1])
 
-        if centroid[0] * centroid[1] < 6000:
+        if centroid[0] * centroid[1] < 60000:
             msg = Twist()
             msg.linear.x = .5
             msg.linear.y = 0
@@ -119,6 +119,7 @@ class Alignment:
             msg.angular.y = 0
             msg.angular.z = 0
             self.yaw_pub.publish(msg)
+            rospy.sleep(.2)
         else:
             msg = Twist()
             msg.linear.x = 0
