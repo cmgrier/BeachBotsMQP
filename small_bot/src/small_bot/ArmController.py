@@ -39,7 +39,7 @@ class ArmController:
 
         self.gripper_servo_pin = GRIPPER_SERVO
         self.joint1_pin = JOINT1_SERVO
-        self.j1_position = 1000
+        self.j1_position = 1500  # Positive is
 
         rospy.Subscriber('pickup_flag', Bool, self.pickup_can)
 
@@ -92,14 +92,7 @@ class ArmController:
         :param angle: angle of the joint to turn to in degrees
         :return:
         """
-        print("joimt1: ", angle)
-        duty = (angle * 0.035) + JOINT1_START
-        if duty < 0:
-            duty = 0
-        # self.joint1_pwm.ChangeDutyCycle(duty)
-        rospy.sleep(.6)
-        # self.joint1_pwm.ChangeDutyCycle(0)
-        rospy.sleep(.6)
+        # TODO
 
     def calibrate_joints(self):
         """
