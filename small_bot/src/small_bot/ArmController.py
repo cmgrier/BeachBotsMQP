@@ -106,34 +106,37 @@ class ArmController:
         Moves the motors until they are zeroed
         :return:
         """
-        trigger = True
-        trigger2 = True
-        # Open gripper
-        # self.gripper_pwm.start(GRIPPER_OPEN)
-        # Zero joint1
-        self.joint1_pwm.start(JOINT1_START)
+        
+        self.turn_joint1(JOINT1_START)
 
-        # Zero joint0
-        # Move arm until it triggers the switch
-        GPIO.output(SM_DIRECTION, GPIO.LOW)
-        while trigger:
-            GPIO.output(SM_STEP, GPIO.HIGH)
-            rospy.sleep(self.delay)
-            GPIO.output(SM_STEP, GPIO.LOW)
-            rospy.sleep(self.delay)
-            if GPIO.input(SWITCH):
-                trigger = False
-                break
-        # Move arm off of switch until it deactivates
-        GPIO.output(SM_DIRECTION, GPIO.HIGH)
-        while trigger2:
-            GPIO.output(SM_STEP, GPIO.HIGH)
-            rospy.sleep(self.delay)
-            GPIO.output(SM_STEP, GPIO.LOW)
-            rospy.sleep(self.delay)
-            if not GPIO.input(SWITCH):
-                trigger2 = False
-                break
+        # trigger = True
+        # trigger2 = True
+        # # Open gripper
+        # # self.gripper_pwm.start(GRIPPER_OPEN)
+        # # Zero joint1
+        # self.joint1_pwm.start(JOINT1_START)
+        #
+        # # Zero joint0
+        # # Move arm until it triggers the switch
+        # GPIO.output(SM_DIRECTION, GPIO.LOW)
+        # while trigger:
+        #     GPIO.output(SM_STEP, GPIO.HIGH)
+        #     rospy.sleep(self.delay)
+        #     GPIO.output(SM_STEP, GPIO.LOW)
+        #     rospy.sleep(self.delay)
+        #     if GPIO.input(SWITCH):
+        #         trigger = False
+        #         break
+        # # Move arm off of switch until it deactivates
+        # GPIO.output(SM_DIRECTION, GPIO.HIGH)
+        # while trigger2:
+        #     GPIO.output(SM_STEP, GPIO.HIGH)
+        #     rospy.sleep(self.delay)
+        #     GPIO.output(SM_STEP, GPIO.LOW)
+        #     rospy.sleep(self.delay)
+        #     if not GPIO.input(SWITCH):
+        #         trigger2 = False
+        #         break
 
     def move_gripper(self, status):
         """
