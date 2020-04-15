@@ -75,7 +75,7 @@ class Alignment:
         if move:
             self.drive_forward()
 
-    def yaw_alignment(self, centroid, video_centroid, yaw_thresh=60):
+    def yaw_alignment(self, centroid, video_centroid, yaw_thresh=50):
         """
         Moves the motors until we are inline with the can
         :param centroid: the centroid tuple
