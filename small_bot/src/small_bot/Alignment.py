@@ -55,7 +55,7 @@ class Alignment:
                 self.pi.set_servo_pulsewidth(self.cam_servo_pin, self.position)
                 rospy.sleep(0.5)
         else:
-            self.pi.set_servo_pulsewidth(self.cam_servo_pin, )
+            self.pi.set_servo_pulsewidth(self.cam_servo_pin, self.position)
 
         self.yaw_alignment(centroid, video_centroid)
 
