@@ -39,7 +39,7 @@ class ArmController:
 
         self.gripper_servo_pin = GRIPPER_SERVO
         self.joint1_pin = JOINT1_SERVO
-        self.j1_position = 1500  # Positive is
+        self.j1_position = 2000  # Positive is away from camera
 
         rospy.Subscriber('pickup_flag', Bool, self.pickup_can)
 
@@ -101,7 +101,8 @@ class ArmController:
         """
 
         self.pi.set_servo_pulsewidth(self.joint1_pin, self.j1_position)
-        rospy.sleep(0.5)
+        rospy.sleep(3)
+        self.pickup_can(0)
 
         # trigger = True
         # trigger2 = True
@@ -155,10 +156,12 @@ class ArmController:
         """
         print("Picking Up Can")
         self.move_gripper(True)
-        # self.turn_joint1(3)
+        self.pi.set_servo_pulsewidth(self.joint1_pin, 500)
+        rospy.sleep(0.5)
         rospy.sleep(1)
-        # self.turn_joint1(6)
         self.move_gripper(False)
+        self.pi.set_servo_pulsewidth(self.joint1_pin, 2000)
+        rospy.sleep(0.5)
 
 
 if __name__ == "__main__":
