@@ -162,7 +162,7 @@ class ArmController:
         while self.picking_can:
             print("Picking Up Can")
             self.move_gripper(True)
-            self.pi.set_servo_pulsewidth(self.joint1_pin, 700)
+            self.pi.set_servo_pulsewidth(self.joint1_pin, 550)
             rospy.sleep(4)
             self.move_gripper(False)
             rospy.sleep(3)
