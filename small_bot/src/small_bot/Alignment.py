@@ -64,7 +64,7 @@ class Alignment:
         :return: void
         """
 
-        nav = Nav.Navigate()
+        nav = Nav()
         if centroid[0] > video_centroid[0] + yaw_thresh:
             nav.turn_angle(nav.angle - 5)
         if centroid[0] < video_centroid[0] + yaw_thresh:
