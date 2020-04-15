@@ -141,11 +141,11 @@ class ArmController:
         """
 
         if not status:
-            self.pi.set_servo_pulsewidth(self.gripper_servo_pin, 700)
+            self.pi.set_servo_pulsewidth(self.gripper_servo_pin, 2200)
             rospy.sleep(0.5)
 
         else:
-            self.pi.set_servo_pulsewidth(self.gripper_servo_pin, 500)
+            self.pi.set_servo_pulsewidth(self.gripper_servo_pin, 800)
             rospy.sleep(0.5)
 
     def pickup_can(self, msg):
@@ -157,11 +157,12 @@ class ArmController:
         print("Picking Up Can")
         self.move_gripper(True)
         self.pi.set_servo_pulsewidth(self.joint1_pin, 500)
-        rospy.sleep(0.5)
-        rospy.sleep(1)
+        rospy.sleep(3)
         self.move_gripper(False)
         self.pi.set_servo_pulsewidth(self.joint1_pin, 2000)
         rospy.sleep(0.5)
+        self.move_gripper(True)
+        self.pi.set_servo_pulsewidth(self.joint1_pin, self.j1_position)
 
 
 if __name__ == "__main__":
