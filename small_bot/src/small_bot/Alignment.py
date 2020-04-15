@@ -57,7 +57,7 @@ class Alignment:
 
         self.yaw_alignment(centroid, video_centroid)
 
-    def yaw_alignment(self, centroid, video_centroid, yaw_thresh=40):
+    def yaw_alignment(self, centroid, video_centroid, yaw_thresh=60):
         """
         Moves the motors until we are inline with the can
         :param centroid: the centroid tuple
@@ -69,9 +69,9 @@ class Alignment:
 
         if centroid[0] > 0 and centroid[1] > 0:
             if centroid[0] > video_centroid[0] + yaw_thresh:
-                turn_angle = -1
+                turn_angle = -.5
             if centroid[0] < video_centroid[0] + yaw_thresh:
-                turn_angle = 1
+                turn_angle = .5
 
             msg = Twist()
             msg.linear.x = 0
