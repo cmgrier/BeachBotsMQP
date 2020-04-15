@@ -51,7 +51,7 @@ class Alignment:
             elif centroid[1] < video_centroid[1] - self.threshold:
                 self.position += self.twitch
 
-        if 2200.0 > self.position > 500.0:
+        if 1000.0 > self.position > 500.0:
             self.pi.set_servo_pulsewidth(self.cam_servo_pin, self.position)
             rospy.sleep(0.5)
 
