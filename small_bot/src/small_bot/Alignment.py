@@ -107,7 +107,7 @@ class Alignment:
         :return: void
         """
         print("Driving Forward +++++++++++++++++++++")
-        for i in range(10):
+        for i in range(30):
             msg = Twist()
             msg.linear.x = 1
             msg.linear.y = 0
