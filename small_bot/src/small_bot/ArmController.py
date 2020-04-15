@@ -101,8 +101,7 @@ class ArmController:
         :return:
         """
 
-        self.pi.set_servo_pulsewidth(self.gripper_servo_pin, True)
-
+        self.move_gripper(True)
         self.pi.set_servo_pulsewidth(self.joint1_pin, self.j1_position)
         rospy.sleep(3)
         # self.pickup_can(0)
