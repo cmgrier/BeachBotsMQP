@@ -4,6 +4,7 @@
 import rospy
 import pigpio
 from geometry_msgs.msg import Point, Twist
+from vision_msgs.msg import BoundingBox2D
 from support.Constants import *
 
 
@@ -18,6 +19,7 @@ class Alignment:
 
         # Subscribers
         rospy.Subscriber('near_centroid', Point, self.centroid_callback)
+        rospy.Subscriber('large_box', BoundingBox2D, self.box_callback)
         self.yaw_pub = rospy.Publisher('cam_yaw', Twist, queue_size=10)
 
         # Connect to local Pi.
@@ -25,12 +27,24 @@ class Alignment:
 
         # Configure the Camera Servo
         self.cam_servo_pin = SERVO_CAM
-        self.position = 600 # DO NOT FORGET TO CHANGE THIS BASED ON CVOUTPUT
+        self.position = 600  # DO NOT FORGET TO CHANGE THIS BASED ON CVOUTPUT
         self.h = 480
         self.w = 500
+        self.area = 0
 
         self.threshold = 30
         self.twitch = 50
+
+    def box_callback(self, msg):
+        """
+        Bounding box callback
+        :param msg: BoundingBox2D
+        :return: void
+        """
+        if msg.size_x > 0 and msg.size_y > 0:
+            self.area = msg.size_x * msg.size_y
+        else:
+            self.area = 0
 
     def centroid_callback(self, msg):
         """
@@ -59,7 +73,7 @@ class Alignment:
 
         move = self.yaw_alignment(centroid, video_centroid)
         if move:
-            self.drive_forward(centroid)
+            self.drive_forward()
 
     def yaw_alignment(self, centroid, video_centroid, yaw_thresh=60):
         """
@@ -101,15 +115,15 @@ class Alignment:
         self.yaw_pub.publish(msg)
         return move_trigger
 
-    def drive_forward(self, centroid):
+    def drive_forward(self):
         """
         Drive the robot forward a small amount
         :return: void
         """
         print("Driving Forward +++++++++++++++++++++")
-        print(centroid[0]*centroid[1])
+        print(self.area)
 
-        if centroid[0] * centroid[1] < 100000:
+        if self.area > 60000:
             msg = Twist()
             msg.linear.x = .5
             msg.linear.y = 0

@@ -77,6 +77,7 @@ class CoralMain:
             results = self.model.DetectWithImage(frame, threshold=self.threshold, keep_aspect_ratio=True,
                                                  relative_coord=False)
 
+            largest_box = (99, 99, -98, -98)
             largest_area = -999
             centroid = None
 
@@ -89,6 +90,7 @@ class CoralMain:
                 if area > largest_area:
                     largest_area = area
                     centroid = (int(startX + (endX - startX) / 2), int(startY + (endY - startY) / 2))
+                    largest_box = (startX, startY, endX, endY)
                 label = self.labels[r.label_id]
                 # draw the bounding box and label on the image
                 cv2.rectangle(orig, (startX, startY), (endX, endY),
@@ -105,7 +107,8 @@ class CoralMain:
             # Socket Connection occurs here
             if centroid is None:
                 centroid = (-99, -99)
-            self.socket_con(orig, centroid)
+
+            self.socket_con(orig, centroid, largest_box)
 
             key = cv2.waitKey(1) & 0xFF
             # if the `q` key was pressed, break from the loop
@@ -116,7 +119,7 @@ class CoralMain:
         cv2.destroyAllWindows()
         self.vs.stop()
 
-    def socket_con(self, frame, centroid):
+    def socket_con(self, frame, centroid, largest_box):
         """
         Socket Connection
         :param frame: the image frame
@@ -126,7 +129,7 @@ class CoralMain:
 
         # Encode the image and pickle the frame and centroid into an array
         result, frame = cv2.imencode('.jpg', frame, self.encode_param)
-        data = pickle.dumps((frame, centroid), 0)
+        data = pickle.dumps((frame, centroid, largest_box), 0)
         size = len(data)
 
         # Send the image and data over the socket connection
