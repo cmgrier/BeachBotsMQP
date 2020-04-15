@@ -5,6 +5,7 @@ import rospy
 import pigpio
 from geometry_msgs.msg import Point
 from support.Constants import *
+import navigation.src.navigation.Navigate as Nav
 
 
 class Alignment:
@@ -52,16 +53,24 @@ class Alignment:
             self.pi.set_servo_pulsewidth(self.cam_servo_pin, self.position)
             rospy.sleep(0.5)
 
-        self.yaw_alignment(centroid)
+        self.yaw_alignment(centroid, video_centroid)
 
-    def yaw_alignment(self, centroid):
+    def yaw_alignment(self, centroid, video_centroid, yaw_thresh=40):
         """
         Moves the motors until we are inline with the can
         :param centroid: the centroid tuple
+        :param video_centroid: the video streams centroid
+        :param yaw_thresh: the yaw threshold
         :return: void
         """
 
+        nav = Nav.Navigate()
+        if centroid[0] > video_centroid[0] + yaw_thresh:
+            nav.turn_angle(nav.angle - 5)
+        if centroid[0] < video_centroid[0] + yaw_thresh:
+            nav.turn_angle(nav.angle + 5)
         
+
 if __name__ == "__main__":
     align_node = Alignment()
     rospy.spin()

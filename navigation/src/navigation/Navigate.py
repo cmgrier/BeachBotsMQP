@@ -19,13 +19,11 @@ class Navigate:
         self.PID = None
         rospy.init_node('navigation', anonymous=True)
         rospy.Subscriber("odom", Pose, self.position_listener)
-        self.pub = rospy.Publisher("cmd_vel",Twist, queue_size = 10 )
-        self.position = (0.0,0.0)
-        self.old_position = (0.0,0.0)
+        self.pub = rospy.Publisher("cmd_vel", Twist, queue_size=10)
+        self.position = (0.0, 0.0)
+        self.old_position = (0.0, 0.0)
         self.angle = 0.0
         self.old_angle = 0.0
-
-
 
     def position_listener(self, data):
         """
@@ -35,8 +33,6 @@ class Navigate:
         """
         self.position = (data.position.x, data.position.y)
         self.angle = data.orientation.z
-       
-
 
     def get_dist(self, x, y, x2, y2):
         """
@@ -47,8 +43,7 @@ class Navigate:
         :param y2: second y-coord in meters
         :return: distance formula
         """
-        return math.sqrt(((x-x2)*(x-x2)) + ((y-y2)*(y-y2)))
-
+        return math.sqrt(((x - x2) * (x - x2)) + ((y - y2) * (y - y2)))
 
     def get_angle(self, x, y, x2, y2):
         """
@@ -59,8 +54,7 @@ class Navigate:
         :param y2: second y-coord in meters
         :return: angle formula
         """
-        return (180/math.pi)*math.atan((y2-y)/(x2-x))
-
+        return (180 / math.pi) * math.atan((y2 - y) / (x2 - x))
 
     def within_distance_threshold(self, dist):
         """
@@ -68,12 +62,11 @@ class Navigate:
         :param dist: Linear distance in meters
         :return: True if current distance is within desired distance threshold
         """
-        active_dist = self.get_dist(self.old_position[0],self.old_position[1],self.position[0],self.position[1])
+        active_dist = self.get_dist(self.old_position[0], self.old_position[1], self.position[0], self.position[1])
         print(active_dist, " : ", dist)
         if active_dist >= dist - DISTANCE_THRESHOLD_MIN and active_dist <= dist + DISTANCE_THRESHOLD_MAX:
             return True
         return False
-
 
     def within_angle_threshold(self, angle):
         """
@@ -87,16 +80,13 @@ class Navigate:
             return True
         return False
 
-
-    def set_speed_limits(self,speed):
+    def set_speed_limits(self, speed):
         if speed > 1.00:
             return 1.00
         elif speed < -1.00:
             return -1.00
         else:
             return speed
-
-
 
     def drive_distance(self, dist):
         """
@@ -109,17 +99,16 @@ class Navigate:
         msg = Twist()
 
         while not self.within_distance_threshold(dist) and not rospy.is_shutdown():
-            active_dist = self.get_dist(self.old_position[0],self.old_position[1],self.position[0],self.position[1])
+            active_dist = self.get_dist(self.old_position[0], self.old_position[1], self.position[0], self.position[1])
             distPID.update(active_dist)
             msg.linear.x = self.set_speed_limits(distPID.output)
             msg.angular.z = 0.0
             self.pub.publish(msg)
-            print("Dist: ",dist, "| active_dist: ", active_dist, " | PID Output: ",distPID.output)
+            print("Dist: ", dist, "| active_dist: ", active_dist, " | PID Output: ", distPID.output)
         msg.linear.x = 0.0
         msg.angular.z = 0.0
         self.pub.publish(msg)
 
-    
     def turn_angle(self, angle):
         """
         Turn to the desired angle
@@ -142,7 +131,6 @@ class Navigate:
         msg.angular.z = 0.0
         self.pub.publish(msg)
 
-
     def drive_to_coord(self, x, y):
         """
         Makes the rovot drive to the specified coordinate
@@ -152,14 +140,13 @@ class Navigate:
         """
         self.old_position = self.position
         self.old_angle = self.angle
-        distTarget = self.get_dist(self.position[0],self.position[1],x,y)
-        angleTarget = self.get_angle(self.position[0],self.position[1],x,y)
+        distTarget = self.get_dist(self.position[0], self.position[1], x, y)
+        angleTarget = self.get_angle(self.position[0], self.position[1], x, y)
         self.turn_angle(angleTarget)
         self.drive_distance(distTarget)
         return True
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     nav = Navigate()
-    nav.drive_distance(0.3048)
-
-
+    rospy.spin()
