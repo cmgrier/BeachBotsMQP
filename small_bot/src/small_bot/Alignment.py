@@ -25,7 +25,7 @@ class Alignment:
 
         # Configure the Camera Servo
         self.cam_servo_pin = SERVO_CAM
-        self.position = 1000
+        self.position = 600
         self.h = 480
         self.w = 500
 
@@ -54,6 +54,8 @@ class Alignment:
             if 1100.0 > self.position > 600.0:
                 self.pi.set_servo_pulsewidth(self.cam_servo_pin, self.position)
                 rospy.sleep(0.5)
+        else:
+            self.pi.set_servo_pulsewidth(self.cam_servo_pin, )
 
         self.yaw_alignment(centroid, video_centroid)
 
