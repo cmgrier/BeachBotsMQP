@@ -69,9 +69,9 @@ class Alignment:
 
         if centroid[0] > 0 and centroid[1] > 0:
             if centroid[0] > video_centroid[0] + yaw_thresh:
-                turn_angle = -.2
+                turn_angle = -.3
             if centroid[0] < video_centroid[0] + yaw_thresh:
-                turn_angle = .2
+                turn_angle = .3
 
             msg = Twist()
             msg.linear.x = 0
@@ -93,7 +93,19 @@ class Alignment:
 
         self.yaw_pub.publish(msg)
 
+    def cleanup(self):
+        """
+        Cleanup
+        :return: void
+        """
+        self.pi.set_servo_pulsewidth(self.cam_servo_pin, 0)
+
 
 if __name__ == "__main__":
     align_node = Alignment()
-    rospy.spin()
+    try:
+        rospy.spin()
+    except KeyboardInterrupt:
+        align_node.cleanup()
+
+
