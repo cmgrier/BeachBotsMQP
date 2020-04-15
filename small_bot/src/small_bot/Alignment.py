@@ -69,7 +69,7 @@ class Alignment:
             nav.turn_angle(nav.angle - 5)
         if centroid[0] < video_centroid[0] + yaw_thresh:
             nav.turn_angle(nav.angle + 5)
-        
+
 
 if __name__ == "__main__":
     align_node = Alignment()
