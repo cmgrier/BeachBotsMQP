@@ -36,10 +36,10 @@ class ArmController:
         GPIO.setup(SWITCH, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
         GPIO.setup(SM_DIRECTION, GPIO.OUT)
         GPIO.setup(SM_STEP, GPIO.OUT)
-        GPIO.setup(JOINT1_SERVO, GPIO.OUT)
 
         self.gripper_servo_pin = GRIPPER_SERVO
-        self.joint1_pwm = GPIO.PWM(JOINT1_SERVO, 50)
+        self.joint1_pin = JOINT1_SERVO
+        self.j1_position = 1000
 
         rospy.Subscriber('pickup_flag', Bool, self.pickup_can)
 
@@ -96,9 +96,9 @@ class ArmController:
         duty = (angle * 0.035) + JOINT1_START
         if duty < 0:
             duty = 0
-        self.joint1_pwm.ChangeDutyCycle(duty)
+        # self.joint1_pwm.ChangeDutyCycle(duty)
         rospy.sleep(.6)
-        self.joint1_pwm.ChangeDutyCycle(0)
+        # self.joint1_pwm.ChangeDutyCycle(0)
         rospy.sleep(.6)
 
     def calibrate_joints(self):
@@ -107,8 +107,8 @@ class ArmController:
         :return:
         """
 
-        self.joint1_pwm.start(JOINT1_START)
-        #self.turn_joint1(8)
+        self.pi.set_servo_pulsewidth(self.joint1_pin, self.j1_position)
+        rospy.sleep(0.5)
 
         # trigger = True
         # trigger2 = True
@@ -162,9 +162,9 @@ class ArmController:
         """
         print("Picking Up Can")
         self.move_gripper(True)
-        self.turn_joint1(3)
+        # self.turn_joint1(3)
         rospy.sleep(1)
-        self.turn_joint1(6)
+        # self.turn_joint1(6)
         self.move_gripper(False)
 
 
