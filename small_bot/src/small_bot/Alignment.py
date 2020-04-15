@@ -61,7 +61,7 @@ class Alignment:
         if move:
             self.drive_forward()
 
-    def yaw_alignment(self, centroid, video_centroid, yaw_thresh=100):
+    def yaw_alignment(self, centroid, video_centroid, yaw_thresh=60):
         """
         Moves the motors until we are inline with the can
         :param centroid: the centroid tuple
@@ -106,7 +106,8 @@ class Alignment:
         Drive the robot forward a small amount
         :return: void
         """
-        for i in range(6):
+        print("Driving Forward +++++++++++++++++++++")
+        for i in range(10):
             msg = Twist()
             msg.linear.x = 1
             msg.linear.y = 0
