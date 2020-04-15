@@ -5,7 +5,7 @@ import rospy
 import pigpio
 from geometry_msgs.msg import Point
 from support.Constants import *
-import navigation.src.navigation.Navigate as Nav
+from navigation.Navigate import Navigate as Nav
 
 
 class Alignment:
