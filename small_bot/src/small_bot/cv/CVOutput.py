@@ -87,8 +87,7 @@ class CVOutput:
             (frame, centroid) = pickle.loads(frame_and_centroid)
             cent = (centroid[0], centroid[1])
 
-            if centroid[0] > 0 and centroid[1] > 0:
-                self.centroid_sender(cent)
+            self.centroid_sender(cent)
 
             frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
             self.curr_image_sender(frame)

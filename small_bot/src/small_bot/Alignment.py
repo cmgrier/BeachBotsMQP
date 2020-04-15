@@ -44,10 +44,12 @@ class Alignment:
 
         # Math for moving the camera
         video_centroid = (self.w / 2, self.h / 2 - 20)
-        if centroid[1] > video_centroid[1] + self.threshold:
-            self.position -= self.twitch
-        elif centroid[1] < video_centroid[1] - self.threshold:
-            self.position += self.twitch
+        if centroid[0] > 0 and centroid[1] > 0:
+
+            if centroid[1] > video_centroid[1] + self.threshold:
+                self.position -= self.twitch
+            elif centroid[1] < video_centroid[1] - self.threshold:
+                self.position += self.twitch
 
         if 2200.0 > self.position > 500.0:
             self.pi.set_servo_pulsewidth(self.cam_servo_pin, self.position)
@@ -65,19 +67,29 @@ class Alignment:
         """
         turn_angle = 0
 
-        if centroid[0] > video_centroid[0] + yaw_thresh:
-            turn_angle = -5
-        if centroid[0] < video_centroid[0] + yaw_thresh:
-            turn_angle = 5
+        if centroid[0] > 0 and centroid[1] > 0:
+            if centroid[0] > video_centroid[0] + yaw_thresh:
+                turn_angle = -5
+            if centroid[0] < video_centroid[0] + yaw_thresh:
+                turn_angle = 5
 
-        msg = Twist()
-        msg.linear.x = 0
-        msg.linear.y = 0
-        msg.linear.z = 0
+            msg = Twist()
+            msg.linear.x = 0
+            msg.linear.y = 0
+            msg.linear.z = 0
 
-        msg.angular.x = 0
-        msg.angular.y = 0
-        msg.angular.z = turn_angle
+            msg.angular.x = 0
+            msg.angular.y = 0
+            msg.angular.z = turn_angle
+        else:
+            msg = Twist()
+            msg.linear.x = 0
+            msg.linear.y = 0
+            msg.linear.z = 0
+
+            msg.angular.x = 0
+            msg.angular.y = 0
+            msg.angular.z = 0
 
         self.yaw_pub.publish(msg)
 
