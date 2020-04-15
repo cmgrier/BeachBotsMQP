@@ -25,7 +25,7 @@ class CVOutput:
         # Configure the Camera Servo
         self.cam_servo_pin = SERVO_CAM
 
-        self.position = 600
+        self.position = 650
         self.h = 480
         self.w = 500
 

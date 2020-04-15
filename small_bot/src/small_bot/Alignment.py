@@ -26,7 +26,7 @@ class Alignment:
 
         # Configure the Camera Servo
         self.cam_servo_pin = SERVO_CAM
-        self.position = 600  # DO NOT FORGET TO CHANGE THIS BASED ON CVOUTPUT
+        self.position = 650  # DO NOT FORGET TO CHANGE THIS BASED ON CVOUTPUT
         self.h = 480
         self.w = 500
         self.area = 0
@@ -116,12 +116,13 @@ class Alignment:
         Drive the robot forward a small amount
         :return: void
         """
-        print("Driving Forward +++++++++++++++++++++")
+
         print(self.area)
 
-        if self.area > 60000:
+        if self.area < 60000:
+            print("Driving Forward +++++++++++++++++++++")
             msg = Twist()
-            msg.linear.x = .5
+            msg.linear.x = .7
             msg.linear.y = 0
             msg.linear.z = 0
 
@@ -131,6 +132,7 @@ class Alignment:
             self.yaw_pub.publish(msg)
             rospy.sleep(.2)
         else:
+            print("Stopped -----------------------------")
             msg = Twist()
             msg.linear.x = 0
             msg.linear.y = 0
