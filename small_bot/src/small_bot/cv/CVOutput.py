@@ -87,12 +87,9 @@ class CVOutput:
 
             (frame, centroid, area) = pickle.loads(frame_and_centroid)
             cent = (centroid[0], centroid[1])
-            area = area[0]
             print(area)
 
             self.area_sender(area)
-
-            self.large_box_sender(largest_box)
             self.centroid_sender(cent)
 
             frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
@@ -102,7 +99,7 @@ class CVOutput:
     def area_sender(self, area):
         """
         Largest Bounding box
-        :param largest_box: largest bounding box
+        :param area: largest bounding box
         :return: void
         """
 
