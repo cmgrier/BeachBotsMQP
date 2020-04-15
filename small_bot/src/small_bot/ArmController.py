@@ -42,6 +42,7 @@ class ArmController:
         self.j1_position = 2000  # Positive is away from camera
 
         rospy.Subscriber('pickup_flag', Bool, self.pickup_can)
+        self.picking_can = False
 
         self.calibrate_joints()
 
@@ -102,7 +103,7 @@ class ArmController:
 
         self.pi.set_servo_pulsewidth(self.joint1_pin, self.j1_position)
         rospy.sleep(3)
-        self.pickup_can(0)
+        # self.pickup_can(0)
 
         # trigger = True
         # trigger2 = True
@@ -145,7 +146,7 @@ class ArmController:
             rospy.sleep(0.5)
 
         else:
-            self.pi.set_servo_pulsewidth(self.gripper_servo_pin, 1000)
+            self.pi.set_servo_pulsewidth(self.gripper_servo_pin, 1200)
             rospy.sleep(0.5)
 
     def pickup_can(self, msg):
@@ -154,16 +155,21 @@ class ArmController:
         :param msg: Bool
         :return: void
         """
-        print("Picking Up Can")
-        self.move_gripper(True)
-        self.pi.set_servo_pulsewidth(self.joint1_pin, 700)
-        rospy.sleep(4)
-        self.move_gripper(False)
-        rospy.sleep(3)
-        self.pi.set_servo_pulsewidth(self.joint1_pin, 2000)
-        rospy.sleep(3)
-        self.move_gripper(True)
-        self.pi.set_servo_pulsewidth(self.joint1_pin, self.j1_position)
+
+        self.picking_can = True
+
+        while self.picking_can:
+            print("Picking Up Can")
+            self.move_gripper(True)
+            self.pi.set_servo_pulsewidth(self.joint1_pin, 700)
+            rospy.sleep(4)
+            self.move_gripper(False)
+            rospy.sleep(3)
+            self.pi.set_servo_pulsewidth(self.joint1_pin, 2000)
+            rospy.sleep(3)
+            self.move_gripper(True)
+            self.pi.set_servo_pulsewidth(self.joint1_pin, self.j1_position)
+            self.picking_can = False
 
 
 if __name__ == "__main__":
