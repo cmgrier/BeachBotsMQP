@@ -56,7 +56,7 @@ class Navigate:
         """
         return (180 / math.pi) * math.atan((y2 - y) / (x2 - x))
 
-    def within_distance_threshold(self, dist):
+    def withinDistanceThreshold(self, dist):
         """
         Determines if the current position meets the threshold for the desired position
         :param dist: Linear distance in meters
@@ -146,7 +146,7 @@ class Navigate:
         self.drive_distance(distTarget)
         return True
 
-
 if __name__ == "__main__":
     nav = Navigate()
     rospy.spin()
+

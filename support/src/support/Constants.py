@@ -38,8 +38,8 @@ SMALL_R_DIRECT_1 = 21
 SMALL_R_DIRECT_2 = 26
 
 # Small Robot Encoder Interrupts
-ENCODER1_PIN1 = 6
-ENCODER1_PIN2 = 16
+ENCODER1_PIN1 = 5 #6
+ENCODER1_PIN2 = 25 #16
 TREAD_CIRCUMFERENCE = 0.0113 # meters/pulse
 
 # Camera Servo
@@ -88,22 +88,15 @@ THETA2 = 0.0
 
 # Collector Arm Motors
 STEP_ANGLE = 0.035  # Degrees per step
-DIR = 0  # Direction pin
-STEP = 0  # Step pin
-SWITCH = 9  # Miso limit switch
-CW = 1
-CCW = 0
-
-COIL_A_1_PIN = 18
-COIL_A_2_PIN = 19
-COIL_B_1_PIN = 20
-COIL_B_2_PIN = 24
+SWITCH = 9  # MiSo limit switch for stepper calibration
+SM_STEP = 24  # Stepper motor driver step pin
+SM_DIRECTION = 18  # Stepper motor driver direction pin
 
 JOINT1_SERVO = 7  # (CE1)
 JOINT1_START = 6
 
 GRIPPER_SERVO = 8  # (CE0)
 GRIPPER_OPEN = 2  # Duty Cycle
-GRIPPER_CLOSE = 10  # Duty Cycle
+GRIPPER_CLOSE = 12  # Duty Cycle
 
 

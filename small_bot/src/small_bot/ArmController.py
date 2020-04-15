@@ -9,6 +9,7 @@
 # ==============================================================================
 from small_bot.Kinematics import Kinematics
 import RPi.GPIO as GPIO
+import pigpio
 import rospy
 from support.Constants import *
 
@@ -19,20 +20,24 @@ class ArmController:
         """
         Constructor for ArmController class
         """
+
+        self.pi = pigpio.pi()  # Initialize Pi
+
         self.kin = Kinematics()
         self.joint0_current = 0.0
         self.joint1_current = 0.0
         self.delay = 0.001
+
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(SWITCH, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-        GPIO.setup(COIL_A_1_PIN, GPIO.OUT)
-        GPIO.setup(COIL_A_2_PIN, GPIO.OUT)
-        GPIO.setup(COIL_B_1_PIN, GPIO.OUT)
-        GPIO.setup(COIL_B_2_PIN, GPIO.OUT)
+        GPIO.setup(SM_DIRECTION, GPIO.OUT)
+        GPIO.setup(SM_STEP, GPIO.OUT)
         GPIO.setup(JOINT1_SERVO, GPIO.OUT)
-        GPIO.setup(GRIPPER_SERVO, GPIO.OUT)
+        self.gripper_servo_pin = GRIPPER_SERVO
+        # GPIO.setup(GRIPPER_SERVO, GPIO.OUT)
         self.joint1_pwm = GPIO.PWM(JOINT1_SERVO, 50)
-        self.gripper_pwm = GPIO.PWM(GRIPPER_SERVO, 50)
+
+        # self.gripper_pwm = GPIO.PWM(GRIPPER_SERVO, 50)
         self.calibrate_joints()
 
     def move_end_effector(self, x, y):
@@ -44,28 +49,14 @@ class ArmController:
         """
 
         try:
-            angles = self.kin.invkin(x,y)
+            angles = self.kin.invkin(x, y)
             self.turn_joint0(angles[0])
             self.turn_joint1(angles[1])
             return True
         except ValueError:
-            error = 'The location ('+str(x)+','+str(y)+') is out of the task space'
+            error = 'The location (' + str(x) + ',' + str(y) + ') is out of the task space'
             print(error)
             return False
-
-    def set_step(self,w1, w2, w3, w4):
-        """
-        Set the voltage for the stepper motor coils
-        :param w1: coil A pin 1 voltage
-        :param w2: coil A pin 2 voltage
-        :param w3: coil B pin 1 voltage
-        :param w4: coil B pin 2 voltage
-        :return:
-        """
-        GPIO.output(COIL_A_1_PIN, w1)
-        GPIO.output(COIL_A_2_PIN, w2)
-        GPIO.output(COIL_B_1_PIN, w3)
-        GPIO.output(COIL_B_2_PIN, w4)
 
     def turn_joint0(self, angle):
         """
@@ -74,34 +65,21 @@ class ArmController:
         :return:
         """
         target = angle - self.joint0_current
-        steps = abs(int(target//STEP_ANGLE))/4
-	print("target: ",target)
-	print("steps: ",steps)
+        steps = abs(int(target // STEP_ANGLE))
+        num_steps = 0
+        print("target: ", target)
+        print("steps: ", steps)
 
         if target < 0:
-            for i in range(0, steps):
-                self.set_step(1, 0, 1, 0)
-                rospy.sleep(self.delay)
-                self.set_step(0, 1, 1, 0)
-                rospy.sleep(self.delay)
-                self.set_step(0, 1, 0, 1)
-                rospy.sleep(self.delay)
-                self.set_step(1, 0, 0, 1)
-                rospy.sleep(self.delay)
-
+            GPIO.output(SM_DIRECTION, GPIO.HIGH)
         else:
-            # Reverse previous step sequence to reverse motor direction
-
-            for i in range(0, steps):
-                self.set_step(1, 0, 0, 1)
-                rospy.sleep(self.delay)
-                self.set_step(0, 1, 0, 1)
-                rospy.sleep(self.delay)
-                self.set_step(0, 1, 1, 0)
-                rospy.sleep(self.delay)
-                self.set_step(1, 0, 1, 0)
-                rospy.sleep(self.delay)
-
+            GPIO.output(SM_DIRECTION, GPIO.LOW)
+        while num_steps < steps:
+            GPIO.output(SM_STEP, GPIO.HIGH)
+            rospy.sleep(self.delay)
+            GPIO.output(SM_STEP, GPIO.LOW)
+            rospy.sleep(self.delay)
+            num_steps += 1
 
     def turn_joint1(self, angle):
         """
@@ -109,15 +87,14 @@ class ArmController:
         :param angle: angle of the joint to turn to in degrees
         :return:
         """
-        print("joimt1: ",angle)
-        duty =   (angle * 0.035) + JOINT1_START
-	if duty < 0:
-	 duty = 0
-        GPIO.output(JOINT1_SERVO, True)
+        print("joimt1: ", angle)
+        duty = (angle * 0.035) + JOINT1_START
+        if duty < 0:
+            duty = 0
         self.joint1_pwm.ChangeDutyCycle(duty)
-        rospy.sleep(1)
-        GPIO.output(JOINT1_SERVO, False)
+        rospy.sleep(.6)
         self.joint1_pwm.ChangeDutyCycle(0)
+        rospy.sleep(.6)
 
     def calibrate_joints(self):
         """
@@ -125,24 +102,33 @@ class ArmController:
         :return:
         """
         trigger = True
-        #Open gripper
-        self.gripper_pwm.start(GRIPPER_OPEN)
-        #Zero joint1
+        trigger2 = True
+        # Open gripper
+        # self.gripper_pwm.start(GRIPPER_OPEN)
+        # Zero joint1
         self.joint1_pwm.start(JOINT1_START)
 
-        #Zero joint0
+        # Zero joint0
+        # Move arm until it triggers the switch
+        GPIO.output(SM_DIRECTION, GPIO.LOW)
         while trigger:
-	   self.set_step(1, 0, 0, 1)
-           rospy.sleep(self.delay)
-           self.set_step(0, 1, 0, 1)
-           rospy.sleep(self.delay)
-           self.set_step(0, 1, 1, 0)
-           rospy.sleep(self.delay)
-           self.set_step(1, 0, 1, 0)
-           rospy.sleep(self.delay)
-	   if GPIO.input(SWITCH):
-		trigger = False
-		break	
+            GPIO.output(SM_STEP, GPIO.HIGH)
+            rospy.sleep(self.delay)
+            GPIO.output(SM_STEP, GPIO.LOW)
+            rospy.sleep(self.delay)
+            if GPIO.input(SWITCH):
+                trigger = False
+                break
+        # Move arm off of switch until it deactivates
+        GPIO.output(SM_DIRECTION, GPIO.HIGH)
+        while trigger2:
+            GPIO.output(SM_STEP, GPIO.HIGH)
+            rospy.sleep(self.delay)
+            GPIO.output(SM_STEP, GPIO.LOW)
+            rospy.sleep(self.delay)
+            if not GPIO.input(SWITCH):
+                trigger2 = False
+                break
 
     def move_gripper(self, status):
         """
@@ -150,25 +136,25 @@ class ArmController:
         :param status: True opens the gripper and False closes it
         :return:
         """
-        if status == False:
-            GPIO.output(GRIPPER_SERVO, True)
-            self.gripper_pwm.ChangeDutyCycle(GRIPPER_CLOSE)
-            rospy.sleep(1)
-            GPIO.output(GRIPPER_SERVO, False)
-            self.gripper_pwm.ChangeDutyCycle(0)
+
+        if not status:
+            self.pi.set_servo_pulsewidth(self.gripper_servo_pin, 700)
+            rospy.sleep(0.5)
+
+            # self.gripper_pwm.ChangeDutyCycle(GRIPPER_CLOSE)
+            # rospy.sleep(.6)
+            # self.gripper_pwm.ChangeDutyCycle(0)
+            # rospy.sleep(.6)
         else:
-            GPIO.output(GRIPPER_SERVO, True)
-            self.gripper_pwm.ChangeDutyCycle(GRIPPER_OPEN)
-            rospy.sleep(1)
-            GPIO.output(GRIPPER_SERVO, False)
-            self.gripper_pwm.ChangeDutyCycle(0)
+            self.pi.set_servo_pulsewidth(self.gripper_servo_pin, 500)
+            rospy.sleep(0.5)
+            # self.gripper_pwm.ChangeDutyCycle(GRIPPER_OPEN)
+            # rospy.sleep(.6)
+            # self.gripper_pwm.ChangeDutyCycle(0)
+            # rospy.sleep(.6)
 
 
-
-if __name__=="__main__":
-    arm = ArmController()
-    try:
-     arm.turn_joint0(45)
-     GPIO.cleanup()
-    except KeyboardInterrupt:
-	 GPIO.cleanup()
+if __name__ == "__main__":
+    ac = ArmController()
+    ac.move_gripper(False)
+    ac.move_gripper(True)
