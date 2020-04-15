@@ -106,9 +106,9 @@ class Alignment:
         Drive the robot forward a small amount
         :return: void
         """
-        for i in range(4):
+        for i in range(6):
             msg = Twist()
-            msg.linear.x = .5
+            msg.linear.x = 1
             msg.linear.y = 0
             msg.linear.z = 0
 
