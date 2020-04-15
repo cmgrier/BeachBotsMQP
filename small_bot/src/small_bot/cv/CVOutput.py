@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 
 # Imports
-import numpy as np
-import cv2
 import rospy
-import sys
+import pigpio
+import socket
+import cv2
+import pickle
+import struct
 from sensor_msgs.msg import Image, CompressedImage
-from std_msgs.msg import Bool
-from geometry_msgs.msg import Point
 from cv_bridge import CvBridge, CvBridgeError
+from support.Constants import *
 
 
 class CVOutput:
@@ -20,48 +21,110 @@ class CVOutput:
         # Initialization of the node
         rospy.init_node('CV_1')
 
-        # Subscribers
-        rospy.Subscriber('init_image', CompressedImage, self.init_image_callback)
-        rospy.Subscriber('curr_image', CompressedImage, self.curr_image_callback)
+        # Configure the Camera Servo
+        self.cam_servo_pin = SERVO_CAM
+
+        self.position = 1000
+        self.h = 480
+        self.w = 500
+
+        self.pi = pigpio.pi()  # Connect to local Pi.
+        # Move Servo
+        self.pi.set_servo_pulsewidth(self.cam_servo_pin, self.position)
+        rospy.sleep(0.5)
 
         # Publishers
-        self.init_pub = rospy.Publisher('init_image_final', Image, queue_size=10)
         self.curr_pub = rospy.Publisher('curr_image_final', Image, queue_size=10)
 
         # Variable Declarations
         self.bridge = CvBridge()
 
-        print("CV_1 Node Initialized")
+        print("CV_OUTPUT Node ROS Finished Initializing")
 
-    def init_image_callback(self, msg):
+        self.HOST = ''
+        self.PORT = 8485
+
+        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        print('Socket created')
+
+        self.s.bind((self.HOST, self.PORT))
+        print('Socket bind complete')
+        self.s.listen(10)
+        print('Socket now listening')
+        self.conn, self.addr = self.s.accept()
+
+        self.data = b""
+        self.payload_size = struct.calcsize(">L")
+        print("payload_size: {}".format(self.payload_size))
+
+        self.main_loop()
+
+    def main_loop(self):
         """
-        Image Callback (Displays an image)
-        :param msg: the image message
+        Main Loop
+        :return:
+        """
+
+        while True:
+            while len(self.data) < self.payload_size:
+                print("Recv: {}".format(len(self.data)))
+                self.data += self.conn.recv(4096)
+
+            print("Done Recv: {}".format(len(self.data)))
+            packed_msg_size = self.data[:self.payload_size]  # Size of the full transfer
+            self.data = self.data[self.payload_size:]  # Image data
+            msg_size = struct.unpack(">L", packed_msg_size)[0]  # Size of message at beginning
+            print("msg_size: {}".format(msg_size))
+            while len(self.data) < msg_size:
+                self.data += self.conn.recv(4096)
+            frame_and_centroid = self.data[:msg_size]
+            self.data = self.data[msg_size:]
+
+            # array = pickle.loads(array_data)
+            # rospy.loginfo("THIS IS THE ARRAY: ====")
+            # rospy.loginfo(array)
+
+            (frame, centroid) = pickle.loads(frame_and_centroid)
+            print("THIS IS CENTROID:")
+            print(centroid)
+            cent = (centroid[0], centroid[1])
+
+            if centroid[0] > 0 and centroid[1] > 0:
+                self.go_to_test(cent)
+            frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
+            self.curr_image_sender(frame)
+            cv2.waitKey(1)
+
+    def go_to_test(self, centroid, threshold=40, twitch=70):
+        """
+        Sends the servo to a given position
+        :param centroid: tuple of coordinates
+        :param threshold: threshold
+        :param twitch: how much the servo moves.
         :return: void
         """
 
-        # Image to numpy array
-        nparr = np.fromstring(msg.data, np.uint8)
-        img_decode = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        video_centroid = (self.w / 2, self.h / 2 - 20)
+        if centroid[1] > video_centroid[1] + threshold:
+            self.position -= twitch
+        elif centroid[1] < video_centroid[1] - threshold:
+            self.position += twitch
 
-        try:
-            cv_image = self.bridge.cv2_to_imgmsg(img_decode, "bgr8")
-            self.init_pub.publish(cv_image)
-        except CvBridgeError as e:
-            print(e)
+        if 2200.0 > self.position > 0.0:
+            self.pi.set_servo_pulsewidth(self.cam_servo_pin, self.position)
+            rospy.sleep(0.5)
+            # print(self.position)
+            # time.sleep(.5)
 
-    def curr_image_callback(self, msg):
+    def curr_image_sender(self, frame):
         """
         Image Callback (Displays an image)
-        :param msg: the image message
+        :param frame: the image message
         :return: void
         """
-        # Image to numpy array
-        nparr = np.fromstring(msg.data, np.uint8)
-        img_decode = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
         try:
-            cv_image = self.bridge.cv2_to_imgmsg(img_decode, "bgr8")
+            cv_image = self.bridge.cv2_to_imgmsg(frame, "bgr8")
             self.curr_pub.publish(cv_image)
         except CvBridgeError as e:
             print(e)
