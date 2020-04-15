@@ -22,6 +22,9 @@ class ArmController:
         Constructor for ArmController class
         """
 
+        # Initialization of the node
+        rospy.init_node('ArmController')
+
         self.pi = pigpio.pi()  # Initialize Pi
 
         self.kin = Kinematics()
