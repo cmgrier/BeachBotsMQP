@@ -51,13 +51,13 @@ class Alignment:
             elif centroid[1] < video_centroid[1] - self.threshold:
                 self.position += self.twitch
 
-        if 1000.0 > self.position > 500.0:
-            self.pi.set_servo_pulsewidth(self.cam_servo_pin, self.position)
-            rospy.sleep(0.5)
+            if 1100.0 > self.position > 600.0:
+                self.pi.set_servo_pulsewidth(self.cam_servo_pin, self.position)
+                rospy.sleep(0.5)
 
         self.yaw_alignment(centroid, video_centroid)
 
-    def yaw_alignment(self, centroid, video_centroid, yaw_thresh=80):
+    def yaw_alignment(self, centroid, video_centroid, yaw_thresh=100):
         """
         Moves the motors until we are inline with the can
         :param centroid: the centroid tuple
@@ -68,10 +68,10 @@ class Alignment:
         turn_angle = 0
 
         if centroid[0] > 0 and centroid[1] > 0:
-            if centroid[0] > video_centroid[0] + yaw_thresh:
-                turn_angle = -.3
-            if centroid[0] < video_centroid[0] + yaw_thresh:
-                turn_angle = .3
+            if centroid[0] > 250 + yaw_thresh:
+                turn_angle = -.35
+            if centroid[0] < 250 + yaw_thresh:
+                turn_angle = .35
 
             msg = Twist()
             msg.linear.x = 0
@@ -99,6 +99,7 @@ class Alignment:
         :return: void
         """
         self.pi.set_servo_pulsewidth(self.cam_servo_pin, 0)
+        self.pi.stop()
 
 
 if __name__ == "__main__":
