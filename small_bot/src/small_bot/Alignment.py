@@ -4,7 +4,6 @@
 import rospy
 import pigpio
 from geometry_msgs.msg import Point, Twist
-from vision_msgs.msg import BoundingBox2D
 from support.Constants import *
 
 
@@ -19,7 +18,7 @@ class Alignment:
 
         # Subscribers
         rospy.Subscriber('near_centroid', Point, self.centroid_callback)
-        rospy.Subscriber('large_box', BoundingBox2D, self.box_callback)
+        rospy.Subscriber('large_box', Point, self.box_callback)
         self.yaw_pub = rospy.Publisher('cam_yaw', Twist, queue_size=10)
 
         # Connect to local Pi.
@@ -41,10 +40,7 @@ class Alignment:
         :param msg: BoundingBox2D
         :return: void
         """
-        if msg.size_x > 0 and msg.size_y > 0:
-            self.area = msg.size_x * msg.size_y
-        else:
-            self.area = 0
+        self.area = msg.x
 
     def centroid_callback(self, msg):
         """

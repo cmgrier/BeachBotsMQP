@@ -8,7 +8,6 @@ import cv2
 import pickle
 import struct
 from sensor_msgs.msg import Image, CompressedImage
-from vision_msgs.msg import BoundingBox2D
 from cv_bridge import CvBridge, CvBridgeError
 from geometry_msgs.msg import Point, Pose2D
 from support.Constants import *
@@ -38,7 +37,7 @@ class CVOutput:
         # Publishers
         self.curr_pub = rospy.Publisher('curr_image_final', Image, queue_size=10)
         self.centroid_pub = rospy.Publisher('near_centroid', Point, queue_size=10)
-        self.box_pub = rospy.Publisher('large_box', BoundingBox2D, queue_size=10)
+        self.box_pub = rospy.Publisher('large_box', Point, queue_size=10)
 
         # Variable Declarations
         self.bridge = CvBridge()
@@ -86,9 +85,12 @@ class CVOutput:
             frame_and_centroid = self.data[:msg_size]
             self.data = self.data[msg_size:]
 
-            (frame, centroid, largest_box) = pickle.loads(frame_and_centroid)
+            (frame, centroid, area) = pickle.loads(frame_and_centroid)
             cent = (centroid[0], centroid[1])
-            largest_box = (largest_box[0], largest_box[1], largest_box[2], largest_box[3])
+            area = area[0]
+            print(area)
+
+            self.area_sender(area)
 
             self.large_box_sender(largest_box)
             self.centroid_sender(cent)
@@ -97,21 +99,17 @@ class CVOutput:
             self.curr_image_sender(frame)
             cv2.waitKey(1)
 
-    def large_box_sender(self, largest_box):
+    def area_sender(self, area):
         """
         Largest Bounding box
         :param largest_box: largest bounding box
         :return: void
         """
 
-        msg = BoundingBox2D()
-        msg2 = Pose2D()
-        msg.size_x = largest_box[2] - largest_box[0]
-        msg.size_y = largest_box[3] - largest_box[1]
-        msg2.x = 0
-        msg2.y = 0
-        msg2.theta = 0
-        msg.center = msg2
+        msg = Point()
+        msg.x = area
+        msg.y = 0
+        msg.z = 0
 
         self.box_pub.publish(msg)
 
