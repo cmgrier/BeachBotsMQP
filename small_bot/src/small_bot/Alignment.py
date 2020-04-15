@@ -69,9 +69,9 @@ class Alignment:
 
         if centroid[0] > 0 and centroid[1] > 0:
             if centroid[0] > video_centroid[0] + yaw_thresh:
-                turn_angle = -.1
+                turn_angle = -.2
             if centroid[0] < video_centroid[0] + yaw_thresh:
-                turn_angle = .1
+                turn_angle = .2
 
             msg = Twist()
             msg.linear.x = 0
