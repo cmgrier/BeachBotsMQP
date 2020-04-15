@@ -72,7 +72,7 @@ class Alignment:
         if centroid[0] > 0 and centroid[1] > 0:
             if centroid[0] > 250 + yaw_thresh:
                 turn_angle = -.35
-            if centroid[0] < 250 + yaw_thresh:
+            if centroid[0] < 250 - yaw_thresh:
                 turn_angle = .35
 
             msg = Twist()
