@@ -177,7 +177,20 @@ class ArmController:
 
         self.pickup_pub.publish(bool_msg)
 
+    def cleanup(self):
+        """
+        Cleans up node when closes occur
+        :return: void
+        """
+        self.pi.set_servo_pulsewidth(self.joint1_pin, 0)
+        self.pi.set_servo_pulsewidth(self.gripper_servo_pin, 0)
+
+        self.pi.stop()
+
 
 if __name__ == "__main__":
     ac = ArmController()
-    rospy.spin()
+    try:
+        rospy.spin()
+    except KeyboardInterrupt:
+        ac.cleanup()

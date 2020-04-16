@@ -138,7 +138,18 @@ class CVOutput:
         # Message Publish
         self.centroid_pub.publish(msg)
 
+    def cleanup(self):
+        """
+        Cleanup upon keyboard closure
+        :return: void
+        """
+        self.pi.set_servo_pulsewidth(self.cam_servo_pin, 0)
+        self.pi.close()
+
 
 if __name__ == "__main__":
     cv_out = CVOutput()
-    rospy.spin()
+    try:
+        rospy.spin()
+    except KeyboardInterrupt:
+        cv_out.cleanup()

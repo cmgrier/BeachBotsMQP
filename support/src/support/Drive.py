@@ -42,11 +42,11 @@ class Drive:
         rospy.Subscriber('cam_yaw', Twist, self.interpreter)
 
     def interpreter(self, msg):
-        print("In CALLBACK")
+        # print("In CALLBACK")
 
         # Detected angular velocity
         if msg.angular.z != 0.0 and msg.linear.x == 0.0:
-            print("IN ANGULAR ")
+            # print("IN ANGULAR ")
             val = (msg.angular.z * 100)
             if val > 100:
                 val = 100
@@ -62,7 +62,7 @@ class Drive:
 
         # Detected linear velocity
         elif msg.angular.z == 0.0 and msg.linear.x != 0.0:
-            print("In LINEAR: ", msg.linear.x)
+            # print("In LINEAR: ", msg.linear.x)
             val = (msg.linear.x * 100)
             if val > 100:
                 val = 100
