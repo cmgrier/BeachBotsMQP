@@ -133,7 +133,7 @@ class Alignment:
 
         print(self.area)
 
-        if self.area < 30000:
+        if self.area < 40000:
             print("Driving Forward +++++++++++++++++++++")
             msg = Twist()
             msg.linear.x = .7
