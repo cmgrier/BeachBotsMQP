@@ -42,6 +42,7 @@ class ArmController:
         self.j1_position = 2000  # Positive is away from camera
 
         rospy.Subscriber('pickup_flag', Bool, self.pickup_can)
+        self.pickup_pub = rospy.Publisher('pickup_done', Bool, queue_size=10)
         self.picking_can = False
 
         self.calibrate_joints()
@@ -170,6 +171,11 @@ class ArmController:
             rospy.sleep(3)
             self.move_gripper(True)
             self.pi.set_servo_pulsewidth(self.joint1_pin, self.j1_position)
+            self.picking_can = False
+
+        bool_msg = True
+
+        self.pickup_pub.publish(bool_msg)
 
 
 if __name__ == "__main__":

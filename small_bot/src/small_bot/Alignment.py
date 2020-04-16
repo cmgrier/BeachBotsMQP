@@ -20,6 +20,7 @@ class Alignment:
         # Subscribers
         rospy.Subscriber('near_centroid', Point, self.centroid_callback)
         rospy.Subscriber('large_box', Point, self.box_callback)
+        rospy.Subscriber('pickup_done', Bool, self.pickup_complete)
         self.yaw_pub = rospy.Publisher('cam_yaw', Twist, queue_size=10)
         self.pickup_ready = rospy.Publisher('pickup_flag', Bool, queue_size=10)
 
@@ -36,6 +37,15 @@ class Alignment:
         self.threshold = 30
         self.twitch = 50
         self.stopped_flag = False
+        self.pickup_done = True
+
+    def pickup_complete(self, msg):
+        """
+        Pickup Done Callback
+        :param msg:
+        :return: void
+        """
+        self.pickup_done = True
 
     def box_callback(self, msg):
         """
@@ -150,10 +160,11 @@ class Alignment:
             self.yaw_pub.publish(msg)
             self.stopped_flag = True
 
-        if self.area > 30000 and self.stopped_flag:
+        if self.area > 30000 and self.stopped_flag and self.pickup_done:
             msg = Bool()
             msg.data = True
             self.pickup_ready.publish(msg)
+            self.pickup_done = False
 
     def cleanup(self):
         """
