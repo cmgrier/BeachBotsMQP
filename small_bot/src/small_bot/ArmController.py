@@ -107,34 +107,30 @@ class ArmController:
         rospy.sleep(3)
         # self.pickup_can(0)
 
-        # trigger = True
-        # trigger2 = True
-        # # Open gripper
-        # # self.gripper_pwm.start(GRIPPER_OPEN)
-        # # Zero joint1
-        # self.joint1_pwm.start(JOINT1_START)
-        #
-        # # Zero joint0
-        # # Move arm until it triggers the switch
-        # GPIO.output(SM_DIRECTION, GPIO.LOW)
-        # while trigger:
-        #     GPIO.output(SM_STEP, GPIO.HIGH)
-        #     rospy.sleep(self.delay)
-        #     GPIO.output(SM_STEP, GPIO.LOW)
-        #     rospy.sleep(self.delay)
-        #     if GPIO.input(SWITCH):
-        #         trigger = False
-        #         break
-        # # Move arm off of switch until it deactivates
-        # GPIO.output(SM_DIRECTION, GPIO.HIGH)
-        # while trigger2:
-        #     GPIO.output(SM_STEP, GPIO.HIGH)
-        #     rospy.sleep(self.delay)
-        #     GPIO.output(SM_STEP, GPIO.LOW)
-        #     rospy.sleep(self.delay)
-        #     if not GPIO.input(SWITCH):
-        #         trigger2 = False
-        #         break
+        trigger = True
+        trigger2 = True
+
+        # Zero joint0
+        # Move arm until it triggers the switch
+        GPIO.output(SM_DIRECTION, GPIO.LOW)
+        while trigger:
+            GPIO.output(SM_STEP, GPIO.HIGH)
+            rospy.sleep(self.delay)
+            GPIO.output(SM_STEP, GPIO.LOW)
+            rospy.sleep(self.delay)
+            if GPIO.input(SWITCH):
+                trigger = False
+                break
+        # Move arm off of switch until it deactivates
+        GPIO.output(SM_DIRECTION, GPIO.HIGH)
+        while trigger2:
+            GPIO.output(SM_STEP, GPIO.HIGH)
+            rospy.sleep(self.delay)
+            GPIO.output(SM_STEP, GPIO.LOW)
+            rospy.sleep(self.delay)
+            if not GPIO.input(SWITCH):
+                trigger2 = False
+                break
 
     def move_gripper(self, status):
         """
@@ -167,7 +163,7 @@ class ArmController:
             rospy.sleep(4)
             self.move_gripper(False)
             rospy.sleep(3)
-            self.pi.set_servo_pulsewidth(self.joint1_pin, 2000)
+            self.pi.set_servo_pulsewidth(self.joint1_pin, 2100)
             rospy.sleep(3)
             self.move_gripper(True)
             self.pi.set_servo_pulsewidth(self.joint1_pin, self.j1_position)
