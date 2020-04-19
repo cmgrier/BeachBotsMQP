@@ -189,6 +189,8 @@ class Alignment:
             msg.data = True
             self.pickup_ready.publish(msg)
             self.pickup_done = False
+            while not self.pickup_done:
+                rospy.sleep(1)
 
     def cleanup(self):
         """
