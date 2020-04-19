@@ -33,10 +33,10 @@ class ArmController:
         self.delay = 0.001
 
         GPIO.setmode(GPIO.BCM)
+        GPIO.setwarnings(False)
         GPIO.setup(SWITCH, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
         GPIO.setup(SM_DIRECTION, GPIO.OUT)
         GPIO.setup(SM_STEP, GPIO.OUT)
-        GPIO.setwarnings(False)
 
         self.gripper_servo_pin = GRIPPER_SERVO
         self.joint1_pin = JOINT1_SERVO
