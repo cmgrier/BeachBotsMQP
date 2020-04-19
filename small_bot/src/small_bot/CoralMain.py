@@ -74,8 +74,8 @@ class CoralMain:
 
             # make predictions on the input frame
             frame = Image.fromarray(frame)
-            results = self.model.DetectWithImage(frame, threshold=self.threshold, keep_aspect_ratio=True,
-                                                 relative_coord=False)
+            results = self.model.detect_with_image(frame, threshold=self.threshold, keep_aspect_ratio=True,
+                                                   relative_coord=False)
 
             largest_box = -999
             largest_area = -999
@@ -125,6 +125,7 @@ class CoralMain:
         Socket Connection
         :param frame: the image frame
         :param centroid: a tuple of the centroid
+        :param largest_box_size: the area of the largest detection
         :return: void
         """
 

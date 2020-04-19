@@ -71,14 +71,14 @@ class CVOutput:
         while True:
 
             while len(self.data) < self.payload_size:
-                print("Recv: {}".format(len(self.data)))
+                # print("Recv: {}".format(len(self.data)))
                 self.data += self.conn.recv(4096)
 
-            print("Done Recv: {}".format(len(self.data)))
+            # print("Done Recv: {}".format(len(self.data)))
             packed_msg_size = self.data[:self.payload_size]  # Size of the full transfer
             self.data = self.data[self.payload_size:]  # Image data
             msg_size = struct.unpack(">L", packed_msg_size)[0]  # Size of message at beginning
-            print("msg_size: {}".format(msg_size))
+            # print("msg_size: {}".format(msg_size))
 
             while len(self.data) < msg_size:
                 self.data += self.conn.recv(4096)

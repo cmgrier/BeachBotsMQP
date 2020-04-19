@@ -161,6 +161,29 @@ class Alignment:
             self.stopped_flag = True
 
         if self.area > 30000 and self.stopped_flag and self.pickup_done:
+
+            # Drive Forward
+            for i in range(30):
+                msg = Twist()
+                msg.linear.x = .7
+                msg.linear.y = 0
+                msg.linear.z = 0
+
+                msg.angular.x = 0
+                msg.angular.y = 0
+                msg.angular.z = 0
+                self.yaw_pub.publish(msg)
+
+            msg = Twist()
+            msg.linear.x = 0
+            msg.linear.y = 0
+            msg.linear.z = 0
+
+            msg.angular.x = 0
+            msg.angular.y = 0
+            msg.angular.z = 0
+            self.yaw_pub.publish(msg)
+
             msg = Bool()
             msg.data = True
             self.pickup_ready.publish(msg)
