@@ -136,7 +136,7 @@ class Alignment:
         if self.area < 30000:
             print("Driving Forward +++++++++++++++++++++")
             msg = Twist()
-            msg.linear.x = .65
+            msg.linear.x = .7
             msg.linear.y = 0
             msg.linear.z = 0
 

@@ -36,8 +36,8 @@ class Drive:
         rospy.Subscriber("/cmd_vel", Twist, self.interpreter)
         self.set_direction("F", "F")
 
-        self.l_pwm = GPIO.PWM(self.l_wheel_pin, 150)
-        self.r_pwm = GPIO.PWM(self.r_wheel_pin, 150)
+        self.l_pwm = GPIO.PWM(self.l_wheel_pin, 250)
+        self.r_pwm = GPIO.PWM(self.r_wheel_pin, 250)
 
         rospy.Subscriber('cam_yaw', Twist, self.interpreter)
 
