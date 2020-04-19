@@ -164,7 +164,7 @@ class Alignment:
 
             # Drive Forward
             print("Found Can, Driving forward")
-            for i in range(30):
+            for i in range(100):
                 msg = Twist()
                 msg.linear.x = .7
                 msg.linear.y = 0
