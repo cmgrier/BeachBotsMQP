@@ -168,7 +168,7 @@ class Alignment:
             msg.data = True
             self.pickup_ready.publish(msg)
             self.pickup_done = False
-            for i in range(100):
+            for i in range(120):
                 msg = Twist()
                 msg.linear.x = .7
                 msg.linear.y = 0
