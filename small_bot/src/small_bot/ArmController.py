@@ -168,6 +168,7 @@ class ArmController:
             self.move_gripper(True)
             self.pi.set_servo_pulsewidth(self.joint1_pin, self.j1_position)
             self.picking_can = False
+            rospy.sleep(5)
 
         bool_msg = True
 
