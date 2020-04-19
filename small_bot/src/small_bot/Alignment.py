@@ -164,6 +164,10 @@ class Alignment:
 
             # Drive Forward
             print("Found Can, Driving forward")
+            msg = Bool()
+            msg.data = True
+            self.pickup_ready.publish(msg)
+            self.pickup_done = False
             for i in range(80):
                 msg = Twist()
                 msg.linear.x = .7
@@ -184,11 +188,6 @@ class Alignment:
             msg.angular.y = 0
             msg.angular.z = 0
             self.yaw_pub.publish(msg)
-
-            msg = Bool()
-            msg.data = True
-            self.pickup_ready.publish(msg)
-            self.pickup_done = False
             while not self.pickup_done:
                 rospy.sleep(1)
 

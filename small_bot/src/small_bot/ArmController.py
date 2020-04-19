@@ -164,7 +164,7 @@ class ArmController:
             rospy.sleep(4)
             self.move_gripper(False)
             rospy.sleep(3)
-            self.pi.set_servo_pulsewidth(self.joint1_pin, 2100)
+            self.pi.set_servo_pulsewidth(self.joint1_pin, 2200)
             rospy.sleep(3)
             self.move_gripper(True)
             rospy.sleep(3)
