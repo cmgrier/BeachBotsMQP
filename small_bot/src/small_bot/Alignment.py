@@ -163,6 +163,7 @@ class Alignment:
         if self.area > 30000 and self.stopped_flag and self.pickup_done:
 
             # Drive Forward
+            print("Found Can, Driving forward")
             for i in range(30):
                 msg = Twist()
                 msg.linear.x = .7
