@@ -34,7 +34,7 @@ class Alignment:
         self.w = 500
         self.area = 0
 
-        self.threshold = 30
+        self.threshold = 20
         self.twitch = 50
         self.stopped_flag = False
         self.pickup_done = True
