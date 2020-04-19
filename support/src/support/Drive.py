@@ -24,6 +24,7 @@ class Drive:
         self.r_direct_2 = SMALL_R_DIRECT_2
 
         GPIO.setmode(GPIO.BCM)
+        GPIO.setwarnings(False)
         GPIO.setup(self.l_direct_1, GPIO.OUT)
         GPIO.setup(self.l_direct_2, GPIO.OUT)
         GPIO.setup(self.r_direct_1, GPIO.OUT)
