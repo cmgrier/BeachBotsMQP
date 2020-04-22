@@ -76,7 +76,8 @@ class TaskSeeker:
             if DEBUG:
                 print(clean_task)
             if clean_task.type == "safe":
-                self.smallbot.isCleaning = False
+                #self.smallbot.isCleaning = False
+                print("waiting for task")
             else:
                 self.smallbot.tasks.put(clean_task.priority, clean_task)
             rospy.loginfo(self.smallbot.tasks)

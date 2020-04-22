@@ -3,7 +3,7 @@ import math
 
 from data.Task import Task
 from data.Robot import Robot
-from geometry_msgs.msg import Pose
+from geometry_msgs.msg import Pose, PoseArray, PolygonStamped, Point32, PointStamped
 from nav_msgs.msg import OccupancyGrid
 from baseBot.srv import RequestCleanTask, RequestTask, PassDumpTask, Identify, RequestOG
 from baseBot.msg import AvoidAlert, ZoneMSG
@@ -29,6 +29,10 @@ class Director:
         s = rospy.Service('give_avoid_status', RequestTask, self.give_avoid_status)
         s = rospy.Service('give_og', RequestOG, self.handle_og_request)
         self.OGpub = rospy.Publisher('occupancy_grid', OccupancyGrid, queue_size=10)
+
+        #for testing
+        self.visible_area_pub = rospy.Publisher('visible_area', PolygonStamped, queue_size=10)
+        self.visible_zones_pub = rospy.Publisher('visible_zones', PoseArray, queue_size=10)
 
         print("Director node started")
 
@@ -85,6 +89,9 @@ class Director:
         if len(self.cleaningManager.cleaningTasks) > 0:
             print("giving cleaning task")
             task = self.cleaningManager.cleaningTasks.pop()
+            self.cleaningManager.completed_tasks.append(task)
+            print("task is " + str(task.zone.id))
+            print("tasks remaining: " + str(len(self.cleaningManager.cleaningTasks)))
             task.workerID = robot_request.workerID
             return task.to_service_format()
         else:
@@ -106,17 +113,96 @@ class Director:
         og = self.cleaningManager.mapManager.occupancy_grid
         OG = OccupancyGrid()
         altered_og = []
+        i = 0
         for val in og:
             if val == -1:
                 altered_og.append(val)
             else:
                 altered_og.append(int(val * 100))
+            i = i + 1
         OG.data = altered_og
         OG.info.width = int(math.sqrt(len(og)))
         OG.info.height = int(math.sqrt(len(og)))
         OG.info.resolution = (2 * X_MAX) / OG_WIDTH
-        OG.info.origin = self.__get_og_origin()
+
+        visible_corners = self.cleaningManager.mapManager.get_visible_area_corners(
+            self.cleaningManager.mapManager.mapMaker.translation, self.cleaningManager.mapManager.mapMaker.orientation)
+        og_origin = Pose()
+        og_origin.position.x = visible_corners[3][0]
+        og_origin.position.y = visible_corners[3][1]
+        euler = self.quaternion_to_euler(self.cleaningManager.mapManager.mapMaker.orientation[0],
+                                         self.cleaningManager.mapManager.mapMaker.orientation[1],
+                                         self.cleaningManager.mapManager.mapMaker.orientation[2],
+                                         self.cleaningManager.mapManager.mapMaker.orientation[3])
+        euler[0] = 0
+        euler[1] = 0
+        new_quat = self.euler_to_quaternion(euler[0], euler[1], euler[2])
+        og_origin.orientation.x = new_quat[0]
+        og_origin.orientation.y = new_quat[1]
+        og_origin.orientation.z = new_quat[2]
+        og_origin.orientation.w = new_quat[3]
+
+        OG.info.origin = og_origin
+
         self.OGpub.publish(OG)
+
+    # publish the visible area in front of the basebot
+    def publish_visible_area(self, t, o):
+        visible_area = self.cleaningManager.mapManager.get_visible_area_corners(t, o)
+        points = []
+        for a_point in visible_area:
+            point = Point32()
+            point.x = a_point[0]
+            point.y = a_point[1]
+            points.append(point)
+        rect = PolygonStamped()
+        rect.header.frame_id = "/map"
+        rect.polygon.points = points
+        if len(points) == 4:
+            self.visible_area_pub.publish(rect)
+
+    def publish_all_visible_zone_corners(self, t, o):
+        poses = []
+        all_zones = self.cleaningManager.mapManager.zones
+        visible_zones = self.cleaningManager.mapManager.get_visible_zones(t, o)
+        print(visible_zones)
+        for zone in all_zones:
+            if zone.id in visible_zones:
+                for corner in zone.corners:
+                    poses.append(corner)
+        pose_array = PoseArray()
+        pose_array.header.frame_id = "/map"
+        pose_array.poses = poses
+        self.visible_zones_pub.publish(pose_array)
+
+    def publish_all_visible_zones(self, t, o):
+        all_zones = self.cleaningManager.mapManager.zones
+        visible_zones = self.cleaningManager.mapManager.get_visible_zones(t, o)
+        i = 0
+        for zone in all_zones:
+            if zone.id in visible_zones:
+                topic = 'visible_zones_' + str(i)
+                pub = rospy.Publisher(topic, PolygonStamped, queue_size=10)
+                rect = PolygonStamped()
+                points = []
+                for corner in zone.corners:
+                    point = Point32()
+                    point.x = corner.position.x
+                    point.y = corner.position.y
+                    points.append(point)
+                rect.header.frame_id = "/map"
+                rect.polygon.points = points
+                pub.publish(rect)
+                i = i + 1
+
+    def publish_position(self, t, o):
+        pub = rospy.Publisher('base_bot_position', PointStamped, queue_size=10)
+        point = PointStamped()
+        point.header.frame_id = "/map"
+        point.point.x = t[0]
+        point.point.y = t[1]
+        point.point.z = t[2]
+        pub.publish(point)
 
     # returns the OG to the requesting smallbot
     def handle_og_request(self, og_request):
@@ -132,7 +218,21 @@ class Director:
         OG.info.width = int(math.sqrt(len(og)))
         OG.info.height = int(math.sqrt(len(og)))
         OG.info.resolution = (2 * X_MAX) / OG_WIDTH
-        OG.info.origin = self.__get_og_origin()
+        #OG.info.origin = self.__get_og_origin()
+        zed_quat = self.cleaningManager.mapManager.mapMaker.orientation
+        zed_euler = self.quaternion_to_euler(zed_quat[0], zed_quat[1], zed_quat[2], zed_quat[3])
+        o_quat = self.euler_to_quaternion(zed_euler[2], zed_euler[1], zed_euler[0] + math.radians(180))
+
+        visible_corners = self.cleaningManager.mapManager.get_visible_area_corners(self.cleaningManager.mapManager.mapMaker.translation, self.cleaningManager.mapManager.mapMaker.orientation)
+        og_origin = Pose()
+        og_origin.position.x = visible_corners[0][0]
+        og_origin.position.y = visible_corners[0][1]
+        og_origin.orientation.x = o_quat[0]
+        og_origin.orientation.y = o_quat[1]
+        og_origin.orientation.z = o_quat[2]
+        og_origin.orientation.w = o_quat[3]
+        OG.info.origin = og_origin
+
         baseBotPose = Pose()
         baseBotPose.position.x = self.cleaningManager.mapManager.mapMaker.translation[0]
         baseBotPose.position.y = self.cleaningManager.mapManager.mapMaker.translation[1]
@@ -170,25 +270,20 @@ class Director:
 
     # converts the given quaternion values into euler angles (in radians)
     def quaternion_to_euler(self, x, y, z, w):
-
         t0 = +2.0 * (w * x + y * z)
         t1 = +1.0 - 2.0 * (x * x + y * y)
-        X = math.degrees(math.atan2(t0, t1))
-
+        roll = math.atan2(t0, t1)
         t2 = +2.0 * (w * y - z * x)
         t2 = +1.0 if t2 > +1.0 else t2
         t2 = -1.0 if t2 < -1.0 else t2
-        Y = math.degrees(math.asin(t2))
-
+        pitch = math.asin(t2)
         t3 = +2.0 * (w * z + x * y)
         t4 = +1.0 - 2.0 * (y * y + z * z)
-        Z = math.degrees(math.atan2(t3, t4))
-
-        return X, Y, Z
+        yaw = math.atan2(t3, t4)
+        return [roll, pitch, yaw]
 
     # converts the given euler angles (in radians) to quaternion values
-    def euler_to_quaternion(self, yaw, pitch, roll):
-
+    def euler_to_quaternion(self, roll, pitch, yaw):
         qx = np.sin(roll / 2) * np.cos(pitch / 2) * np.cos(yaw / 2) - np.cos(roll / 2) * np.sin(pitch / 2) * np.sin(
             yaw / 2)
         qy = np.cos(roll / 2) * np.sin(pitch / 2) * np.cos(yaw / 2) + np.sin(roll / 2) * np.cos(pitch / 2) * np.sin(
@@ -197,5 +292,4 @@ class Director:
             yaw / 2)
         qw = np.cos(roll / 2) * np.cos(pitch / 2) * np.cos(yaw / 2) + np.sin(roll / 2) * np.sin(pitch / 2) * np.sin(
             yaw / 2)
-
         return [qx, qy, qz, qw]

@@ -15,6 +15,7 @@ class MapMaker:
         self.maps = list()
         #self.map = []
         self.mesh = sl.Mesh()
+        print("Finding ZED...")
         self.zed = sl.Camera()
         self.translation = [0, 0, 0]
         self.orientation = [0, 0, 0, 0]
@@ -24,10 +25,12 @@ class MapMaker:
         trackparms.enable_pose_smoothing = True
         self.tracking_params = trackparms
         self.mapping_params = sl.SpatialMappingParameters(
-            sl.MAPPING_RESOLUTION.MAPPING_RESOLUTION_LOW,
-            sl.MAPPING_RANGE.MAPPING_RANGE_FAR)
+            resolution=sl.MAPPING_RESOLUTION.MAPPING_RESOLUTION_LOW,
+            mapping_range=sl.MAPPING_RANGE.MAPPING_RANGE_FAR,
+            save_texture=True)
         self.filter_params = sl.MeshFilterParameters()
         self.runtime_params = sl.RuntimeParameters()
+        print("Starting ZED...")
         self.start_camera()
         self.update_pose()
         self.has_requested_map = False
@@ -38,14 +41,16 @@ class MapMaker:
         self.init_params.camera_resolution = sl.RESOLUTION.RESOLUTION_HD720  # Use HD720 video mode (default fps: 60)
         self.init_params.coordinate_system = sl.COORDINATE_SYSTEM.COORDINATE_SYSTEM_RIGHT_HANDED_Z_UP  # Use a right-handed Y-up coordinate system
         self.init_params.coordinate_units = sl.UNIT.UNIT_METER  # Set units in meters
-
-        self.zed.open(self.init_params)
+        print("Opening...")
+        result = self.zed.open(self.init_params)
+        print(result)
 
         self.mapping_params.map_type = sl.SPATIAL_MAP_TYPE.SPATIAL_MAP_TYPE_MESH
         self.mapping_params.save_texture = True     # may change this to reduce load on system
         self.filter_params.set(sl.MESH_FILTER.MESH_FILTER_HIGH)  # not available for fused point cloud
-
+        print("Enabling Tracking...")
         self.zed.enable_tracking(self.tracking_params)
+        print("Enabling Spatial Mapping...")
         self.zed.enable_spatial_mapping(self.mapping_params)
 
     # shuts down the camera, should be called when the basebot shuts down to ensure safe shutdown
@@ -75,7 +80,7 @@ class MapMaker:
         self.mesh = mesh
 
     # updates the self.mesh with an asynchronous process. Will only update as frequently as the MESH_REFRESH_RATE
-    def update_map_async(self):
+    def update_map_async(self, apply_texture = False):
         if not self.has_requested_map:
             self.zed.request_spatial_map_async()
             self.has_requested_map = True
@@ -91,6 +96,11 @@ class MapMaker:
             self.mesh = mesh
             self.has_requested_map = False
             self.last_update_time = time.time()
+            if apply_texture:
+                if DEBUG:
+                    print("applying texture...")
+                self.mesh.apply_texture()
+                self.mesh.save("MYMAP")
         return status
 
     # requests a new frame to be captured from the zed camera, will block until the frame is grabbed
@@ -121,7 +131,7 @@ class MapMaker:
     # updates the position and orientation of the zed camera, should be run in main loop. Orientation is a quaternion
     def update_pose(self):
         pose = sl.Pose()
-        if self.zed.get_position(pose) == sl.TRACKING_STATE.TRACKING_STATE_OK:
+        if self.zed.get_position(pose, sl.REFERENCE_FRAME.REFERENCE_FRAME_WORLD) == sl.TRACKING_STATE.TRACKING_STATE_OK:
             t = pose.get_translation()
             self.translation = [t.get()[0], t.get()[1], t.get()[2]]
             o = pose.get_orientation()
@@ -130,7 +140,7 @@ class MapMaker:
     # updates position and orientation, but only the z orientation. x and y are assumed to be 0
     def update_pose_z(self):
         pose = sl.Pose()
-        if self.zed.get_position(pose) == sl.TRACKING_STATE.TRACKING_STATE_OK:
+        if self.zed.get_position(pose, sl.REFERENCE_FRAME.REFERENCE_FRAME_WORLD) == sl.TRACKING_STATE.TRACKING_STATE_OK:
             t = pose.get_translation()
             self.translation = [t.get()[0], t.get()[1], t.get()[2]]
             o = pose.get_orientation()

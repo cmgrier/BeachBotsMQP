@@ -34,7 +34,7 @@ class AStar:
         if start == end:
             rospy.loginfo("START IS LAST")
             return [start]
-        print("running ASTAR")
+        print("running ASTAR...")
         self.__frontier = list()
         node = Node()
         node.index = start

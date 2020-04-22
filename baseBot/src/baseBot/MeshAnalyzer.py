@@ -249,7 +249,9 @@ class MeshAnalyzer:
         bottom_right = zone.corners[2]
         bottom_left = zone.corners[3]
 
-        area = math.fabs(top_left[0] - top_right[0]) * math.fabs(top_left[1] - bottom_left[1])
+        top = math.sqrt(math.pow(top_left[0] - top_right[0], 2) + math.pow(top_left[1] - top_right[1], 2))
+        side = math.sqrt(math.pow(top_left[0] - bottom_left[0], 2) + math.pow(top_left[1] - bottom_left[1], 2))
+        area = top * side
         # area of 4 triangles
         t0 = .5 * (point[0] * (top_left[1] - top_right[1]) +
                    top_left[0] * (top_right[1] - point[1]) +
@@ -293,12 +295,14 @@ class MeshAnalyzer:
 
         yi = 0
         traversable_triangles = []
-        print("filtering triangles")
+        if DEBUG:
+            print("filtering triangles")
         for triangle in self.mesh.triangles:
             if self.is_triangle_traversable_by_angle(triangle):
                 traversable_triangles.append(triangle)
-        print("Number of triangles: " + str(len(self.mesh.triangles)) + " Number of TT: " + str(len(traversable_triangles)))
-        print("number of filtered triangles " + str(len(self.mesh.triangles) - len(traversable_triangles)))
+        if DEBUG:
+            print("Number of triangles: " + str(len(self.mesh.triangles)) + " Number of TT: " + str(len(traversable_triangles)))
+            print("number of filtered triangles " + str(len(self.mesh.triangles) - len(traversable_triangles)))
         while yi < OG_WIDTH:
             xi = 0
             while xi < OG_WIDTH:
@@ -306,10 +310,12 @@ class MeshAnalyzer:
                 y = tl[1] + yi * dy / (OG_WIDTH - 1)
                 t = self.get_triangle_from_point([x, y], traversable_triangles)
                 if t[0] == -1 and t[1] == -1 and t[2] == -1:
-                    #print("triangle not found")
+                    if DEBUG:
+                        print("triangle not found")
                     OG.append(-1)
                 else:
-                    print("triangle is traversable")
+                    if DEBUG:
+                        print("triangle is traversable")
                     OG.append(self.get_triangle_normal(t)[2])
                 xi += 1
             yi += 1
@@ -329,9 +335,9 @@ class MeshAnalyzer:
                         triangles.append(triangle)
                         zone_triangles[zone.id] = triangles
                         break
-
-        for zone in visible_zones:
-            print("triangles in zone " + str(zone.id) + ": " + str(len(zone_triangles[zone.id])))
+        if DEBUG:
+            for zone in visible_zones:
+                print("triangles in zone " + str(zone.id) + ": " + str(len(zone_triangles[zone.id])))
 
         tl = area_corners[0]
         tr = area_corners[1]
@@ -370,5 +376,66 @@ class MeshAnalyzer:
                 xi += 1
             yi += 1
 
-        print("total triangles not found: " + str(total_not_found) + " total no zones: " + str(total_no_zone) + " total found: " + str(total_found))
+        if DEBUG:
+            print("total triangles not found: " + str(total_not_found) + " total no zones: " + str(total_no_zone) + " total found: " + str(total_found))
+        return OG
+
+# makes an OG from the given zones and area_corners
+    def make_occupancy_grid_bl(self, visible_zones, area_corners):
+        zone_triangles = dict()
+        for zone in visible_zones:
+            zone_triangles[zone.id] = []
+        for triangle in self.mesh.triangles:
+            if self.is_triangle_traversable_by_angle(triangle):
+                centroid = self.get_centroid(triangle)
+                for zone in visible_zones:
+                    if self.is_point_in_zone(zone, centroid):
+                        triangles = zone_triangles[zone.id]
+                        triangles.append(triangle)
+                        zone_triangles[zone.id] = triangles
+                        break
+        if DEBUG:
+            for zone in visible_zones:
+                print("triangles in zone " + str(zone.id) + ": " + str(len(zone_triangles[zone.id])))
+
+        tl = area_corners[0]
+        tr = area_corners[1]
+        br = area_corners[2]
+        bl = area_corners[3]
+
+        OG = []
+
+        dx = tr[0] - tl[0]
+        dy = tr[1] - br[1]
+        total_not_found = 0
+        total_no_zone = 0
+        total_found = 0
+        yi = 0
+        while yi < OG_WIDTH:
+            xi = 0
+            while xi < OG_WIDTH:
+                x = bl[0] + xi * dx / (OG_WIDTH - 1)
+                y = bl[1] + yi * dy / (OG_WIDTH - 1)
+
+                zone_id = -1
+                for zone in visible_zones:
+                    if self.is_point_in_zone(zone, [x, y]):
+                        zone_id = zone.id
+                        break
+                if zone_id == -1:
+                    total_no_zone += 1
+                    OG.append(-1)
+                else:
+                    t = self.get_triangle_from_point([x, y], zone_triangles[zone_id])
+                    if t[0] == -1 and t[1] == -1 and t[2] == -1:
+                        total_not_found += 1
+                        OG.append(-1)
+                    else:
+                        total_found += 1
+                        OG.append(self.get_triangle_normal(t)[2])
+                xi += 1
+            yi += 1
+
+        if DEBUG:
+            print("total triangles not found: " + str(total_not_found) + " total no zones: " + str(total_no_zone) + " total found: " + str(total_found))
         return OG

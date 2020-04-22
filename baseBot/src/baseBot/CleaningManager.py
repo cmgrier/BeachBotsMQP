@@ -14,6 +14,7 @@ class CleaningManager:
         self.cleaningTasks = []
         self.robotManager = RobotManager(robots, self.mapManager, self)
         self.dumpRequests = []
+        self.completed_tasks = []
 
         self.create_cleaning_tasks()
 
@@ -21,5 +22,15 @@ class CleaningManager:
     # creates
     def create_cleaning_tasks(self):
         for zone in self.mapManager.zones:
-            self.cleaningTasks.append(Task(zone=zone))
+            exists = False
+            for task in self.cleaningTasks:
+                if task.zone.id == zone.id:
+                    exists = True
+                    break
+            for task in self.completed_tasks:
+                if task.zone.id == zone.id:
+                    exists = True
+                    break
+            if not exists:
+                self.cleaningTasks.append(Task(zone=zone))
 

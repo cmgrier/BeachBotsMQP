@@ -15,13 +15,15 @@ class CleanManager:
         self.waypoints = []
         self.testing = False
         self.simulating = True
+        self.OG_real = True
         self.sim_pos = Pose()
         pass
 
     def do_task(self, task):
         # this will attempt to complete the given clean task,
         # update progress on task and return the updated task
-        print("Waypoints left: " + str(len(self.waypoints)))
+        if DEBUG:
+            print("Waypoints left: " + str(len(self.waypoints)))
         self.smallbot.publish_zone_shape(task)
         if self.testing:
             return self.do_task_test(task)
@@ -31,20 +33,31 @@ class CleanManager:
             print("added new waypoints for task " + str(task.zone.id))
         elif len(self.waypoints) > 0:
             self.counter += 1
-            if self.simulating:
+            if self.simulating and not self.OG_real:
                 if self.is_at_position(self.sim_pos, self.waypoints[0]):
                     self.waypoints.pop(0)
                     print("Waypoint Reached!")
                 else:
                     self.increment_sim_pos(self.waypoints[0])
-                    print("SIM POS: ")
-                    print(self.sim_pos)
+                    if DEBUG:
+                        print("SIM POS: ")
+                        print(self.sim_pos)
                     self.smallbot.publish_pos(self.sim_pos)
+            elif self.simulating and self.OG_real:
+                self.counter += 1
+                if self.is_at_position(self.sim_pos, self.waypoints[0]):
+                    self.waypoints.pop(0)
+                    print("Waypoint Reached!")
+                else:
+                    self.nav_to_point(self.waypoints[0], self.smallbot.occupancyGrid)
+                    if DEBUG:
+                        print("SIM POS: ")
+                        print(self.sim_pos)
             else:
                 if self.is_at_position(self.smallbot.position, self.waypoints[0]):
                     self.waypoints.pop(0)
                 else:
-                    self.nav_to_point(self.waypoints[0])
+                    self.nav_to_point(self.waypoints[0], self.smallbot.occupancyGrid)
         elif len(self.waypoints) == 0:
             print("Cleaning Task " + str(task.zone.id) + " COMPLETE")
             task.isComplete = True
@@ -71,7 +84,7 @@ class CleanManager:
         return task
 
     def increment_sim_pos(self, goal):
-        change = .005
+        change = .05
         vector = [goal.position.x - self.sim_pos.position.x, goal.position.y - self.sim_pos.position.y]
         mag = math.sqrt(math.pow(vector[0], 2) + math.pow(vector[1], 2))
         norm = [vector[0] / mag, vector[1] / mag]
@@ -87,10 +100,18 @@ class CleanManager:
         return goal_pose.position.x - POSITION_THRESHOLD < x < goal_pose.position.x + POSITION_THRESHOLD \
             and goal_pose.position.y - POSITION_THRESHOLD < y < goal_pose.position.y + POSITION_THRESHOLD
 
-    # tell robot to drive to a certain pose in a straight line
-    def nav_to_point(self, pose):
-        # post to cmd_vel here or in a helper
-        pass
+    # astar to the given point from current position
+    def nav_to_point(self, pose, OG):
+        astar = AStar(OG.data)
+        start = self.point_to_index(self.smallbot.position.position, OG)
+        goal = self.point_to_index(pose.position, OG)
+        path = astar.find_path(start, goal)
+        points = self.get_path_of_points(path, OG)
+        if self.simulating:
+            if self.is_at_position(self.sim_pos, points[0]):
+                points.pop(0)
+            self.increment_sim_pos(points[0])
+            self.smallbot.publish_pos(self.sim_pos)
 
     # makes a path in zone
     def make_path_in_zone(self, task):
@@ -150,7 +171,8 @@ class CleanManager:
 
     # converts an index to a Pose
     def index_to_point(self, index, OG):
-        print("Index: " + str(index))
+        if DEBUG:
+            print("Index: " + str(index))
         x_change = (X_MAX * 2) / OG_WIDTH
         y_change = (Y_MAX - Y_MIN) / OG_WIDTH
         base = [-X_MAX * 2, Y_MAX - Y_MIN]
@@ -162,9 +184,10 @@ class CleanManager:
         point = Pose()
         point.position.x = x * (math.cos(angle) * x_change + math.sin(angle) * y_change) + origin.x
         point.position.y = y * (math.cos(angle) * y_change + math.sin(angle) * x_change) + origin.y
-        print("origin: " + str(origin))
-        print("angle: " + str(angle))
-        print("Converted Point: " + str(point))
+        if DEBUG:
+            print("origin: " + str(origin))
+            print("angle: " + str(angle))
+            print("Converted Point: " + str(point))
         return point
 
     # converts a Pose.position to an index
@@ -177,7 +200,10 @@ class CleanManager:
         angle = self.angle_between_vectors(base, current)
         x_index = (point.x - origin.x) / (x_change * math.cos(angle) + y_change * math.sin(angle))
         y_index = (point.y - origin.y) / (y_change * math.cos(angle) + x_change * math.sin(angle))
-        return int(x_index + y_index * OG_WIDTH)
+        index = int(x_index + y_index * OG_WIDTH)
+        if index < 0:
+
+        return
 
     # returns the angle between two vectors
     def angle_between_vectors(self, v1, v2):

@@ -143,15 +143,23 @@ class MapManager:
 
     # returns the visible zones from given position (t) and orientation (o)
     def get_visible_zones(self, t, o):
+        if DEBUG:
+            print("Get visible zones...")
         visible_area_corners = self.get_visible_area_corners(t, o)
         visible_area_zone = Zone(visible_area_corners, -1)
+        if DEBUG:
+            print("visible area corners: " + str(visible_area_corners))
 
         mesh = self.mapMaker.mesh
         ma = MeshAnalyzer(mesh)
         possible_zones = set()
+        if DEBUG:
+            print("num vertices: " + str(len(mesh.vertices)))
         for vertex in mesh.vertices:
             possible_zones.add(self.get_zone_index_from_point(vertex))
 
+        if DEBUG:
+            print("possible zones: " + str(possible_zones))
         visible_zones = []
         for zone in possible_zones:
             corners = self.get_corners_from_center(self.get_center_from_zone_index(zone))
@@ -159,18 +167,32 @@ class MapManager:
             for corner in corners:
                 if not ma.is_point_in_zone(visible_area_zone, corner):
                     visible = False
+                    break
             if visible:
                 visible_zones.append(zone)
+        if DEBUG:
+            print("num visible zones: " + str(len(visible_zones)))
         return visible_zones
 
     # updates self.zones with all visible zones that have not been cleaned yet. This should be called in main loop
     def update_zones(self):
         visible_zones = self.get_visible_zones(self.mapMaker.translation, self.mapMaker.orientation)
-        for zone in self.cleanedZones:
-            if visible_zones.__contains__(zone):
-                visible_zones.remove(zone)
+        zones_to_add = []
+        for zone in visible_zones:
+            should_add = True
+            for cleaned_zone in self.cleanedZones:
+                if cleaned_zone.id == zone:
+                    should_add = False
+                    break
 
-        for zone_index in visible_zones:
+            for identified_zone in self.zones:
+                if identified_zone.id == zone:
+                    should_add = False
+
+            if should_add:
+                zones_to_add.append(zone)
+
+        for zone_index in zones_to_add:
             corners = self.get_corners_from_center(self.get_center_from_zone_index(zone_index))
             tl = Pose()
             tl.position.x = corners[0][0]
@@ -210,12 +232,12 @@ class MapManager:
         t3 = +2.0 * (w * z + x * y)
         t4 = +1.0 - 2.0 * (y * y + z * z)
         yaw = math.atan2(t3, t4)
-        return [yaw, pitch, roll]
+        return [roll, pitch, yaw]
 
     # returns the corners of the visible area in front of the ZED
     def get_visible_area_corners(self, t, o):
-        tl = [t[0] - X_MAX, t[1] + Y_MIN + Y_MAX]
-        tr = [t[0] + X_MAX, t[1] + Y_MIN + Y_MAX]
+        tl = [t[0] - X_MAX, t[1] + Y_MAX]
+        tr = [t[0] + X_MAX, t[1] + Y_MAX]
         br = [t[0] + X_MAX, t[1] + Y_MIN]
         bl = [t[0] - X_MAX, t[1] + Y_MIN]
 
@@ -239,7 +261,7 @@ class MapManager:
             corners = self.get_corners_from_center(center)
             z = Zone(corners, zone_id)
             full_zones.append(z)
-        OG = ma.make_occupancy_grid_in_front(full_zones, corners)
+        OG = ma.make_occupancy_grid_bl(full_zones, corners)
         self.occupancy_grid = OG
 
     """

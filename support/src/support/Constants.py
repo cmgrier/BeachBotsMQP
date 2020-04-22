@@ -75,6 +75,9 @@ DRIVE_DIST_DP = 0.01
 # make true to activate debug print statements
 DEBUG = False
 
+# Make False to run normally
+SIMULATING = True
+
 
 # Collector Arm D-H Frame Data
 A1 = 0.130  # meters

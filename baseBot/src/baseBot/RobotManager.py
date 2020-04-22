@@ -24,6 +24,8 @@ class RobotManager:
     def should_robot_avoid(self, workerID):
         robot = self.get_robot(workerID)
         robot.avoidCounter = robot.avoidCounter + 1
+        if SIMULATING:
+            return False
         if DEBUG:
             print("avoid counter:")
             print(robot.avoidCounter)

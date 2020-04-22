@@ -5,6 +5,7 @@ from baseBot.CleaningManager import CleaningManager
 from geometry_msgs.msg import Pose
 from data.Task import Task
 from data.Zone import Zone
+from support.Constants import *
 import time
 import pyzed.sl as sl
 
@@ -157,7 +158,7 @@ def advanced_test_with_camera():
 
         if timer == 50:
             "updating OG..."
-            CM.mapManager.mapMaker.update_pose_z()
+            CM.mapManager.mapMaker.update_pose()
             CM.mapManager.mapMaker.update_map_async()
             CM.mapManager.update_OG()
             CM.robotManager.director.publish_og()
@@ -165,5 +166,88 @@ def advanced_test_with_camera():
 
         time.sleep(.5)
 
+
+def test_zone_identification_with_movement():
+    emptyRobotList = []
+    CM = CleaningManager(emptyRobotList)
+    timer = 0
+    print("Getting Frames...")
+    while timer < 500:
+        CM.mapManager.mapMaker.update_map_async()
+        if CM.mapManager.mapMaker.get_frame() == sl.ERROR_CODE.SUCCESS:
+            # When grab() = SUCCESS, a new image, depth and pose is available.
+            # Spatial mapping automatically ingests the new data to build the mesh.
+            timer += 1
+    timer = 0
+    while True:
+        if CM.mapManager.mapMaker.get_frame() == sl.ERROR_CODE.SUCCESS:
+            timer += 1
+        if timer == 50:
+            print("updating OG...")
+            CM.mapManager.mapMaker.update_pose()
+            CM.mapManager.mapMaker.update_map_async(True)
+            CM.mapManager.update_OG()
+            CM.robotManager.director.publish_og()
+            CM.robotManager.director.publish_visible_area(CM.mapManager.mapMaker.translation, CM.mapManager.mapMaker.orientation)
+            CM.robotManager.director.publish_all_visible_zones(CM.mapManager.mapMaker.translation, CM.mapManager.mapMaker.orientation)
+            CM.robotManager.director.publish_position(CM.mapManager.mapMaker.translation, CM.mapManager.mapMaker.orientation)
+            timer = 0
+            print("done")
+            zone_strs = ""
+            for zone in CM.mapManager.zones:
+                zone_strs += str(zone.id) + ", "
+            print("current zones: " + str(zone_strs))
+            print("visible area corners: " + str(CM.mapManager.get_visible_area_corners(CM.mapManager.mapMaker.translation, CM.mapManager.mapMaker.orientation)))
+            CM.mapManager.update_zones()
+            CM.create_cleaning_tasks()
+            visible_zones = CM.mapManager.get_visible_zones(CM.mapManager.mapMaker.translation, CM.mapManager.mapMaker.orientation)
+            #print("Visible Zones: " + str(visible_zones))
+            #print("new zones: " + str(CM.mapManager.zones))
+
+
+def final_test_full():
+    emptyRobotList = []
+    CM = CleaningManager(emptyRobotList)
+    timer = 0
+    print("Getting Frames...")
+    while timer < 500:
+        CM.mapManager.mapMaker.update_map_async()
+        if CM.mapManager.mapMaker.get_frame() == sl.ERROR_CODE.SUCCESS:
+            # When grab() = SUCCESS, a new image, depth and pose is available.
+            # Spatial mapping automatically ingests the new data to build the mesh.
+            timer += 1
+    timer = 0
+    print("Ready")
+    while True:
+        if CM.mapManager.mapMaker.get_frame() == sl.ERROR_CODE.SUCCESS:
+            timer += 1
+        if timer == 50:
+            if DEBUG:
+                print("updating OG...")
+            CM.mapManager.mapMaker.update_pose()
+            CM.mapManager.mapMaker.update_map_async(True)
+            CM.mapManager.update_OG()
+            CM.robotManager.director.publish_og()
+            CM.robotManager.director.publish_visible_area(CM.mapManager.mapMaker.translation,
+                                                          CM.mapManager.mapMaker.orientation)
+            CM.robotManager.director.publish_all_visible_zones(CM.mapManager.mapMaker.translation,
+                                                               CM.mapManager.mapMaker.orientation)
+            CM.robotManager.director.publish_position(CM.mapManager.mapMaker.translation,
+                                                      CM.mapManager.mapMaker.orientation)
+            timer = 0
+            if DEBUG:
+                print("done")
+                zone_strs = ""
+                for zone in CM.mapManager.zones:
+                    zone_strs += str(zone.id) + ", "
+                print("current zones: " + str(zone_strs))
+                print("visible area corners: {0}".format(str(
+                    CM.mapManager.get_visible_area_corners(CM.mapManager.mapMaker.translation,
+                                                           CM.mapManager.mapMaker.orientation))))
+            CM.mapManager.update_zones()
+            CM.create_cleaning_tasks()
+
+
 if __name__ == "__main__":
-    advanced_test_with_camera()
+    print("Starting...")
+    final_test_full()
