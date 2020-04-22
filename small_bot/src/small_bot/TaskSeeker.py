@@ -1,4 +1,12 @@
-#!/usr/bin/env python
+#!/usr/bin/python
+# title           :TaskSeeker.py
+# description     :requests tasks for smallbot
+# author          :Sean Tidd
+# date            :2020-02-11
+# version         :0.1
+# notes           :
+# python_version  :3.5
+# ==============================================================================
 import rospy
 from data.Task import Task
 from data.Zone import Zone

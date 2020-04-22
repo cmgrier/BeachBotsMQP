@@ -1,4 +1,12 @@
-# data of the different tasks to be completed by the small bots
+#!/usr/bin/python
+# title           :Task.py
+# description     :main node for smallbot
+# author          :Sean Tidd
+# date            :2020-02-11
+# version         :0.1
+# notes           :
+# python_version  :3.5
+# ==============================================================================
 from geometry_msgs.msg import Pose
 from data.Zone import Zone
 
@@ -18,6 +26,10 @@ class Task:
 
     # set the priority level of the task based on the type
     def set_priority(self):
+        """
+        Automatically set the priority of the task by type
+        :return:
+        """
         if self.type == "clean":
             self.priority = 3
         elif self.type == "avoid":

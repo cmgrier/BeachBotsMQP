@@ -1,3 +1,12 @@
+#!/usr/bin/python
+# title           :TaskManager.py
+# description     :identifies and executes tasks for smallbot
+# author          :Sean Tidd
+# date            :2020-02-11
+# version         :0.1
+# notes           :
+# python_version  :3.5
+# ==============================================================================
 from data.Task import Task
 from small_bot.CleanManager import CleanManager
 from small_bot.AvoidManager import AvoidManager
@@ -28,5 +37,11 @@ class TaskManager:
         else:
             return task
 
-    def pub_vel(self, vel):
-        self.velPub.publish(vel)
+
+    #def pub_vel(self, vel):
+        """
+        Publishes the velocity along the /cmd_vel topic
+        :param vel: the velocity 
+        :return: 
+        """
+     #   self.velPub.publish(vel)

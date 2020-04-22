@@ -1,3 +1,12 @@
+#!/usr/bin/python
+# title           :DumpManager.py
+# description     :executes dump tasks for smallbot
+# author          :Sean Tidd
+# date            :2020-02-11
+# version         :0.1
+# notes           :
+# python_version  :3.5
+# ==============================================================================
 from data.Task import Task
 
 
@@ -9,6 +18,9 @@ class DumpManager:
         pass
 
     def do_task(self, task):
-        # this will attempt to complete the given dump task,
-        # update progress on task and return the updated task
+        """
+        Will attempt to complete the given dump task
+        :param task: the dump task to execute
+        :return: the updated task
+        """
         return task

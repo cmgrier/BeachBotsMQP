@@ -40,7 +40,7 @@ SMALL_R_DIRECT_2 = 26
 # Small Robot Encoder Interrupts
 ENCODER1_PIN1 = 6
 ENCODER1_PIN2 = 16
-TREAD_CIRCUMFERENCE = 0.151 # meters
+TREAD_CIRCUMFERENCE = 0.0113 # meters/pulse
 
 # Camera Servo
 SERVO_CAM = 17
@@ -59,13 +59,13 @@ X_MAX = 2.25
 OG_WIDTH = 20
 
 # Navigation
-DISTANCE_THRESHOLD_MIN = 0.2
-DISTANCE_THRESHOLD_MAX = 0.2
+DISTANCE_THRESHOLD_MIN = 0.001
+DISTANCE_THRESHOLD_MAX = 0.001
 ANGLE_THRESHOLD_MIN = 1.0
 ANGLE_THRESHOLD_MAX = 1.0
 
 #PID
-TURN_ANGLE_KP = 1.0
+TURN_ANGLE_KP = 1.5
 TURN_ANGLE_IP = 0.1
 TURN_ANGLE_DP = 0.01
 DRIVE_DIST_KP = 1.0
@@ -87,13 +87,13 @@ THETA1 = 0.0
 A2 = 0.180  # meters
 ALPHA2 = 0.0
 D2 = 0.0
-THETA2 = 0.0 #30  # degrees
+THETA2 = 0.0
 
 # Collector Arm Motors
 STEP_ANGLE = 0.035  # Degrees per step
 DIR = 0  # Direction pin
 STEP = 0  # Step pin
-SWITCH = 0
+SWITCH = 9  # Miso limit switch
 CW = 1
 CCW = 0
 
@@ -101,5 +101,12 @@ COIL_A_1_PIN = 18
 COIL_A_2_PIN = 19
 COIL_B_1_PIN = 20
 COIL_B_2_PIN = 24
+
+JOINT1_SERVO = 7  # (CE1)
+JOINT1_START = 6
+
+GRIPPER_SERVO = 8  # (CE0)
+GRIPPER_OPEN = 2  # Duty Cycle
+GRIPPER_CLOSE = 10  # Duty Cycle
 
 
