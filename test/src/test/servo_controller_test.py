@@ -4,7 +4,7 @@ import maestro
 
 class ServoController:
     def __init__(self):
-        servo = maestro.Controller()
+        servo = maestro.Controller('/dev/ttyAMA0')
         servo.setAccel(0, 4)  # set servo 0 acceleration to 4
         servo.setSpeed(0, 10)  # set speed of servo
         servo.setTarget(0, 6000)  # set servo to move to center position
