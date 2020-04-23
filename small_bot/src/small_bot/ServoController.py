@@ -34,9 +34,9 @@ class ServoController:
         rospy.sleep(3)
         self.gripper(False)
         # Move the joint to over the bucket
-        self.elbow(10000)
+        self.elbow(12000)
         rospy.sleep(3)
-        self.elbow(1000)
+        self.elbow(100)
 
     def gripper(self, val, accel=4, speed=10):
         """
@@ -49,9 +49,9 @@ class ServoController:
         self.servo.setSpeed(self.gripper_pin, speed)  # set gripper speed
 
         if val:
-            self.servo.setTarget(self.gripper_pin, 1000)  # set gripper position
+            self.servo.setTarget(self.gripper_pin, 3000)  # set gripper position
         else:
-            self.servo.setTarget(self.gripper_pin, 6000)  # set gripper position
+            self.servo.setTarget(self.gripper_pin, 9000)  # set gripper position
 
     def get_gripper_pos(self):
         """
