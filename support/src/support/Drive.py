@@ -16,12 +16,12 @@ from geometry_msgs.msg import Twist
 
 class Drive:
     def __init__(self):
-        self.l_wheel_pin = SMALL_L_WHEEL_PIN
-        self.r_wheel_pin = SMALL_R_WHEEL_PIN
-        self.l_direct_1 = SMALL_L_DIRECT_1
-        self.l_direct_2 = SMALL_L_DIRECT_2
-        self.r_direct_1 = SMALL_R_DIRECT_1
-        self.r_direct_2 = SMALL_R_DIRECT_2
+        self.l_wheel_pin = L_WHEEL_PIN
+        self.r_wheel_pin = R_WHEEL_PIN
+        self.l_direct_1 = L_DIRECT_1
+        self.l_direct_2 = L_DIRECT_2
+        self.r_direct_1 = R_DIRECT_1
+        self.r_direct_2 = R_DIRECT_2
 
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)

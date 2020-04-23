@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+### CHRIS CONSTANTS ###
 TRASH_BIN_THRESHOLD = 12  # TODO: Get the actual value for this constant
 
 STORED_MAP_SIZE = 10
@@ -7,7 +8,7 @@ SAFE_DISTANCE_BETWEEN_BOTS = 100
 AVOID_DISTANCE = 30
 
 # SmallBot general
-POSITION_THRESHOLD = .1 # how close the robot needs to be to a position to count it as reached, this is for zone paths
+POSITION_THRESHOLD = .1  # how close the robot needs to be to a position to count it as reached, this is for zone paths
 
 # Zones
 ZONE_LENGTH = 2
@@ -27,30 +28,12 @@ TURNING_FACTOR = 1
 TERRAIN_TOO_DIFFICULT = 30
 ZONE_TOO_DIFFICULT_PERCENT = .1
 
-# Small Motors
-SMALL_L_WHEEL_PIN = 12
-SMALL_R_WHEEL_PIN = 13
-
-SMALL_L_DIRECT_1 = 4
-SMALL_L_DIRECT_2 = 27
-
-SMALL_R_DIRECT_1 = 21
-SMALL_R_DIRECT_2 = 26
-
-# Small Robot Encoder Interrupts
-ENCODER1_PIN1 = 5 #6
-ENCODER1_PIN2 = 25 #16
-TREAD_CIRCUMFERENCE = 0.0113 # meters/pulse
-
-# Camera Servo
-SERVO_CAM = 17
-
 # ZED
-MESH_REFRESH_RATE = 2   # update mesh per second
+MESH_REFRESH_RATE = 2  # update mesh per second
 # this is the z value of the triangle's normal to indicate if the triangle is traversable
 TRIANGLE_NORMAL_Z_TRAVERSABLE = .7
 TRIANGLE_NORMAL_ANGLE_TRAVERSABLE = .523599
-MAX_INCLINE = 30    # max angle incline
+MAX_INCLINE = 30  # max angle incline
 # visible area for zed (used for finding visible zones)
 Y_MIN = .5
 Y_MAX = 5.0
@@ -58,23 +41,7 @@ X_MAX = 2.25
 # Occupancy grid width
 OG_WIDTH = 20
 
-# Navigation
-DISTANCE_THRESHOLD_MIN = 0.001
-DISTANCE_THRESHOLD_MAX = 0.001
-ANGLE_THRESHOLD_MIN = 1.0
-ANGLE_THRESHOLD_MAX = 1.0
-
-#PID
-TURN_ANGLE_KP = 1.5
-TURN_ANGLE_IP = 0.1
-TURN_ANGLE_DP = 0.01
-DRIVE_DIST_KP = 1.0
-DRIVE_DIST_IP = 0.1
-DRIVE_DIST_DP = 0.01
-
-# make true to activate debug print statements
-DEBUG = False
-
+### SEAN CONSTANTS ###
 
 # Collector Arm D-H Frame Data
 A1 = 0.130  # meters
@@ -86,17 +53,62 @@ ALPHA2 = 0.0
 D2 = 0.0
 THETA2 = 0.0
 
+# make true to activate debug print statements
+DEBUG = False
+
+# Navigation
+DISTANCE_THRESHOLD_MIN = 0.001
+DISTANCE_THRESHOLD_MAX = 0.001
+ANGLE_THRESHOLD_MIN = 1.0
+ANGLE_THRESHOLD_MAX = 1.0
+
+# PID
+TURN_ANGLE_KP = 1.5
+TURN_ANGLE_IP = 0.1
+TURN_ANGLE_DP = 0.01
+DRIVE_DIST_KP = 1.0
+DRIVE_DIST_IP = 0.1
+DRIVE_DIST_DP = 0.01
+
+TREAD_CIRCUMFERENCE = 0.0113  # meters/pulse
+
+### PIN CONSTANTS ###
+
+# Servo Driver Pins
+SD_TRANS = 14
+SD_RECEIVE = 15
+
+# Servo Driver Serial Pins
+CAMERA = 0
+ELBOW = 1
+GRIPPER = 2
+BUCKET = 3
+
 # Collector Arm Motors
 STEP_ANGLE = 0.035  # Degrees per step
-SWITCH = 9  # MiSo limit switch for stepper calibration
-SM_STEP = 24  # Stepper motor driver step pin
-SM_DIRECTION = 18  # Stepper motor driver direction pin
+SWITCH = 23  # limit switch for stepper calibration
+SM_STEP = 18  # Stepper motor driver step pin
+SM_DIRECTION = 17  # Stepper motor driver direction pin
 
-JOINT1_SERVO = 7  # (CE1)
-JOINT1_START = 6
+# IMU Pins
+SCL_PIN = 3
+SDA_PIN = 2
 
-GRIPPER_SERVO = 8  # (CE0)
-GRIPPER_OPEN = 2  # Duty Cycle
-GRIPPER_CLOSE = 12  # Duty Cycle
+# Drive Motors
+L_WHEEL_PIN = 21
+R_WHEEL_PIN = 13
+
+L_DIRECT_1 = 24
+L_DIRECT_2 = 25
+
+R_DIRECT_1 = 5
+R_DIRECT_2 = 6
+
+# Robot Encoder Interrupts
+ENCODER1_PIN1 = 4
+ENCODER1_PIN2 = 27
+
+
+
 
 
