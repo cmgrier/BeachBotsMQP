@@ -13,8 +13,8 @@ class ServoController:
         self.servo = maestro.Controller()
 
         # Pins
-        self.gripper_pin = 0
-        self.elbow_pin = 1
+        self.gripper_pin = GRIPPER
+        self.elbow_pin = ELBOW
 
         # ROS Subscribers and Publishers
         rospy.Subscriber('pickup_flag', Bool, self.pickup_can)
@@ -31,8 +31,12 @@ class ServoController:
         """
         # Open the Gripper
         self.gripper(True)
+        rospy.sleep(3)
+        self.gripper(False)
         # Move the joint to over the bucket
-        self.elbow(2000)
+        self.elbow(10000)
+        rospy.sleep(3)
+        self.elbow(1000)
 
     def gripper(self, val, accel=4, speed=10):
         """
@@ -47,7 +51,7 @@ class ServoController:
         if val:
             self.servo.setTarget(self.gripper_pin, 1000)  # set gripper position
         else:
-            self.servo.setTarget(self.gripper_pin, 1500)  # set gripper position
+            self.servo.setTarget(self.gripper_pin, 6000)  # set gripper position
 
     def get_gripper_pos(self):
         """
