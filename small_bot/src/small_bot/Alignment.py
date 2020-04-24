@@ -32,8 +32,8 @@ class Alignment:
         self.w = 500
         self.area = 0
 
-        self.threshold = 20
-        self.twitch = 50
+        self.threshold = 15
+        self.twitch = 30
         self.stopped_flag = False
         self.pickup_done = True
 
@@ -162,7 +162,7 @@ class Alignment:
             # Drive Forward
             print("Found Can, Driving forward")
             rospy.sleep(5)
-            for i in range(120):
+            for i in range(300):
                 msg = Twist()
                 msg.linear.x = .7
                 msg.linear.y = 0
@@ -172,7 +172,7 @@ class Alignment:
                 msg.angular.y = 0
                 msg.angular.z = 0
                 self.yaw_pub.publish(msg)
-
+            # rospy.sleep(2)
             msg = Twist()
             msg.linear.x = 0
             msg.linear.y = 0
