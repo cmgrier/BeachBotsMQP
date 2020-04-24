@@ -95,9 +95,9 @@ class Alignment:
 
         if centroid[0] > 0 and centroid[1] > 0:
             if centroid[0] > video_centroid[0] + yaw_thresh:
-                turn_angle = -.25
+                turn_angle = -.15
             elif centroid[0] < video_centroid[0] - yaw_thresh:
-                turn_angle = .25
+                turn_angle = .15
             else:
                 move_trigger = True
 
