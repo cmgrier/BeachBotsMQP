@@ -49,9 +49,9 @@ class ServoController:
         self.servo.setSpeed(self.gripper_pin, speed)  # set gripper speed
 
         if val:
-            self.servo.setTarget(self.gripper_pin, 5000)  # set gripper position
+            self.servo.setTarget(self.gripper_pin, 6000)  # set gripper position
         else:
-            self.servo.setTarget(self.gripper_pin, 9000)  # set gripper position
+            self.servo.setTarget(self.gripper_pin, 8000)  # set gripper position
 
     def get_gripper_pos(self):
         """
