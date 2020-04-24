@@ -29,16 +29,12 @@ class ServoController:
         """
         Calibrates all servos
         """
+        # Move the joint to over the bucket
         self.elbow(8500)
-        rospy.sleep(2)
         # Open the Gripper
         self.gripper(True)
-        rospy.sleep(3)
-        self.gripper(False)
-        # Move the joint to over the bucket
 
-
-    def gripper(self, val, accel=4, speed=10):
+    def gripper(self, val, accel=5, speed=15):
         """
         :param val: True opens the gripper, False closes the gripper
         :param accel: acceleration of servo
@@ -60,7 +56,7 @@ class ServoController:
         """
         return self.servo.getPosition(self.gripper_pin)  # get the current position of gripper servo
 
-    def elbow(self, val, accel=4, speed=10):
+    def elbow(self, val, accel=5, speed=15):
         """
         :param val: True opens the gripper, False closes the gripper
         :param accel: acceleration of servo
