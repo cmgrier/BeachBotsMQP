@@ -161,7 +161,7 @@ class Alignment:
 
             # Drive Forward
             print("Found Can, Driving forward")
-
+            rospy.sleep(5)
             for i in range(120):
                 msg = Twist()
                 msg.linear.x = .7
