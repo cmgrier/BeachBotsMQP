@@ -10,7 +10,7 @@ class ServoController:
         print("Made Controller")
         servo.setAccel(1, 4)  # set servo 0 acceleration to 4
         servo.setSpeed(1, 10)  # set speed of servo
-        servo.setTarget(1, 9000)  # set servo to move to center position
+        servo.setTarget(1, 8900)  # set servo to move to center position
         time.sleep(5)
         # x = servo.getPosition(1)  # get the current position of servo 1
         print("Done")
