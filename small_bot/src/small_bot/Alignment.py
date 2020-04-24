@@ -72,10 +72,10 @@ class Alignment:
             elif centroid[1] < video_centroid[1] - self.threshold:
                 self.position += self.twitch
 
-            if 5000.0 > self.position > 4000.0:
+            if 5000.0 > self.position > 3900.0:
                 self.servo.setTarget(self.cam_servo_pin, self.position)
         else:
-            if 5000.0 > self.position > 4000.0:
+            if 5000.0 > self.position > 3900.0:
                 self.servo.setTarget(self.cam_servo_pin, self.position)
 
         move = self.yaw_alignment(centroid, video_centroid)
@@ -95,9 +95,9 @@ class Alignment:
 
         if centroid[0] > 0 and centroid[1] > 0:
             if centroid[0] > video_centroid[0] + yaw_thresh:
-                turn_angle = -.25
+                turn_angle = -.20
             elif centroid[0] < video_centroid[0] - yaw_thresh:
-                turn_angle = .25
+                turn_angle = .20
             else:
                 move_trigger = True
 
@@ -172,7 +172,7 @@ class Alignment:
                 msg.angular.y = 0
                 msg.angular.z = 0
                 self.yaw_pub.publish(msg)
-            rospy.sleep(2)
+            rospy.sleep(1)
             msg = Twist()
             msg.linear.x = 0
             msg.linear.y = 0
@@ -184,7 +184,7 @@ class Alignment:
             self.yaw_pub.publish(msg)
 
             print("Done driving forward, picking up can")
-            rospy.sleep(5)
+            rospy.sleep(3)
 
             msg = Bool()
             msg.data = True
