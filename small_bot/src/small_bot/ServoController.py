@@ -56,6 +56,7 @@ class ServoController:
         # Move arm until it triggers the switch
         GPIO.output(SM_DIRECTION, GPIO.LOW)
         while trigger:
+            print("Made it into step loop")
             GPIO.output(SM_STEP, GPIO.HIGH)
             rospy.sleep(self.delay)
             GPIO.output(SM_STEP, GPIO.LOW)
