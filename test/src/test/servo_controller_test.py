@@ -15,7 +15,7 @@ class ServoController:
         # servo.setRange(1, 0, 12000)
         # print(servo.getMax(1))
         # print(servo.getMin(1))
-        servo.setTarget(0, 8500)  # set servo to move to center position
+        servo.setTarget(0, 6000)  # set servo to move to center position
         time.sleep(5)
         servo.setTarget(0, 2000)
         time.sleep(5)
