@@ -27,7 +27,7 @@ class Alignment:
 
         # Configure the Camera Servo
         self.cam_servo_pin = SERVO_CAM
-        self.position = 700  # DO NOT FORGET TO CHANGE THIS BASED ON CVOUTPUT
+        self.position = 4500  # DO NOT FORGET TO CHANGE THIS BASED ON CVOUTPUT
         self.h = 480
         self.w = 500
         self.area = 0
@@ -72,11 +72,10 @@ class Alignment:
             elif centroid[1] < video_centroid[1] - self.threshold:
                 self.position += self.twitch
 
-            if 1100.0 > self.position > 600.0:
+            if 5000.0 > self.position > 4200.0:
                 self.servo.setTarget(self.cam_servo_pin, self.position)
-                # rospy.sleep(0.5)
         else:
-            if 1100.0 > self.position > 600.0:
+            if 5000.0 > self.position > 4200.0:
                 self.servo.setTarget(self.cam_servo_pin, self.position)
 
         move = self.yaw_alignment(centroid, video_centroid)

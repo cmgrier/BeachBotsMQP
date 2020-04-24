@@ -29,12 +29,14 @@ class ServoController:
         """
         Calibrates all servos
         """
+        self.elbow(8500)
+        rospy.sleep(2)
         # Open the Gripper
         self.gripper(True)
         rospy.sleep(3)
         self.gripper(False)
         # Move the joint to over the bucket
-        self.elbow(8500)
+
 
     def gripper(self, val, accel=4, speed=10):
         """
