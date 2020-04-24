@@ -26,7 +26,7 @@ class Alignment:
         self.pickup_ready = rospy.Publisher('pickup_flag', Bool, queue_size=10)
 
         # Configure the Camera Servo
-        self.cam_servo_pin = SERVO_CAM
+        self.cam_servo_pin = CAMERA
         self.position = 4500  # DO NOT FORGET TO CHANGE THIS BASED ON CVOUTPUT
         self.h = 480
         self.w = 500
