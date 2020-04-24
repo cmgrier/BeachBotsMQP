@@ -182,7 +182,10 @@ class Alignment:
             msg.angular.y = 0
             msg.angular.z = 0
             self.yaw_pub.publish(msg)
-            rospy.sleep(3)
+
+            print("Done driving forward, picking up can")
+            rospy.sleep(5)
+
             msg = Bool()
             msg.data = True
             self.pickup_ready.publish(msg)
