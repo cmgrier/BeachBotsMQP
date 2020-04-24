@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import maestro
 import rospy
+import RPi.GPIO as GPIO
 from std_msgs.msg import Bool
 from support.Constants import *
 
@@ -15,6 +16,13 @@ class ServoController:
         # Pins
         self.gripper_pin = GRIPPER
         self.elbow_pin = ELBOW
+
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setwarnings(False)
+        GPIO.setup(SWITCH, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+        GPIO.setup(SM_DIRECTION, GPIO.OUT)
+        GPIO.setup(SM_STEP, GPIO.OUT)
+        self.delay = 0.001
 
         # ROS Subscribers and Publishers
         rospy.Subscriber('pickup_flag', Bool, self.pickup_can)
@@ -33,6 +41,38 @@ class ServoController:
         self.elbow(8500)
         # Open the Gripper
         self.gripper(True)
+        # Stepper Motor
+        rospy.sleep(2)
+        self.stepper_motor()
+
+    def stepper_motor(self):
+        """
+        Handles the Stepper motor
+        """
+        trigger = True
+        trigger2 = True
+
+        # Zero joint0
+        # Move arm until it triggers the switch
+        GPIO.output(SM_DIRECTION, GPIO.LOW)
+        while trigger:
+            GPIO.output(SM_STEP, GPIO.HIGH)
+            rospy.sleep(self.delay)
+            GPIO.output(SM_STEP, GPIO.LOW)
+            rospy.sleep(self.delay)
+            if GPIO.input(SWITCH):
+                trigger = False
+                break
+        # Move arm off of switch until it deactivates
+        GPIO.output(SM_DIRECTION, GPIO.HIGH)
+        while trigger2:
+            GPIO.output(SM_STEP, GPIO.HIGH)
+            rospy.sleep(self.delay)
+            GPIO.output(SM_STEP, GPIO.LOW)
+            rospy.sleep(self.delay)
+            if not GPIO.input(SWITCH):
+                trigger2 = False
+                break
 
     def gripper(self, val, accel=5, speed=15):
         """
