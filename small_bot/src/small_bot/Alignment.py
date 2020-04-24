@@ -95,9 +95,9 @@ class Alignment:
 
         if centroid[0] > 0 and centroid[1] > 0:
             if centroid[0] > video_centroid[0] + yaw_thresh:
-                turn_angle = -.2
+                turn_angle = -.25
             elif centroid[0] < video_centroid[0] - yaw_thresh:
-                turn_angle = .2
+                turn_angle = .25
             else:
                 move_trigger = True
 
@@ -162,7 +162,7 @@ class Alignment:
             # Drive Forward
             print("Found Can, Driving forward")
             rospy.sleep(5)
-            for i in range(300):
+            for i in range(100):
                 msg = Twist()
                 msg.linear.x = .7
                 msg.linear.y = 0
@@ -172,7 +172,7 @@ class Alignment:
                 msg.angular.y = 0
                 msg.angular.z = 0
                 self.yaw_pub.publish(msg)
-            # rospy.sleep(2)
+            rospy.sleep(2)
             msg = Twist()
             msg.linear.x = 0
             msg.linear.y = 0
