@@ -28,12 +28,12 @@ class CVOutput:
         # Configure the Camera Servo
         self.cam_servo_pin = SERVO_CAM
 
-        self.position = 700
+        self.position = 4500
         self.h = 480
         self.w = 500
 
         # Move Servo
-        self.servo.setTarget(self.cam_servo_pin, 3000)
+        self.servo.setTarget(self.cam_servo_pin, self.position)
         rospy.sleep(0.5)
 
         # Publishers
