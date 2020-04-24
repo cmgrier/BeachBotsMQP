@@ -34,9 +34,9 @@ class ServoController:
         rospy.sleep(3)
         self.gripper(False)
         # Move the joint to over the bucket
-        self.elbow(9000)
-        rospy.sleep(3)
-        self.elbow(3000)
+        # self.elbow(9000)
+        # rospy.sleep(3)
+        # self.elbow(3000)
 
     def gripper(self, val, accel=4, speed=10):
         """
