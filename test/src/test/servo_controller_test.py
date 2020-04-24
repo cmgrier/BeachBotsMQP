@@ -17,7 +17,7 @@ class ServoController:
         # print(servo.getMin(1))
         servo.setTarget(0, 5000)  # set servo to move to center position
         time.sleep(3)
-        servo.setTarget(0, 4000)
+        servo.setTarget(0, 4200)
         time.sleep(3)
         # x = servo.getPosition(1)  # get the current position of servo 1
         print("Done")
