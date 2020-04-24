@@ -133,7 +133,7 @@ class Alignment:
         if 0 < self.area < 30000:
             print("Driving Forward +++++++++++++++++++++")
             msg = Twist()
-            msg.linear.x = .7
+            msg.linear.x = .6
             msg.linear.y = 0
             msg.linear.z = 0
 
@@ -164,7 +164,7 @@ class Alignment:
             rospy.sleep(5)
             for i in range(100):
                 msg = Twist()
-                msg.linear.x = .7
+                msg.linear.x = .6
                 msg.linear.y = 0
                 msg.linear.z = 0
 
