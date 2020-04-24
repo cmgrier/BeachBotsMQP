@@ -7,6 +7,7 @@ import socket
 import cv2
 import pickle
 import struct
+import maestro
 from sensor_msgs.msg import Image, CompressedImage
 from cv_bridge import CvBridge, CvBridgeError
 from geometry_msgs.msg import Point, Pose2D
@@ -22,6 +23,8 @@ class CVOutput:
         # Initialization of the node
         rospy.init_node('CV_OUT')
 
+        self.servo = maestro.Controller()
+
         # Configure the Camera Servo
         self.cam_servo_pin = SERVO_CAM
 
@@ -29,9 +32,8 @@ class CVOutput:
         self.h = 480
         self.w = 500
 
-        self.pi = pigpio.pi()  # Connect to local Pi.
         # Move Servo
-        self.pi.set_servo_pulsewidth(self.cam_servo_pin, self.position)
+        self.servo.setTarget(self.cam_servo_pin, 3000)
         rospy.sleep(0.5)
 
         # Publishers
@@ -143,8 +145,7 @@ class CVOutput:
         Cleanup upon keyboard closure
         :return: void
         """
-        self.pi.set_servo_pulsewidth(self.cam_servo_pin, 0)
-        self.pi.close()
+        self.servo.close()
 
 
 if __name__ == "__main__":

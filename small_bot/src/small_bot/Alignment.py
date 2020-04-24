@@ -2,7 +2,7 @@
 
 # Imports
 import rospy
-import pigpio
+import maestro
 from geometry_msgs.msg import Point, Twist
 from std_msgs.msg import Bool
 from support.Constants import *
@@ -16,6 +16,7 @@ class Alignment:
 
         # Initialization of the node
         rospy.init_node('Alignment')
+        self.servo = maestro.Controller()
 
         # Subscribers
         rospy.Subscriber('near_centroid', Point, self.centroid_callback)
@@ -23,9 +24,6 @@ class Alignment:
         rospy.Subscriber('pickup_done', Bool, self.pickup_complete)
         self.yaw_pub = rospy.Publisher('cam_yaw', Twist, queue_size=10)
         self.pickup_ready = rospy.Publisher('pickup_flag', Bool, queue_size=10)
-
-        # Connect to local Pi.
-        self.pi = pigpio.pi()
 
         # Configure the Camera Servo
         self.cam_servo_pin = SERVO_CAM
@@ -75,11 +73,11 @@ class Alignment:
                 self.position += self.twitch
 
             if 1100.0 > self.position > 600.0:
-                self.pi.set_servo_pulsewidth(self.cam_servo_pin, self.position)
-                rospy.sleep(0.5)
+                self.servo.setTarget(self.cam_servo_pin, self.position)
+                # rospy.sleep(0.5)
         else:
             if 1100.0 > self.position > 600.0:
-                self.pi.set_servo_pulsewidth(self.cam_servo_pin, self.position)
+                self.servo.setTarget(self.cam_servo_pin, self.position)
 
         move = self.yaw_alignment(centroid, video_centroid)
         if move:
@@ -196,8 +194,7 @@ class Alignment:
         Cleanup
         :return: void
         """
-        self.pi.set_servo_pulsewidth(self.cam_servo_pin, 0)
-        self.pi.stop()
+        self.servo.close()
 
 
 if __name__ == "__main__":
