@@ -8,9 +8,9 @@ class ServoController:
         print("Initialized")
         servo = maestro.Controller()
         print("Made Controller")
-        servo.setAccel(2, 4)  # set servo 0 acceleration to 4
-        servo.setSpeed(2, 10)  # set speed of servo
-        servo.setTarget(2, 8000)  # set servo to move to center position
+        servo.setAccel(1, 4)  # set servo 0 acceleration to 4
+        servo.setSpeed(1, 10)  # set speed of servo
+        servo.setTarget(1, 8000)  # set servo to move to center position
         time.sleep(5)
         # x = servo.getPosition(1)  # get the current position of servo 1
         print("Done")
