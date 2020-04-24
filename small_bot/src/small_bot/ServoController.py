@@ -74,7 +74,7 @@ class ServoController:
         """
         return self.servo.getPosition(self.elbow_pin)  # get the current position of elbow servo
 
-    def pickup_can(self):
+    def pickup_can(self, msg):
         """
         Pickup the Can
         """
