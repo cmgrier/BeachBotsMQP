@@ -67,15 +67,11 @@ class ServoController:
                 break
         # Move arm off of switch until it deactivates
         GPIO.output(SM_DIRECTION, GPIO.HIGH)
-        while trigger2:
+        for x in range(24 * 20):
             GPIO.output(SM_STEP, GPIO.HIGH)
             time.sleep(self.delay)
             GPIO.output(SM_STEP, GPIO.LOW)
             time.sleep(self.delay)
-            if not GPIO.input(SWITCH):
-                time.sleep(3)
-                trigger2 = False
-                break
 
     def gripper(self, val, accel=5, speed=15):
         """
