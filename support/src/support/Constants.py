@@ -87,7 +87,7 @@ BUCKET = 3
 # Collector Arm Motors
 STEP_ANGLE = 0.035  # Degrees per step
 SWITCH = 23  # limit switch for stepper calibration
-SM_STEP = 18  # Stepper motor driver step pin
+SM_STEP = 22  # Stepper motor driver step pin
 SM_DIRECTION = 17  # Stepper motor driver direction pin
 
 # IMU Pins
