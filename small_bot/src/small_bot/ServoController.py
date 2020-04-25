@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import maestro
 import rospy
+import time
 import RPi.GPIO as GPIO
 from std_msgs.msg import Bool
 from support.Constants import *
@@ -58,9 +59,9 @@ class ServoController:
         while trigger:
             # print("Made it into step loop")
             GPIO.output(SM_STEP, GPIO.HIGH)
-            rospy.sleep(self.delay)
+            time.sleep(self.delay)
             GPIO.output(SM_STEP, GPIO.LOW)
-            rospy.sleep(self.delay)
+            time.sleep(self.delay)
             if GPIO.input(SWITCH):
                 trigger = False
                 break
@@ -68,9 +69,9 @@ class ServoController:
         GPIO.output(SM_DIRECTION, GPIO.HIGH)
         while trigger2:
             GPIO.output(SM_STEP, GPIO.HIGH)
-            rospy.sleep(self.delay)
+            time.sleep(self.delay)
             GPIO.output(SM_STEP, GPIO.LOW)
-            rospy.sleep(self.delay)
+            time.sleep(self.delay)
             if not GPIO.input(SWITCH):
                 trigger2 = False
                 break
