@@ -73,6 +73,7 @@ class ServoController:
             GPIO.output(SM_STEP, GPIO.LOW)
             time.sleep(self.delay)
             if not GPIO.input(SWITCH):
+                time.sleep(3)
                 trigger2 = False
                 break
 
