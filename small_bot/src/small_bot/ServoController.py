@@ -39,7 +39,7 @@ class ServoController:
         Calibrates all servos
         """
         # Move the joint to over the bucket
-        self.elbow(2000)
+        self.elbow(8500)
         # Open the Gripper
         self.gripper(True)
         # Stepper Motor
