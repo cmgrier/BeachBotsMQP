@@ -161,7 +161,7 @@ class Alignment:
 
             # Drive Forward
             print("Found Can, Driving forward")
-            rospy.sleep(5)
+            rospy.sleep(3)
             for i in range(100):
                 msg = Twist()
                 msg.linear.x = .6
@@ -172,7 +172,7 @@ class Alignment:
                 msg.angular.y = 0
                 msg.angular.z = 0
                 self.yaw_pub.publish(msg)
-            rospy.sleep(1)
+            rospy.sleep(3)
             msg = Twist()
             msg.linear.x = 0
             msg.linear.y = 0
