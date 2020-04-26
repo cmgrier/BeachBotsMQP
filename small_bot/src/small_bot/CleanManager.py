@@ -25,6 +25,7 @@ class CleanManager:
         self.testing = False
         self.simulating = True
         self.sim_pos = Pose()
+        #TODO: Create the self.trash_listiner to work with a new topic called 'detect_trash'
         pass
 
     def do_task(self, task):
@@ -57,6 +58,8 @@ class CleanManager:
             else:
                 if self.is_at_position(self.smallbot.position, self.waypoints[0]):
                     self.waypoints.pop(0)
+                    #TODO: LISTEN FOR TRASH DETECTION WITH THE self.trash_listiner SUBSCRIBER
+                    #TODO: IF TRASH DETECTED REQUEST TRASH COLLECTION VIA collect_trash_request()
                 else:
                     self.nav_to_point(self.waypoints[0])
         elif len(self.waypoints) == 0:
@@ -84,6 +87,11 @@ class CleanManager:
             task.isComplete = True
         return task
 
+    def collect_trash_request(self):
+        #TODO: IMPLEMENT THIS FUNCTION TO REQUEST ALIGNMENT.py TO BEGIN CAN COLLECTING
+        print()
+
+
     def increment_sim_pos(self, goal):
         change = .005
         vector = [goal.position.x - self.sim_pos.position.x, goal.position.y - self.sim_pos.position.y]
@@ -103,7 +111,7 @@ class CleanManager:
 
     # tell robot to drive to a certain pose in a straight line
     def nav_to_point(self, pose):
-        # post to cmd_vel here or in a helper
+        # TODO: IMPLEMENT THIS FUNCTION TO WORK WITH NAVIGATE::drive_to_coord()
         pass
 
     # makes a path in zone
