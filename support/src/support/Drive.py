@@ -35,12 +35,11 @@ class Drive:
         rospy.init_node('drive_listener', anonymous=True)
         self.pub = rospy.Publisher("/drive_direct", direct_msg, queue_size=10)
         rospy.Subscriber("/cmd_vel", Twist, self.interpreter)
+        rospy.Subscriber('cam_yaw', Twist, self.interpreter)
         self.set_direction("F", "F")
 
         self.l_pwm = GPIO.PWM(self.l_wheel_pin, 250)
         self.r_pwm = GPIO.PWM(self.r_wheel_pin, 250)
-
-        rospy.Subscriber('cam_yaw', Twist, self.interpreter)
 
     def interpreter(self, msg):
         # print("In CALLBACK")
@@ -80,21 +79,6 @@ class Drive:
         else:
             self.stop_wheels()
 
-        """else:
-            turn_val = msg.angular.z
-            lin_val = msg.linear.x
-    
-            right_wheel_val = lin_val - ((turn_val / lin_val) * 25)
-            left_wheel_val = lin_val + ((turn_val / lin_val) * 25)
-    
-            if left_wheel_val < 0:
-                left_wheel_val = math.abs(left_wheel_val)
-            if right_wheel_val < 0:
-                right_wheel_val = math.abs(right_wheel_val)
-    
-            run_wheels(left_wheel_val, right_wheel_val)
-        """
-
     def run_wheels(self, l_speed, r_speed):
         """
         Begins the PWM for both wheels
@@ -118,7 +102,7 @@ class Drive:
         """
         Sets the direction of the left and right wheels
         :param lwheel: direction for left wheel
-        :param rhweel: direction for right wheel
+        :param rwheel: direction for right wheel
         :return:
         """
 
@@ -157,8 +141,6 @@ class Drive:
     def cleanup(self):
         self.stop_wheels()
         GPIO.cleanup()
-
-    # TODO add PID capability
 
 
 if __name__ == "__main__":

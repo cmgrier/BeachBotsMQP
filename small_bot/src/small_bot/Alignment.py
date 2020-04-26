@@ -26,14 +26,14 @@ class Alignment:
         self.pickup_ready = rospy.Publisher('pickup_flag', Bool, queue_size=10)
 
         # Configure the Camera Servo
-        self.cam_servo_pin = SERVO_CAM
+        self.cam_servo_pin = CAMERA
         self.position = 4500  # DO NOT FORGET TO CHANGE THIS BASED ON CVOUTPUT
         self.h = 480
         self.w = 500
         self.area = 0
 
-        self.threshold = 20
-        self.twitch = 50
+        self.threshold = 15
+        self.twitch = 30
         self.stopped_flag = False
         self.pickup_done = True
 
@@ -72,10 +72,10 @@ class Alignment:
             elif centroid[1] < video_centroid[1] - self.threshold:
                 self.position += self.twitch
 
-            if 5000.0 > self.position > 4200.0:
+            if 5000.0 > self.position > 3900.0:
                 self.servo.setTarget(self.cam_servo_pin, self.position)
         else:
-            if 5000.0 > self.position > 4200.0:
+            if 5000.0 > self.position > 3900.0:
                 self.servo.setTarget(self.cam_servo_pin, self.position)
 
         move = self.yaw_alignment(centroid, video_centroid)
@@ -95,9 +95,9 @@ class Alignment:
 
         if centroid[0] > 0 and centroid[1] > 0:
             if centroid[0] > video_centroid[0] + yaw_thresh:
-                turn_angle = -.35
+                turn_angle = -.20
             elif centroid[0] < video_centroid[0] - yaw_thresh:
-                turn_angle = .35
+                turn_angle = .20
             else:
                 move_trigger = True
 
@@ -130,10 +130,10 @@ class Alignment:
 
         print(self.area)
 
-        if self.area < 30000:
+        if 0 < self.area < 30000:
             print("Driving Forward +++++++++++++++++++++")
             msg = Twist()
-            msg.linear.x = .7
+            msg.linear.x = .6
             msg.linear.y = 0
             msg.linear.z = 0
 
@@ -161,13 +161,10 @@ class Alignment:
 
             # Drive Forward
             print("Found Can, Driving forward")
-            msg = Bool()
-            msg.data = True
-            self.pickup_ready.publish(msg)
-            self.pickup_done = False
-            for i in range(120):
+            rospy.sleep(3)
+            for i in range(100):
                 msg = Twist()
-                msg.linear.x = .7
+                msg.linear.x = .6
                 msg.linear.y = 0
                 msg.linear.z = 0
 
@@ -175,7 +172,7 @@ class Alignment:
                 msg.angular.y = 0
                 msg.angular.z = 0
                 self.yaw_pub.publish(msg)
-
+            rospy.sleep(5)
             msg = Twist()
             msg.linear.x = 0
             msg.linear.y = 0
@@ -185,6 +182,15 @@ class Alignment:
             msg.angular.y = 0
             msg.angular.z = 0
             self.yaw_pub.publish(msg)
+
+            print("Done driving forward, picking up can")
+            rospy.sleep(3)
+
+            msg = Bool()
+            msg.data = True
+            self.pickup_ready.publish(msg)
+            self.pickup_done = False
+
             while not self.pickup_done:
                 rospy.sleep(1)
 

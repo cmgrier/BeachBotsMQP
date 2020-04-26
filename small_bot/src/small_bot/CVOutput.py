@@ -26,7 +26,7 @@ class CVOutput:
         self.servo = maestro.Controller()
 
         # Configure the Camera Servo
-        self.cam_servo_pin = SERVO_CAM
+        self.cam_servo_pin = CAMERA
 
         self.position = 4500
         self.h = 480

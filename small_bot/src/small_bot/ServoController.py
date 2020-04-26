@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 import maestro
 import rospy
+import time
+import RPi.GPIO as GPIO
 from std_msgs.msg import Bool
 from support.Constants import *
 
@@ -16,6 +18,13 @@ class ServoController:
         self.gripper_pin = GRIPPER
         self.elbow_pin = ELBOW
 
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setwarnings(False)
+        GPIO.setup(SWITCH, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+        GPIO.setup(SM_DIRECTION, GPIO.OUT)
+        GPIO.setup(SM_STEP, GPIO.OUT)
+        self.delay = 0.001
+
         # ROS Subscribers and Publishers
         rospy.Subscriber('pickup_flag', Bool, self.pickup_can)
         self.pickup_pub = rospy.Publisher('pickup_done', Bool, queue_size=10)
@@ -29,16 +38,42 @@ class ServoController:
         """
         Calibrates all servos
         """
+        # Move the joint to over the bucket
         self.elbow(8500)
-        rospy.sleep(2)
         # Open the Gripper
         self.gripper(True)
-        rospy.sleep(3)
-        self.gripper(False)
-        # Move the joint to over the bucket
+        # Stepper Motor
+        rospy.sleep(2)
+        self.stepper_motor()
 
+    def stepper_motor(self):
+        """
+        Handles the Stepper motor
+        """
+        trigger = True
+        trigger2 = True
 
-    def gripper(self, val, accel=4, speed=10):
+        # Zero joint0
+        # Move arm until it triggers the switch
+        GPIO.output(SM_DIRECTION, GPIO.LOW)
+        while trigger:
+            # print("Made it into step loop")
+            GPIO.output(SM_STEP, GPIO.HIGH)
+            time.sleep(self.delay)
+            GPIO.output(SM_STEP, GPIO.LOW)
+            time.sleep(self.delay)
+            if GPIO.input(SWITCH):
+                trigger = False
+                break
+        # Move arm off of switch until it deactivates
+        GPIO.output(SM_DIRECTION, GPIO.HIGH)
+        for x in range(24 * 20):
+            GPIO.output(SM_STEP, GPIO.HIGH)
+            time.sleep(self.delay)
+            GPIO.output(SM_STEP, GPIO.LOW)
+            time.sleep(self.delay)
+
+    def gripper(self, val, accel=5, speed=15):
         """
         :param val: True opens the gripper, False closes the gripper
         :param accel: acceleration of servo
@@ -60,7 +95,7 @@ class ServoController:
         """
         return self.servo.getPosition(self.gripper_pin)  # get the current position of gripper servo
 
-    def elbow(self, val, accel=4, speed=10):
+    def elbow(self, val, accel=5, speed=15):
         """
         :param val: True opens the gripper, False closes the gripper
         :param accel: acceleration of servo
@@ -78,7 +113,7 @@ class ServoController:
         """
         return self.servo.getPosition(self.elbow_pin)  # get the current position of elbow servo
 
-    def pickup_can(self):
+    def pickup_can(self, msg):
         """
         Pickup the Can
         """

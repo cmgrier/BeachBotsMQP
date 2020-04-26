@@ -87,7 +87,7 @@ BUCKET = 3
 # Collector Arm Motors
 STEP_ANGLE = 0.035  # Degrees per step
 SWITCH = 23  # limit switch for stepper calibration
-SM_STEP = 18  # Stepper motor driver step pin
+SM_STEP = 22  # Stepper motor driver step pin
 SM_DIRECTION = 17  # Stepper motor driver direction pin
 
 # IMU Pins
@@ -98,11 +98,11 @@ SDA_PIN = 2
 L_WHEEL_PIN = 21
 R_WHEEL_PIN = 13
 
-L_DIRECT_1 = 24
-L_DIRECT_2 = 25
+L_DIRECT_1 = 25
+L_DIRECT_2 = 24
 
-R_DIRECT_1 = 5
-R_DIRECT_2 = 6
+R_DIRECT_1 = 6
+R_DIRECT_2 = 5
 
 # Robot Encoder Interrupts
 ENCODER1_PIN1 = 4
