@@ -1,16 +1,15 @@
 #!/usr/bin/env python
 
 # Imports
-import rospy
-import pigpio
 import socket
 import cv2
-import pickle
-import struct
 import maestro
-from sensor_msgs.msg import Image, CompressedImage
+import pickle
+import rospy
+import struct
 from cv_bridge import CvBridge, CvBridgeError
-from geometry_msgs.msg import Point, Pose2D
+from geometry_msgs.msg import Point
+from sensor_msgs.msg import Image
 from support.Constants import *
 
 

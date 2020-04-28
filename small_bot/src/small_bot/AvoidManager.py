@@ -18,6 +18,7 @@ class AvoidManager:
         self.smallbot = smallbot
         self.taskManager = taskManager
         self.counter = 0
+        self.avoid_test = False
         pass
 
     def do_task(self, task):
@@ -33,9 +34,13 @@ class AvoidManager:
         if DEBUG:
             print("working on avoid task")
             print(self.counter)
-        if self.counter > 100:
+        if self.avoid_test and self.counter > 100:
             print("AVOID TASK COMPLETE")
             self.counter = 0
             task.isComplete = True
+        else:
+            #TODO: IMPLEMENT THE CODE TO MAKE THE ROBOT NAVIGATE TO THE COORD VIA NAVIGATE::nav_to_coord()
+            #TODO: IF THE SMALLBOT REACHES THE COORD, SET THE TASK ISCOMPLETE TO TRUE
+            print()
         return task
 
