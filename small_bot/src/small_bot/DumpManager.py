@@ -23,4 +23,10 @@ class DumpManager:
         :param task: the dump task to execute
         :return: the updated task
         """
+        #TODO: IMPLEMENT THIS FUNCTIONALITY
+        #TODO: MAKE THE ROBOT DRIVE TO THE COORD AND DUMP WITH dump()
         return task
+
+    def dump(self):
+        #TODO: IMPLEMENT THE BUCKET SERVO FOR DUMPING
+        print()
