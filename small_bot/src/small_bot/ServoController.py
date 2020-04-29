@@ -147,6 +147,20 @@ class ServoController:
         bool_msg.data = True
         self.pickup_pub.publish(bool_msg)
 
+    def go_to_position(self, start, end):
+        i = 0
+        self.gripper(True)
+        self.elbow(start)
+        rospy.sleep(4)
+        print("At Start Position")
+        self.elbow(end)
+        while i < 100:
+            pos = self.servo.getPosition(self.elbow_pin)
+            print(pos)
+            rospy.sleep(0.1)
+            i += 1
+        print("At End Position")
+
     def cleanup(self):
         """
         Cleans up if keyboard interrupt
