@@ -27,7 +27,7 @@ class CVOutput:
         # Configure the Camera Servo
         self.cam_servo_pin = CAMERA
 
-        self.position = 4500
+        self.position = 4500  # DO NOT FORGET TO CHANGE IN ALIGNMENT AS WELL
         self.h = 480
         self.w = 500
 
@@ -45,6 +45,7 @@ class CVOutput:
 
         print("CV_OUTPUT Node ROS Finished Initializing")
 
+        # Socket Connection
         self.HOST = ''
         self.PORT = 8485
 

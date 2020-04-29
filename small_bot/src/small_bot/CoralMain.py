@@ -76,7 +76,7 @@ class CoralMain:
             frame = Image.fromarray(frame)
             results = self.model.detect_with_image(frame, threshold=self.threshold, keep_aspect_ratio=True,
                                                    relative_coord=False)
-
+            # Variable Init
             largest_box = -999
             largest_area = -999
             centroid = None
@@ -87,6 +87,8 @@ class CoralMain:
                 box = r.bounding_box.flatten().astype("int")
                 (startX, startY, endX, endY) = box
                 area = (endY - startY) * (endX - startX)
+
+                # If this area is larger than any area before it make it the largest area
                 if area > largest_area:
                     largest_area = area
                     centroid = (int(startX + (endX - startX) / 2), int(startY + (endY - startY) / 2))
@@ -105,10 +107,10 @@ class CoralMain:
             cv2.circle(orig, centroid, 4, (0, 255, 0), 2)
             cv2.circle(orig, (int(self.w / 2), int(self.h / 2) - 20), 4, (0, 0, 255), 2)
 
-            # Socket Connection occurs here
             if centroid is None:
                 centroid = (-99, -99)
 
+            # Socket Connection
             self.socket_con(orig, centroid, largest_box)
 
             key = cv2.waitKey(1) & 0xFF
