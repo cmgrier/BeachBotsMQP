@@ -1,5 +1,5 @@
 # BeachBots MQP
-This is the repository for the Beach Cleaner MQP
+This is the repository for the BeachBots MQP
 ## Dependencies
 
 ## ROS
