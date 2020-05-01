@@ -20,7 +20,7 @@ If you want to just run the ZED samples, simply download the ZED SDK and follow 
 If you want to be able to write your own code for the ZED and run it (which you will need to do for this project) you must have a NVIDIA GPU and will need to install CUDA 10.0 in addition to downloading the ZED SDK. The steps for doing so are [here](https://www.stereolabs.com/docs/installation/linux/).
 
 ### Computer Vision
-Everything needed to use the computer vision can be found [here](https://coral.ai/docs/accelerator/get-started/#3-run-a-model-using-the-tensorflow-lite-api)
+Everything needed to be installed for the computer vision can be found [here](https://coral.ai/docs/accelerator/get-started/#3-run-a-model-using-the-tensorflow-lite-api). Specifically run all the commands under the "On Linux" header.
 
 ## Code Architecture
 
