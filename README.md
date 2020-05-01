@@ -60,6 +60,7 @@ the test for it should then be made here.
 
 ## How To Launch Basebot and Smallbot Code
 *Note the password on the Rasberry Pi is "pi"
+
 To launch the Smallbot with all the code, ssh into the Smallbot and type:
 ```
 roslaunch small_bot smallbot.launch
