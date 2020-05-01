@@ -51,7 +51,7 @@ project and makes them global. This allows for easy changes across the project
 The test package is where all the test files are. If a new feature is made,
 the test for it should then be made here.
 
-##How To Launch Basebot and Smallbot Code
+## How To Launch Basebot and Smallbot Code
 To launch the Smallbot with all the code, ssh into the Smallbot and type:
 '''
 roslaunch small_bot smallbot.launch
