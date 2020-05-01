@@ -8,8 +8,16 @@ However, the Smallbots must use ROS Melodic on the Raspberry Pis.
 You can find the instructions to downloading ROS Melodic [here](http://wiki.ros.org/melodic/Installation/Ubuntu) 
 
 ### RPi.GPIO
+```
+sudo apt-get update
+```
+```
+sudo apt-get install rpi.gpio
+```
 
 ### ZED Camera
+If you want to just run the ZED samples, simply download the ZED SDK and follow the steps [here](https://www.stereolabs.com/docs/installation/) to run the samples.
+If you want to be able to write your own code for the ZED and run it (which you will need to do for this project) you must have a NVIDIA GPU and will need to install CUDA 10.0 in addition to downloading the ZED SDK. The steps for doing so are [here](https://www.stereolabs.com/docs/installation/linux/).
 
 ### Computer Vision
 
@@ -51,14 +59,15 @@ the test for it should then be made here.
 
 ## How To Launch Basebot and Smallbot Code
 To launch the Smallbot with all the code, ssh into the Smallbot and type:
-''
+```
 roslaunch small_bot smallbot.launch
-''
+```
 To launch the Basebot with all the code, ssh into the Basebot (or let your desktop
 be the Basebot) and type:
-'''
+```
 roslaunch baseBot basebot.launch
-'''
+```
 
 ## Wiki For More Code Details
+[Beachbots MQP Wiki]()
 
