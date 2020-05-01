@@ -24,7 +24,7 @@ Everything needed to be installed for the computer vision can be found [here](ht
 
 ## Code Architecture
 
-### Basebot Package
+### Base_bot Package
 This is where all the Basebot code is. The main node is the Director.py
 file. This package includes the ZED camera nodes, task creation, zone creation,
 robot communication,and anything that deals with mapping.
@@ -66,7 +66,7 @@ roslaunch small_bot smallbot.launch
 To launch the Basebot with all the code, ssh into the Basebot (or let your desktop
 be the Basebot) and type:
 ```
-roslaunch baseBot basebot.launch
+roslaunch base_bot basebot.launch
 ```
 
 ## Wiki For More Code Details
