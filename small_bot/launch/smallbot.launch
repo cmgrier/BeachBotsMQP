@@ -1,0 +1,8 @@
+<launch>
+  <node pkg="small_bot" type="CVOutput.py" name="CV_Output" output="screen"/>
+  <node pkg="small_bot" type="SmallBotManager.py" name="small_bot manager" output="screen" />
+  <node pkg="support" type="Drive.py" name="Drive"/>
+  <node pkg="navigation" type="imu.py" name="IMU"/>
+  <node pkg="navigation" type="Encoder.py" name="Encoder"/>
+  	
+</launch>

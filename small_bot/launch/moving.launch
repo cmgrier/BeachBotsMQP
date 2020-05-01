@@ -1,0 +1,6 @@
+<launch>
+  <node pkg="small_bot" type="CVOutput.py" name="CV_Output" output="screen"/>
+  <node pkg="small_bot" type="Alignment.py" name="Alignment" output="screen"/>
+  <node pkg="small_bot" type="ServoController.py" name="ServoController" output="screen"/>
+  <node pkg="support" type="Drive.py" name="Drive" output="screen"/>
+</launch>

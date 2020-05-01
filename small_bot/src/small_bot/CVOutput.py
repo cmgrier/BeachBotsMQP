@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 
 # Imports
-import rospy
-import pigpio
 import socket
 import cv2
+import maestro
 import pickle
+import rospy
 import struct
-from sensor_msgs.msg import Image, CompressedImage
 from cv_bridge import CvBridge, CvBridgeError
+from geometry_msgs.msg import Point
+from sensor_msgs.msg import Image
 from support.Constants import *
 
 
@@ -19,28 +20,32 @@ class CVOutput:
         """
 
         # Initialization of the node
-        rospy.init_node('CV_1')
+        rospy.init_node('CV_OUT')
+
+        self.servo = maestro.Controller()
 
         # Configure the Camera Servo
-        self.cam_servo_pin = SERVO_CAM
+        self.cam_servo_pin = CAMERA
 
-        self.position = 1000
+        self.position = 4500  # DO NOT FORGET TO CHANGE IN ALIGNMENT AS WELL
         self.h = 480
         self.w = 500
 
-        self.pi = pigpio.pi()  # Connect to local Pi.
         # Move Servo
-        self.pi.set_servo_pulsewidth(self.cam_servo_pin, self.position)
+        self.servo.setTarget(self.cam_servo_pin, self.position)
         rospy.sleep(0.5)
 
         # Publishers
         self.curr_pub = rospy.Publisher('curr_image_final', Image, queue_size=10)
+        self.centroid_pub = rospy.Publisher('near_centroid', Point, queue_size=10)
+        self.box_pub = rospy.Publisher('large_box', Point, queue_size=10)
 
         # Variable Declarations
         self.bridge = CvBridge()
 
         print("CV_OUTPUT Node ROS Finished Initializing")
 
+        # Socket Connection
         self.HOST = ''
         self.PORT = 8485
 
@@ -62,59 +67,49 @@ class CVOutput:
     def main_loop(self):
         """
         Main Loop
-        :return:
+        :return: void
         """
 
         while True:
+
             while len(self.data) < self.payload_size:
-                print("Recv: {}".format(len(self.data)))
+                # print("Recv: {}".format(len(self.data)))
                 self.data += self.conn.recv(4096)
 
-            print("Done Recv: {}".format(len(self.data)))
+            # print("Done Recv: {}".format(len(self.data)))
             packed_msg_size = self.data[:self.payload_size]  # Size of the full transfer
             self.data = self.data[self.payload_size:]  # Image data
             msg_size = struct.unpack(">L", packed_msg_size)[0]  # Size of message at beginning
-            print("msg_size: {}".format(msg_size))
+            # print("msg_size: {}".format(msg_size))
+
             while len(self.data) < msg_size:
                 self.data += self.conn.recv(4096)
             frame_and_centroid = self.data[:msg_size]
             self.data = self.data[msg_size:]
 
-            # array = pickle.loads(array_data)
-            # rospy.loginfo("THIS IS THE ARRAY: ====")
-            # rospy.loginfo(array)
-
-            (frame, centroid) = pickle.loads(frame_and_centroid)
-            print("THIS IS CENTROID:")
-            print(centroid)
+            (frame, centroid, area) = pickle.loads(frame_and_centroid)
             cent = (centroid[0], centroid[1])
 
-            if centroid[0] > 0 and centroid[1] > 0:
-                self.go_to_test(cent)
+            self.area_sender(area)
+            self.centroid_sender(cent)
+
             frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
             self.curr_image_sender(frame)
             cv2.waitKey(1)
 
-    def go_to_test(self, centroid, threshold=40, twitch=70):
+    def area_sender(self, area):
         """
-        Sends the servo to a given position
-        :param centroid: tuple of coordinates
-        :param threshold: threshold
-        :param twitch: how much the servo moves.
+        Largest Bounding box
+        :param area: largest bounding box
         :return: void
         """
 
-        video_centroid = (self.w / 2, self.h / 2 - 20)
-        if centroid[1] > video_centroid[1] + threshold:
-            self.position -= twitch
-        elif centroid[1] < video_centroid[1] - threshold:
-            self.position += twitch
+        msg = Point()
+        msg.x = area
+        msg.y = 0
+        msg.z = 0
 
-        if 2200.0 > self.position > 0.0:
-            self.pi.set_servo_pulsewidth(self.cam_servo_pin, self.position)
-            rospy.sleep(0.5)
-            # print(self.position)
-            # time.sleep(.5)
+        self.box_pub.publish(msg)
 
     def curr_image_sender(self, frame):
         """
@@ -129,7 +124,33 @@ class CVOutput:
         except CvBridgeError as e:
             print(e)
 
+    def centroid_sender(self, centroid):
+        """
+        Centroid Sender
+        :param centroid: centroid as a tuple, non negative
+        :return: void
+        """
+
+        # Message Decryption
+        msg = Point()
+        msg.x = centroid[0]
+        msg.y = centroid[1]
+        msg.z = 0
+
+        # Message Publish
+        self.centroid_pub.publish(msg)
+
+    def cleanup(self):
+        """
+        Cleanup upon keyboard closure
+        :return: void
+        """
+        self.servo.close()
+
 
 if __name__ == "__main__":
     cv_out = CVOutput()
-    rospy.spin()
+    try:
+        rospy.spin()
+    except KeyboardInterrupt:
+        cv_out.cleanup()

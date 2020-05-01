@@ -14,18 +14,20 @@ from navigation.AStar import AStar
 from geometry_msgs.msg import Pose
 import math
 
+
 class CleanManager:
 
     def __init__(self, smallbot, taskManager):
         self.smallbot = smallbot
         self.taskManager = taskManager
-        self.counter = 0    # here for testing
+        self.counter = 0  # here for testing
         self.current_task_id = -1
         self.waypoints = []
         self.testing = False
         self.simulating = True
         self.OG_real = True
         self.sim_pos = Pose()
+        # TODO: Create the self.trash_listiner to work with a new topic called 'detect_trash'
         pass
 
     def do_task(self, task):
@@ -70,6 +72,8 @@ class CleanManager:
             else:
                 if self.is_at_position(self.smallbot.position, self.waypoints[0]):
                     self.waypoints.pop(0)
+                    # TODO: LISTEN FOR TRASH DETECTION WITH THE self.trash_listiner SUBSCRIBER
+                    # TODO: IF TRASH DETECTED REQUEST TRASH COLLECTION VIA collect_trash_request()
                 else:
                     self.nav_to_point(self.waypoints[0], self.smallbot.occupancyGrid)
         elif len(self.waypoints) == 0:
@@ -97,6 +101,10 @@ class CleanManager:
             task.isComplete = True
         return task
 
+    def collect_trash_request(self):
+        # TODO: IMPLEMENT THIS FUNCTION TO REQUEST ALIGNMENT.py TO BEGIN CAN COLLECTING
+        print()
+
     def increment_sim_pos(self, goal):
         change = .05
         vector = [goal.position.x - self.sim_pos.position.x, goal.position.y - self.sim_pos.position.y]
@@ -112,7 +120,7 @@ class CleanManager:
         x = current_pose.position.x
         y = current_pose.position.y
         return goal_pose.position.x - POSITION_THRESHOLD < x < goal_pose.position.x + POSITION_THRESHOLD \
-            and goal_pose.position.y - POSITION_THRESHOLD < y < goal_pose.position.y + POSITION_THRESHOLD
+               and goal_pose.position.y - POSITION_THRESHOLD < y < goal_pose.position.y + POSITION_THRESHOLD
 
     # astar to the given point from current position
     def nav_to_point(self, pose, OG):
@@ -216,8 +224,7 @@ class CleanManager:
         y_index = (point.y - origin.y) / (y_change * math.cos(angle) + x_change * math.sin(angle))
         index = int(x_index + y_index * OG_WIDTH)
         if index < 0:
-
-        return
+            return
 
     # returns the angle between two vectors
     def angle_between_vectors(self, v1, v2):

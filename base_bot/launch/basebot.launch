@@ -1,0 +1,3 @@
+<launch>
+  <node pkg="basebot" type="Director.py" name="Basebot"/>
+</launch>
