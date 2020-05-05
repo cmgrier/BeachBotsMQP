@@ -72,5 +72,5 @@ roslaunch base_bot basebot.launch
 ```
 
 ## Wiki For More Code Details
-[Beachbots MQP Wiki]()
+[Beachbots MQP Wiki](https://l.messenger.com/l.php?u=https%3A%2F%2Fsites.google.com%2Fview%2Fbeachbotsmqp%2Fhome&h=AT1f71yi_8KqheP6eVr6VqBRjE6HcraewPU_uFR1Qc3mxMskOzU03S0BEspziAaUAA0f-jP2ujssywV-7kkphXevPOYsj9sc2qy4ZnKM2h1SntYMo2pMNL2ewaHV8IkOKzT0zA)
 
